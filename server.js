@@ -8,8 +8,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 /* ================== АВТОПОИСК КАРТИНОК ================== */
 let FOUND_IMAGES = {};
-// ИЗМЕНЕНО: Теперь папка называется 'товары'
-const ITEMS_DIR = path.join(__dirname, 'public', 'товары');
+// ИСПРАВЛЕНО: Путь к папке items (как и было изначально)
+const ITEMS_DIR = path.join(__dirname, 'public', 'items');
 
 function scanImages() {
   FOUND_IMAGES = {};
@@ -21,14 +21,14 @@ function scanImages() {
     const fullPath = path.join(ITEMS_DIR, entry.name);
     if (entry.isFile() && /\.(png|jpe?g|webp|gif)$/i.test(entry.name)) {
       const baseName = path.parse(entry.name).name.toLowerCase().replace(/\s+/g, '_');
-      FOUND_IMAGES[baseName] = '/товары/' + encodeURIComponent(entry.name);
+      FOUND_IMAGES[baseName] = '/items/' + encodeURIComponent(entry.name);
     }
     if (entry.isDirectory()) {
       const folderName = entry.name.toLowerCase().replace(/\s+/g, '_');
       const filesInFolder = fs.readdirSync(fullPath);
       const imageFile = filesInFolder.find(f => /\.(png|jpe?g|webp|gif)$/i.test(f));
       if (imageFile) {
-        FOUND_IMAGES[folderName] = '/товары/' + encodeURIComponent(entry.name) + '/' + encodeURIComponent(imageFile);
+        FOUND_IMAGES[folderName] = '/items/' + encodeURIComponent(entry.name) + '/' + encodeURIComponent(imageFile);
       }
     }
   });

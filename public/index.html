@@ -20,7 +20,7 @@
   --border-soft:#222228;
   --text:#ffffff;
   --dim:#888893;
-  --accent:#4f46e5; /* Синий акцент для кнопки пополнения */
+  --accent:#4f46e5; 
   --accent-2:#4338ca;
   --gold:#ffd700;
   --ok:#10b981;
@@ -31,14 +31,14 @@
 html,body{height:100%}
 body{
   font-family:'Segoe UI',Roboto,sans-serif;
-  color:var(--text); min-height:100vh; padding:12px 12px 90px; overflow-x:hidden;
+  color:var(--text); min-height:100vh; padding:12px 12px 100px; /* Отступ снизу для меню */
+  overflow-x:hidden;
   background-color:var(--bg);
   background-size:cover; background-position:center; background-attachment:fixed;
   -webkit-font-smoothing:antialiased;
   transition: background-image 0.5s ease;
 }
 
-/* Затемнение фона, чтобы текст читался (если юзер поставил обои) */
 body::before {
   content: ''; position: fixed; inset: 0; background: rgba(10,10,12,0.85); z-index: -1; pointer-events: none;
 }
@@ -112,7 +112,7 @@ header{
 .slot-box { background:var(--card-2); border:1px solid var(--border); border-radius:12px; padding:10px; flex:1; cursor:pointer; }
 
 /* ========== МИНЫ ========== */
-.mines-wrapper { max-width:400px; margin:0 auto; }
+.mines-wrapper { max-width:400px; margin:0 auto; padding-bottom: 20px; }
 .mines-grid { display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; margin:15px 0; }
 .mine-cell {
   aspect-ratio:1; background:var(--card-2); border:1px solid var(--border); border-radius:10px;
@@ -121,6 +121,13 @@ header{
 .mine-cell:active { transform:scale(0.95); }
 .mine-cell.opened { background:var(--card-3); border-color:var(--border-soft); pointer-events:none; }
 .mine-cell.bomb { background:var(--bad); border-color:#b91c1c; }
+
+/* ========== СКИНЫ ========== */
+.skins-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(80px, 1fr)); gap:10px; margin-top:15px; }
+.skin-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:15px 5px; text-align:center; }
+.skin-card img { width:40px; height:40px; object-fit:contain; margin-bottom:5px; }
+.skin-card .sc-name { font-size:11px; font-weight:700; }
+.skin-card .sc-price { font-size:10px; color:var(--gold); font-weight:900; margin-top:2px; }
 
 /* ========== ИНВЕНТАРЬ ========== */
 .inventory{display:grid; grid-template-columns:repeat(auto-fill,minmax(94px,1fr)); gap:10px}
@@ -142,13 +149,14 @@ header{
 .setting-row { display:flex; justify-content:space-between; align-items:center; padding:15px 0; border-bottom:1px solid var(--border-soft); font-weight:700; font-size:14px;}
 .setting-row:last-child { border:none; }
 input[type="text"], input[type="number"], input[type="password"] { width:100%; padding:12px; background:var(--card-2); border:1px solid var(--border); border-radius:10px; color:#fff; font-size:15px; margin-bottom:10px; outline:none; }
+.admin-box { background:var(--card); padding:15px; border-radius:16px; margin-bottom:15px; }
+.admin-box h3 { font-size:14px; margin-bottom:10px; color:var(--dim); }
 </style>
 </head>
 <body>
 
 <div id="toastContainer" style="position:fixed;top:12px;right:12px;z-index:999;display:flex;flex-direction:column;gap:5px;pointer-events:none;"></div>
 
-<!-- ЗВУКИ -->
 <audio id="soundSpin" src="/sounds/spin.mp3" preload="auto"></audio>
 <audio id="soundWin" src="/sounds/win.mp3" preload="auto"></audio>
 <audio id="soundClick" src="/sounds/click.mp3" preload="auto"></audio>
@@ -197,6 +205,10 @@ input[type="text"], input[type="number"], input[type="password"] { width:100%; p
           <div class="gc-icon">💣</div>
           <div class="gc-title">Мины</div>
         </div>
+        <div class="game-card" onclick="openGame('skins')">
+          <div class="gc-icon">🔫</div>
+          <div class="gc-title">Скины</div>
+        </div>
       </div>
     </div>
 
@@ -237,7 +249,6 @@ input[type="text"], input[type="number"], input[type="password"] { width:100%; p
           <div style="font-size:14px;">Множитель: <b id="minesMultLbl" style="color:var(--gold);">1.0x</b></div>
         </div>
         
-        <!-- Настройки перед стартом -->
         <div id="minesSetup">
           <input type="number" id="minesBetInput" placeholder="Ставка (🌟)" value="100">
           <div style="display:flex; gap:5px; margin-bottom:10px;">
@@ -249,12 +260,17 @@ input[type="text"], input[type="number"], input[type="password"] { width:100%; p
           <button class="btn-main" id="btnStartMines">Начать игру</button>
         </div>
 
-        <!-- Сетка -->
         <div class="mines-grid" id="minesGrid" style="display:none;"></div>
 
-        <!-- Кнопка забрать -->
-        <button class="btn-main" id="btnCashout" style="display:none; background:var(--ok); color:#fff;">Забрать <span id="cashoutVal">0</span> 🌟</button>
+        <button class="btn-main" id="btnCashout" style="display:none; background:var(--ok); color:#fff; margin-bottom:20px;">Забрать <span id="cashoutVal">0</span> 🌟</button>
       </div>
+    </div>
+
+    <!-- Игра: Скины -->
+    <div id="gameSkins" style="display:none;">
+      <button class="btn-black" onclick="openGame('menu')" style="margin-bottom:15px;">← Назад</button>
+      <h2 style="font-size:20px; margin-bottom:10px;">Каталог скинов</h2>
+      <div class="skins-grid" id="skinsGrid"></div>
     </div>
   </div>
 
@@ -299,7 +315,7 @@ input[type="text"], input[type="number"], input[type="password"] { width:100%; p
     <button class="btn-main" id="logoutBtn" style="background:var(--bad); color:#fff;">Выйти</button>
   </div>
 
-  <!-- ВКЛАДКА: АДМИНКА (скрытая) -->
+  <!-- ВКЛАДКА: АДМИНКА -->
   <div id="section-admin" class="content-section">
     <button class="btn-black" onclick="switchTab('settings')" style="margin-bottom:15px;">← Назад</button>
     <h2 style="font-size:20px; margin-bottom:15px;">Админка</h2>
@@ -335,7 +351,7 @@ input[type="text"], input[type="number"], input[type="password"] { width:100%; p
     </div>
 
     <div style="display:flex; gap:10px;">
-      <button class="btn-black" id="btnClaimBonus" style="font-size:13px;">Бонус</button>
+      <button class="btn-black" id="btnProfileDeposit" style="font-size:13px;">Пополнить</button>
       <button class="btn-black" id="btnProfilePromo" style="font-size:13px;">Промокод</button>
     </div>
     <button class="btn-black" onclick="closeModal('profileModal')" style="margin-top:15px; background:transparent; border:none; color:var(--dim); font-size:13px;">Закрыть</button>
@@ -348,17 +364,6 @@ input[type="text"], input[type="number"], input[type="password"] { width:100%; p
     <h3 style="margin-bottom:15px;">Выберите предмет</h3>
     <div id="selectItemList" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:10px; max-height:50vh; overflow-y:auto;"></div>
     <button class="btn-black" onclick="closeModal('selectItemModal')" style="margin-top:15px;">Отмена</button>
-  </div>
-</div>
-
-<!-- МОДАЛКА: ПОПОЛНЕНИЕ -->
-<div class="modal" id="depositModal">
-  <div class="box" style="text-align:center;">
-    <h2>💳 Пополнение</h2>
-    <p style="font-size:13px; color:var(--dim); margin:10px 0;">Напишите в Telegram: <b>@tagen</b></p>
-    <input type="number" id="depositAmount" placeholder="Сумма в звездах">
-    <button class="btn-main" id="btnSendDeposit">Отправить</button>
-    <button class="btn-black" onclick="closeModal('depositModal')" style="margin-top:10px;">Отмена</button>
   </div>
 </div>
 
@@ -379,11 +384,9 @@ input[type="text"], input[type="number"], input[type="password"] { width:100%; p
 let currentUser = null;
 let authMode = 'login';
 let playerData = { balance: 0, inventory: [], is_admin: false };
-let DB_CASES = [];
-let ALL_ITEMS = [];
 let isSoundOn = true;
 
-// 12 предметов, которые мы оставили
+// 12 предметов
 const CUSTOM_ITEMS = [
   { id: 'heart', name: 'Сердечко', icon: '/items/heart', price: 15 },
   { id: 'rose', name: 'Роза', icon: '/items/rose', price: 25 },
@@ -399,7 +402,6 @@ const CUSTOM_ITEMS = [
   { id: 'galaxy', name: 'Галактика', icon: '/items/galaxy', price: 2000000 }
 ];
 
-// Инициализация
 document.addEventListener('DOMContentLoaded', () => {
   applyWallpaper();
   checkLogin();
@@ -407,7 +409,6 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(updateOnline, 30000);
 });
 
-// Утилиты
 const $ = id => document.getElementById(id);
 function toast(msg, type = 'info') {
   const c = $('toastContainer');
@@ -465,6 +466,7 @@ $('mainAuthBtn').onclick = async () => {
     const data = await res.json();
     if(!res.ok) throw new Error(data.error);
     currentUser = login;
+    localStorage.setItem('saved_user', currentUser);
     $('authScreen').style.display = 'none';
     $('mainScreen').style.display = 'block';
     $('bottomNav').style.display = 'flex';
@@ -511,7 +513,11 @@ function switchTab(tabId) {
   document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   $(`section-${tabId}`).classList.add('active');
-  document.querySelector(`.nav-item[data-tab="${tabId}"]`).classList.add('active');
+  const navBtn = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
+  if(navBtn) navBtn.classList.add('active');
+  
+  if(tabId === 'admin') renderAdminUI();
+  window.scrollTo(0,0);
 }
 
 // ИГРЫ
@@ -520,7 +526,28 @@ function openGame(game) {
   $('gamesMenu').style.display = game === 'menu' ? 'block' : 'none';
   $('gameUpgrade').style.display = game === 'upgrade' ? 'block' : 'none';
   $('gameMines').style.display = game === 'mines' ? 'block' : 'none';
+  $('gameSkins').style.display = game === 'skins' ? 'block' : 'none';
+  
   if(game === 'upgrade') renderUpgradeGrid();
+  if(game === 'skins') renderSkins();
+  window.scrollTo(0,0);
+}
+
+// --- СКИНЫ ---
+function renderSkins() {
+  const grid = $('skinsGrid');
+  grid.innerHTML = '';
+  CUSTOM_ITEMS.forEach(item => {
+    const d = document.createElement('div');
+    d.className = 'skin-card';
+    // Если картинки нет - покажет эмодзи
+    d.innerHTML = `
+      <img src="${item.icon}.png" onerror="this.src='https://via.placeholder.com/40?text=📦'">
+      <div class="sc-name">${item.name}</div>
+      <div class="sc-price">${item.price} 🌟</div>
+    `;
+    grid.appendChild(d);
+  });
 }
 
 // --- АПГРЕЙД ---
@@ -530,8 +557,8 @@ function renderUpgradeGrid() {
   CUSTOM_ITEMS.forEach(item => {
     const d = document.createElement('div');
     d.style.cssText = `background:var(--card-2); padding:8px; border-radius:10px; text-align:center; cursor:pointer; border:1px solid ${targetUpgradeItem && targetUpgradeItem.id === item.id ? '#fff' : 'transparent'}`;
-    d.innerHTML = `<img src="${item.icon}.png" style="width:24px;height:24px;object-fit:contain;"><div style="font-size:9px;margin-top:3px;">${item.name}</div>`;
-    d.onclick = () => { targetUpgradeItem = item; $('upgTargetIcon').innerHTML = `<img src="${item.icon}.png" style="width:20px;">`; renderUpgradeGrid(); };
+    d.innerHTML = `<img src="${item.icon}.png" style="width:24px;height:24px;object-fit:contain;" onerror="this.style.display='none'"><div style="font-size:9px;margin-top:3px;">${item.name}</div>`;
+    d.onclick = () => { targetUpgradeItem = item; $('upgTargetIcon').innerHTML = `<img src="${item.icon}.png" style="width:20px;" onerror="this.style.display='none'">`; renderUpgradeGrid(); };
     grid.appendChild(d);
   });
 }
@@ -573,15 +600,13 @@ function clickMine(cell, idx) {
   if(!minesActive || cell.classList.contains('opened')) return;
   cell.classList.add('opened');
   if(minesBombs[idx]) {
-    // Проиграл
     cell.textContent = '💣'; cell.classList.add('bomb');
-    playSound($('soundWin')); // Используем как звук бомбы
+    playSound($('soundWin'));
     minesActive = false;
     revealAllMines();
     toast('Вы подорвались!', 'error');
     setTimeout(() => { resetMines(); enterGame(); }, 2000);
   } else {
-    // Прошел
     cell.textContent = '💎';
     playSound($('soundCoin'));
     minesOpened++;
@@ -591,12 +616,8 @@ function clickMine(cell, idx) {
   }
 }
 
-function updateMultiplier() {
-  $('minesMultLbl').textContent = getMult().toFixed(2) + 'x';
-}
-function getMult() {
-  return 1 + (minesOpened * (minesCount / 15));
-}
+function updateMultiplier() { $('minesMultLbl').textContent = getMult().toFixed(2) + 'x'; }
+function getMult() { return 1 + (minesOpened * (minesCount / 15)); }
 function revealAllMines() {
   document.querySelectorAll('.mine-cell').forEach((c, i) => {
     if(minesBombs[i]) { c.textContent = '💣'; c.classList.add('bomb'); }
@@ -611,8 +632,6 @@ function resetMines() {
 $('btnCashout').onclick = () => {
   if(!minesActive) return;
   const winAmt = Math.floor(minesBet * getMult());
-  // Тут нужно отправлять на сервер, чтобы обновить баланс
-  // Пока делаем локально для визуала
   playerData.balance += winAmt;
   $('uiBalanceTop').textContent = playerData.balance;
   $('profileBalance').textContent = playerData.balance + ' 🌟';
@@ -631,7 +650,7 @@ function renderInventory() {
     const d = document.createElement('div');
     d.className = 'item';
     d.innerHTML = `
-      <div class="ii"><img src="${item.icon}.png" onerror="this.src='${item.icon}'"></div>
+      <div class="ii"><img src="${item.icon}.png" onerror="this.src='https://via.placeholder.com/32?text=📦'"></div>
       <div class="iname">${item.name}</div>
       <div class="iprice">${item.price} 🌟</div>
       <button onclick="sellItem('${item.uid}')">Продать</button>
@@ -645,9 +664,48 @@ async function sellItem(uid) {
   enterGame();
 }
 
+// АДМИНКА
+function renderAdminUI() {
+  const c = $('adminContent');
+  c.innerHTML = `
+    <div class="admin-box">
+      <h3>Игроки</h3>
+      <table id="adminTable" style="width:100%; text-align:left; font-size:12px; margin-top:10px;"></table>
+    </div>
+    <div class="admin-box">
+      <h3>Выдать звёзды</h3>
+      <input type="text" id="aTarget" placeholder="Логин">
+      <input type="number" id="aAmount" value="1000">
+      <button class="btn-main" onclick="adminGive()" style="background:var(--ok); color:#fff;">Выдать</button>
+    </div>
+  `;
+  fetch('/api/admin/players').then(r=>r.json()).then(players => {
+    const t = $('adminTable');
+    t.innerHTML = players.map(p => `
+      <tr style="border-bottom:1px solid var(--border-soft);">
+        <td style="padding:8px 0; color:${p.is_admin?'var(--gold)':'#fff'}">${p.login}</td>
+        <td style="padding:8px 0;">${p.balance} 🌟</td>
+      </tr>
+    `).join('');
+  }).catch(()=>{});
+}
+
+async function adminGive() {
+  const target = $('aTarget').value;
+  const amount = $('aAmount').value;
+  if(!target || !amount) return toast('Заполните поля', 'error');
+  const res = await fetch('/api/admin/give-stars', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({adminLogin: currentUser, targetLogin: target, amount})
+  });
+  if(res.ok) { toast('Успешно', 'success'); renderAdminUI(); }
+  else toast('Ошибка', 'error');
+}
+
 // ПРОЧЕЕ
 $('openProfileBtn').onclick = () => $('profileModal').classList.add('show');
-$('btnDeposit').onclick = () => $('depositModal').classList.add('show');
+$('btnDeposit').onclick = () => window.location.href = 'http://hunter.tg/@Tagen';
+$('btnProfileDeposit').onclick = () => window.location.href = 'http://hunter.tg/@Tagen';
 $('btnProfilePromo').onclick = () => $('promoModal').classList.add('show');
 $('adminFromSettings').onclick = () => switchTab('admin');
 
@@ -660,4 +718,4 @@ async function updateOnline() {
 }
 </script>
 </body>
-  </html>
+        </html>

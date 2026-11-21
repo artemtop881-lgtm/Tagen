@@ -27,14 +27,11 @@ body{
   transition: background-image 0.5s ease;
 }
 
-/* Обои */
 body::before { content: ''; position: fixed; inset: 0; background: rgba(8,8,10,0.85); z-index: -1; pointer-events: none; }
 
-/* 3D карточки и кнопки */
 .card3d { background:linear-gradient(180deg,var(--card-2),var(--card)); border:1px solid var(--border); border-radius:20px; box-shadow: 0 6px 0 var(--hard), 0 12px 20px rgba(0,0,0,.4); transition:0.1s; }
 .pressed { transform:translateY(4px) !important; box-shadow: 0 2px 0 var(--hard) !important; }
 
-/* Неон */
 html.neon .card3d, html.neon .btn-main, html.neon .game-card, html.neon .case-card, html.neon .item, html.neon .mine-cell, html.neon header {
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.4), 0 6px 0 var(--hard) !important;
   border-color: #fff !important;
@@ -106,6 +103,11 @@ header{ display:flex; align-items:center; justify-content:space-between; gap:10p
 .mine-cell.opened { background:var(--card-3); border-color:var(--border-soft); pointer-events:none; box-shadow:none; transform:translateY(4px); }
 .mine-cell.bomb { background:var(--bad); border-color:var(--bad-dk); }
 
+/* ========== КОШЕЛЕК ========== */
+.wallet-card { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:20px; margin-bottom:15px; box-shadow: 0 4px 0 var(--hard); }
+.wallet-card h3 { font-size:16px; font-weight:800; margin-bottom:15px; color:var(--accent); }
+.wallet-card input { width:100%; padding:15px; background:var(--card-2); border:1px solid var(--border); border-radius:12px; color:#fff; font-size:18px; font-weight:900; text-align:center; margin-bottom:15px; outline:none; }
+
 /* ========== КНОПКИ ========== */
 .btn-main { width:100%; padding:16px; border:none; border-radius:14px; background:linear-gradient(180deg,#fff,#ddd); color:#000; font-weight:900; font-size:15px; cursor:pointer; box-shadow:0 5px 0 #999; transition:0.1s; }
 .btn-main:active { transform:translateY(4px); box-shadow:0 1px 0 #999; }
@@ -131,7 +133,6 @@ header{ display:flex; align-items:center; justify-content:space-between; gap:10p
 .modal.show{display:flex; animation:fadeIn .2s;}
 .modal .box{ background:var(--card); border:1px solid var(--border); border-radius:22px; padding:22px 18px; width:100%; max-width:400px; max-height:90vh; overflow-y:auto; box-shadow: 0 10px 0 var(--hard); }
 
-/* ========== ПРОЧЕЕ ========== */
 input[type="text"], input[type="number"], input[type="password"] { width:100%; padding:14px; background:var(--card-2); border:1px solid var(--border); border-radius:12px; color:#fff; font-size:15px; margin-bottom:12px; outline:none; box-shadow:inset 0 2px 4px rgba(0,0,0,0.5); }
 .admin-box { background:var(--card); padding:15px; border-radius:16px; margin-bottom:15px; border:1px solid var(--border); }
 .admin-box h3 { font-size:14px; color:var(--accent); margin-bottom:10px; }
@@ -139,12 +140,10 @@ input[type="text"], input[type="number"], input[type="password"] { width:100%; p
 .admin-box td, .admin-box th { padding:8px 5px; border-bottom:1px solid var(--border-soft); text-align:left; }
 .admin-box button { padding:10px; border:none; border-radius:10px; font-weight:800; cursor:pointer; color:#fff; box-shadow:0 3px 0 rgba(0,0,0,0.5); margin-top:5px; width:100%; }
 
-/* Снежинки */
 #snowLayer { position:fixed; inset:0; pointer-events:none; z-index:9999; overflow:hidden; }
 .flake { position:absolute; top:-20px; background:#fff; border-radius:50%; box-shadow:0 0 5px #fff; animation: fall linear infinite; }
 @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
 
-/* Свитч */
 .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--card-3); transition: .4s; border-radius: 34px; border: 1px solid var(--border); }
@@ -179,7 +178,6 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 <!-- ОСНОВНОЙ ЭКРАН -->
 <div id="mainScreen" style="display:none; max-width:600px; margin:0 auto;">
-  <!-- Шапка -->
   <header>
     <div class="logo">Tagen<span>Game</span></div>
     <div class="top-center">
@@ -304,10 +302,21 @@ input:checked + .slider:before { transform: translateX(22px); }
     <div class="inventory" id="inventory"></div>
   </div>
 
-  <!-- ВКЛАДКА: БАТЛ -->
-  <div id="section-battle" class="content-section" style="text-align:center;">
-    <h2 style="font-size:20px; margin-bottom:10px;">⚔️ Батл</h2>
-    <p style="color:var(--dim); font-size:13px; margin-bottom:15px;">Скоро здесь будут PvP сражения!</p>
+  <!-- ВКЛАДКА: КОШЕЛЕК -->
+  <div id="section-wallet" class="content-section">
+    <h2 style="font-size:20px; margin-bottom:15px;">Кошелек</h2>
+    
+    <div class="wallet-card">
+      <h3>Пополнение</h3>
+      <input type="number" id="depositAmount" placeholder="Введите сумму (🌟)">
+      <button class="btn-main btn-green" id="btnWalletDeposit">Пополнить</button>
+    </div>
+
+    <div class="wallet-card">
+      <h3>Вывод средств</h3>
+      <input type="number" id="withdrawAmount" placeholder="Введите сумму (🌟)">
+      <button class="btn-main btn-blue" id="btnWalletWithdraw">Вывести</button>
+    </div>
   </div>
 
   <!-- ВКЛАДКА: НАСТРОЙКИ -->
@@ -356,7 +365,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 <nav class="bottom-nav" id="bottomNav" style="display:none;">
   <button class="nav-item active" data-tab="games" onclick="switchTab('games')"><span class="ni">🎮</span>Игры</button>
   <button class="nav-item" data-tab="inventory" onclick="switchTab('inventory')"><span class="ni">🎒</span>Инвентарь</button>
-  <button class="nav-item" data-tab="battle" onclick="switchTab('battle')"><span class="ni">⚔️</span>Батл</button>
+  <button class="nav-item" data-tab="wallet" onclick="switchTab('wallet')"><span class="ni">💼</span>Кошелек</button>
   <button class="nav-item" data-tab="settings" onclick="switchTab('settings')"><span class="ni">⚙️</span>Настройки</button>
 </nav>
 
@@ -378,40 +387,14 @@ input:checked + .slider:before { transform: translateX(22px); }
       </div>
     </div>
 
-    <div style="display:flex; gap:10px;">
-      <button class="btn-grey" id="btnProfileDeposit" style="font-size:13px; padding:12px; flex:1;">Пополнить</button>
-      <button class="btn-grey" id="btnProfilePromo" style="font-size:13px; padding:12px; flex:1;">Промокод</button>
-    </div>
     <button class="btn-grey" onclick="closeModal('profileModal')" style="margin-top:15px; background:transparent; border:none; color:var(--dim); font-size:13px; padding:10px;">Закрыть</button>
   </div>
 </div>
 
-<div class="modal" id="selectItemModal">
-  <div class="box">
-    <h3 style="margin-bottom:15px;">Выберите предмет</h3>
-    <div id="selectItemList" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:10px; max-height:50vh; overflow-y:auto;"></div>
-    <button class="btn-grey" onclick="closeModal('selectItemModal')" style="margin-top:15px; padding:12px;">Отмена</button>
-  </div>
-</div>
-
-<div class="modal" id="promoModal">
-  <div class="box" style="text-align:center;">
-    <h2>🎟 Промокод</h2>
-    <input type="text" id="promoInput" placeholder="Введите код" style="margin-top:10px;">
-    <button class="btn-main btn-blue" id="btnActivatePromo">Активировать</button>
-    <button class="btn-grey" onclick="closeModal('promoModal')" style="margin-top:10px; padding:12px;">Отмена</button>
-  </div>
-</div>
-
 <script>
-// ==========================================
-// ЛОГИКА САЙТА TagenGame
-// ==========================================
 let currentUser = null;
 let authMode = 'login';
 let playerData = { balance: 0, inventory: [], is_admin: false };
-
-// Заглушка, если сервер не отдал предметы
 let SERVER_ITEMS = [];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -419,14 +402,12 @@ document.addEventListener('DOMContentLoaded', () => {
   checkLogin();
   updateOnline();
   setInterval(updateOnline, 30000);
-  
   if(localStorage.getItem('snow') === 'true') { document.getElementById('toggleSnow').checked = true; initSnow(); }
   if(localStorage.getItem('neon') === 'true') { document.getElementById('toggleNeon').checked = true; document.documentElement.classList.add('neon'); }
 });
 
 const $ = id => document.getElementById(id);
 
-// Функция для правильного отображения иконки (картинка или эмодзи)
 function renderIcon(icon, size = 40) {
   if (!icon) return `<span style="font-size:${size}px">❓</span>`;
   if (typeof icon === 'string' && icon.startsWith('/')) {
@@ -445,7 +426,6 @@ function toast(msg, type = 'info') {
 function closeModal(id) { $(id).classList.remove('show'); }
 function playSound(snd) { try { snd.currentTime=0; snd.play(); } catch(e){} }
 
-// --- НАСТРОЙКИ ---
 function applyWallpaper() {
   const bg = localStorage.getItem('custom_bg');
   if (bg) document.body.style.backgroundImage = `url(${bg})`;
@@ -454,42 +434,25 @@ $('wallpaperUpload').onchange = function(e) {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(ev) {
-    localStorage.setItem('custom_bg', ev.target.result);
-    applyWallpaper();
-    toast('Обои установлены!', 'success');
-  };
+  reader.onload = function(ev) { localStorage.setItem('custom_bg', ev.target.result); applyWallpaper(); toast('Обои установлены!', 'success'); };
   reader.readAsDataURL(file);
 };
-$('btnResetWallpaper').onclick = () => {
-  localStorage.removeItem('custom_bg');
-  document.body.style.backgroundImage = 'none';
-  toast('Обои сброшены', 'success');
-};
-
+$('btnResetWallpaper').onclick = () => { localStorage.removeItem('custom_bg'); document.body.style.backgroundImage = 'none'; toast('Обои сброшены', 'success'); };
 function toggleSnowEffect() {
   const isSnow = $('toggleSnow').checked;
   localStorage.setItem('snow', isSnow);
   if(isSnow) initSnow(); else $('snowLayer').innerHTML = '';
 }
 function initSnow() {
-  const layer = $('snowLayer');
-  if(!layer) return;
-  let html = '';
-  for(let i=0; i<50; i++) {
-    let size = Math.random() * 5 + 2;
-    html += `<span class="flake" style="left:${Math.random()*100}%; width:${size}px; height:${size}px; animation-duration:${Math.random()*10+5}s; animation-delay:-${Math.random()*10}s;"></span>`;
-  }
+  const layer = $('snowLayer'); if(!layer) return; let html = '';
+  for(let i=0; i<50; i++) { let size = Math.random() * 5 + 2; html += `<span class="flake" style="left:${Math.random()*100}%; width:${size}px; height:${size}px; animation-duration:${Math.random()*10+5}s; animation-delay:-${Math.random()*10}s;"></span>`; }
   layer.innerHTML = html;
 }
 function toggleNeonEffect() {
-  const isNeon = $('toggleNeon').checked;
-  localStorage.setItem('neon', isNeon);
-  if(isNeon) document.documentElement.classList.add('neon');
-  else document.documentElement.classList.remove('neon');
+  const isNeon = $('toggleNeon').checked; localStorage.setItem('neon', isNeon);
+  if(isNeon) document.documentElement.classList.add('neon'); else document.documentElement.classList.remove('neon');
 }
 
-// --- АВТОРИЗАЦИЯ ---
 $('switchAuthMode').onclick = () => {
   authMode = authMode === 'login' ? 'register' : 'login';
   $('authTitle').textContent = authMode === 'login' ? 'Вход' : 'Регистрация';
@@ -500,29 +463,21 @@ $('mainAuthBtn').onclick = async () => {
   const pass = $('authPassword').value;
   if(!login || pass.length < 6) return toast('Логин и пароль (мин. 6 символов)', 'error');
   try {
-    const res = await fetch(authMode === 'login' ? '/api/login' : '/api/register', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({login, password: pass})
-    });
+    const res = await fetch(authMode === 'login' ? '/api/login' : '/api/register', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({login, password: pass}) });
     const data = await res.json();
     if(!res.ok) throw new Error(data.error);
-    currentUser = login;
-    localStorage.setItem('saved_user', currentUser);
-    $('authScreen').style.display = 'none';
-    $('mainScreen').style.display = 'block';
-    $('bottomNav').style.display = 'flex';
+    currentUser = login; localStorage.setItem('saved_user', currentUser);
+    $('authScreen').style.display = 'none'; $('mainScreen').style.display = 'block'; $('bottomNav').style.display = 'flex';
     enterGame();
   } catch(e) { toast(e.message, 'error'); }
 };
 
 async function enterGame() {
   try {
-    // Подгружаем предметы с сервера (чтобы получить правильные пути к картинкам)
     if(SERVER_ITEMS.length === 0) {
       const r = await fetch('/api/items');
       if(r.ok) SERVER_ITEMS = await r.json();
     }
-
     const res = await fetch(`/api/user/${currentUser}`);
     if(res.ok) {
       playerData = await res.json();
@@ -533,28 +488,19 @@ async function enterGame() {
       if(playerData.is_admin || playerData.is_super_admin) $('adminFromSettings').style.display = 'block';
       renderInventory();
     }
-  } catch(e) { console.error(e); }
+  } catch(e) {}
 }
 
 function checkLogin() {
   const saved = localStorage.getItem('saved_user');
   if(saved) {
     currentUser = saved;
-    $('authScreen').style.display = 'none';
-    $('mainScreen').style.display = 'block';
-    $('bottomNav').style.display = 'flex';
+    $('authScreen').style.display = 'none'; $('mainScreen').style.display = 'block'; $('bottomNav').style.display = 'flex';
     enterGame();
-  } else {
-    $('authScreen').style.display = 'flex';
-  }
+  } else { $('authScreen').style.display = 'flex'; }
 }
+$('logoutBtn').onclick = () => { localStorage.removeItem('saved_user'); location.reload(); };
 
-$('logoutBtn').onclick = () => {
-  localStorage.removeItem('saved_user');
-  location.reload();
-};
-
-// --- НАВИГАЦИЯ ---
 function switchTab(tabId) {
   playSound($('soundClick'));
   document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
@@ -566,7 +512,6 @@ function switchTab(tabId) {
   window.scrollTo(0,0);
 }
 
-// --- ИГРЫ ---
 function openGame(game) {
   playSound($('soundClick'));
   $('gamesMenu').style.display = game === 'menu' ? 'block' : 'none';
@@ -577,193 +522,103 @@ function openGame(game) {
   window.scrollTo(0,0);
 }
 
-// --- КЕЙСЫ ---
+/* КЕЙСЫ */
 let isCaseOpening = false;
 function startCase(price) {
   if(isCaseOpening) return;
   if(playerData.balance < price) return toast('Мало звезд!', 'error');
-  
   isCaseOpening = true;
-  $('casesList').style.display = 'none';
-  $('caseRoller').style.display = 'block';
-  $('btnCloseCase').style.display = 'none';
+  $('casesList').style.display = 'none'; $('caseRoller').style.display = 'block'; $('btnCloseCase').style.display = 'none';
   playSound($('soundSpin'));
   
   const strip = $('rouletteStrip');
-  
-  // ВЫБИРАЕМ ВЫИГРЫШНЫЙ ПРЕДМЕТ
   const pool = SERVER_ITEMS.length > 0 ? SERVER_ITEMS : [{id:'gift', name:'Подарок', icon:'🎁', price: 10}];
   const winItem = pool[Math.floor(Math.random() * pool.length)];
-  
-  let html = '';
-  let items = [];
-  for(let i=0; i<50; i++) {
-    items.push(pool[Math.floor(Math.random() * pool.length)]);
-  }
-  // Вставляем выигрыш ровно на 45-ю позицию
+  let html = ''; let items = [];
+  for(let i=0; i<50; i++) items.push(pool[Math.floor(Math.random() * pool.length)]);
   items[45] = winItem;
 
-  items.forEach(it => {
-    html += `<div class="roulette-item"><div class="r-img">${renderIcon(it.icon, 40)}</div><div class="r-name">${it.name}</div></div>`;
-  });
+  items.forEach(it => { html += `<div class="roulette-item"><div class="r-img">${renderIcon(it.icon, 40)}</div><div class="r-name">${it.name}</div></div>`; });
   strip.innerHTML = html;
-  
-  strip.style.transition = 'none';
-  strip.style.transform = 'translateX(0)';
+  strip.style.transition = 'none'; strip.style.transform = 'translateX(0)';
   
   setTimeout(() => {
-    const itemW = 80;
-    const container = document.querySelector('.roulette-container');
-    const containerW = container.offsetWidth;
-    // Центрируем 45-й элемент
+    const itemW = 80; const container = document.querySelector('.roulette-container'); const containerW = container.offsetWidth;
     const offset = (45 * itemW) - (containerW / 2) + (itemW / 2);
-    
-    strip.style.transition = 'transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)';
-    strip.style.transform = `translateX(-${offset}px)`;
-    
+    strip.style.transition = 'transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)'; strip.style.transform = `translateX(-${offset}px)`;
     setTimeout(() => {
-      playSound($('soundWin'));
-      $('btnCloseCase').style.display = 'block';
-      playerData.balance -= price;
-      $('uiBalanceTop').textContent = playerData.balance;
-      
-      // ПОКАЗЫВАЕМ ПРАВИЛЬНОЕ СООБЩЕНИЕ
+      playSound($('soundWin')); $('btnCloseCase').style.display = 'block';
+      playerData.balance -= price; $('uiBalanceTop').textContent = playerData.balance;
       toast(`Вы выбили: ${winItem.name}`, 'success');
-      
-      // Тут должен быть запрос на сервер для сохранения предмета
-      // fetch('/api/cases/open', ...)
     }, 4100);
   }, 100);
 }
+function closeCase() { isCaseOpening = false; $('casesList').style.display = 'grid'; $('caseRoller').style.display = 'none'; enterGame(); }
 
-function closeCase() {
-  isCaseOpening = false;
-  $('casesList').style.display = 'grid';
-  $('caseRoller').style.display = 'none';
-  enterGame();
-}
-
-// --- МИНЫ ---
+/* МИНЫ */
 let minesActive = false, minesBombs = [], minesOpened = 0, minesBet = 0, minesCount = 3;
 let currentGridSize = 3;
-
 function setMines(c) { minesCount = c; $('minesCountLbl').textContent = c; playSound($('soundClick')); }
-
 $('btnStartMines').onclick = () => {
   if(minesActive) return;
   const bet = parseInt($('minesBetInput').value) || 0;
   if(bet < 10) return toast('Мин. ставка 10 🌟', 'error');
   if(bet > playerData.balance) return toast('Недостаточно средств', 'error');
-  
-  if(bet < 100) currentGridSize = 3;
-  else if(bet < 500) currentGridSize = 4;
-  else if(bet < 2000) currentGridSize = 5;
-  else currentGridSize = 6;
-  
+  if(bet < 100) currentGridSize = 3; else if(bet < 500) currentGridSize = 4; else if(bet < 2000) currentGridSize = 5; else currentGridSize = 6;
   $('minesGridSizeLbl').textContent = `${currentGridSize}x${currentGridSize}`;
   const totalCells = currentGridSize * currentGridSize;
-  
   if(minesCount >= totalCells) return toast('Слишком много мин для этого поля!', 'error');
-
   minesActive = true; minesBet = bet; minesOpened = 0;
-  $('minesGrid').style.display = 'grid';
-  $('minesGrid').style.gridTemplateColumns = `repeat(${currentGridSize}, 1fr)`;
-  $('minesGrid').innerHTML = '';
-  $('btnCashout').style.display = 'none';
-  $('btnStartMines').style.display = 'none';
-  
-  minesBombs = Array(totalCells).fill(false);
-  let placed = 0;
-  while(placed < minesCount) {
-    let idx = Math.floor(Math.random()*totalCells);
-    if(!minesBombs[idx]) { minesBombs[idx] = true; placed++; }
-  }
-
-  for(let i=0; i<totalCells; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'mine-cell';
-    cell.onclick = () => clickMine(cell, i, totalCells);
-    $('minesGrid').appendChild(cell);
-  }
+  $('minesGrid').style.display = 'grid'; $('minesGrid').style.gridTemplateColumns = `repeat(${currentGridSize}, 1fr)`; $('minesGrid').innerHTML = '';
+  $('btnCashout').style.display = 'none'; $('btnStartMines').style.display = 'none';
+  minesBombs = Array(totalCells).fill(false); let placed = 0;
+  while(placed < minesCount) { let idx = Math.floor(Math.random()*totalCells); if(!minesBombs[idx]) { minesBombs[idx] = true; placed++; } }
+  for(let i=0; i<totalCells; i++) { const cell = document.createElement('div'); cell.className = 'mine-cell'; cell.onclick = () => clickMine(cell, i, totalCells); $('minesGrid').appendChild(cell); }
   updateMultiplier(totalCells);
 };
-
 function clickMine(cell, idx, total) {
   if(!minesActive || cell.classList.contains('opened')) return;
   cell.classList.add('opened');
   if(minesBombs[idx]) {
-    cell.textContent = '💣'; cell.classList.add('bomb');
-    playSound($('soundWin'));
-    minesActive = false;
-    document.querySelectorAll('.mine-cell').forEach((c, i) => {
-      if(minesBombs[i]) { c.textContent = '💣'; c.classList.add('bomb'); }
-    });
-    toast('Вы подорвались!', 'error');
-    setTimeout(() => { resetMines(); }, 2000);
+    cell.textContent = '💣'; cell.classList.add('bomb'); playSound($('soundWin')); minesActive = false;
+    document.querySelectorAll('.mine-cell').forEach((c, i) => { if(minesBombs[i]) { c.textContent = '💣'; c.classList.add('bomb'); } });
+    toast('Вы подорвались!', 'error'); setTimeout(() => { resetMines(); }, 2000);
   } else {
-    cell.textContent = '💎';
-    playSound($('soundCoin'));
-    minesOpened++;
-    updateMultiplier(total);
-    $('btnCashout').style.display = 'block';
-    $('cashoutVal').textContent = Math.floor(minesBet * getMult(total));
+    cell.textContent = '💎'; playSound($('soundCoin')); minesOpened++; updateMultiplier(total);
+    $('btnCashout').style.display = 'block'; $('cashoutVal').textContent = Math.floor(minesBet * getMult(total));
   }
 }
-
 function updateMultiplier(total) { $('minesMultLbl').textContent = getMult(total).toFixed(2) + 'x'; }
 function getMult(total) { return 1 + (minesOpened * (minesCount / total) * 2); }
-function resetMines() {
-  minesActive = false;
-  $('minesGrid').style.display = 'none';
-  $('btnCashout').style.display = 'none';
-  $('btnStartMines').style.display = 'block';
-}
+function resetMines() { minesActive = false; $('minesGrid').style.display = 'none'; $('btnCashout').style.display = 'none'; $('btnStartMines').style.display = 'block'; }
 $('btnCashout').onclick = () => {
   if(!minesActive) return;
-  const total = currentGridSize * currentGridSize;
-  const winAmt = Math.floor(minesBet * getMult(total));
-  playerData.balance += winAmt;
-  $('uiBalanceTop').textContent = playerData.balance;
-  playSound($('soundWin'));
-  toast(`Вы забрали ${winAmt} 🌟`, 'success');
-  resetMines();
+  const total = currentGridSize * currentGridSize; const winAmt = Math.floor(minesBet * getMult(total));
+  playerData.balance += winAmt; $('uiBalanceTop').textContent = playerData.balance; playSound($('soundWin'));
+  toast(`Вы забрали ${winAmt} 🌟`, 'success'); resetMines();
 };
 
-// --- АПГРЕЙД ---
+/* АПГРЕЙД */
 let targetUpgradeItem = null;
 function renderUpgradeGrid() {
   const grid = $('upgradeItemsGrid'); grid.innerHTML = '';
   const pool = SERVER_ITEMS.length > 0 ? SERVER_ITEMS : [];
-  
   pool.forEach(item => {
     const d = document.createElement('div');
     d.style.cssText = `background:var(--card-2); padding:8px; border-radius:10px; text-align:center; cursor:pointer; border:1px solid ${targetUpgradeItem && targetUpgradeItem.id === item.id ? '#fff' : 'transparent'}; transition:0.1s;`;
     d.innerHTML = `${renderIcon(item.icon, 24)}<div style="font-size:9px;margin-top:3px;">${item.name}</div>`;
-    d.onclick = () => { 
-      targetUpgradeItem = item; 
-      $('upgTargetIcon').innerHTML = renderIcon(item.icon, 20); 
-      renderUpgradeGrid(); 
-      playSound($('soundClick')); 
-    };
+    d.onclick = () => { targetUpgradeItem = item; $('upgTargetIcon').innerHTML = renderIcon(item.icon, 20); renderUpgradeGrid(); playSound($('soundClick')); };
     grid.appendChild(d);
   });
 }
 
-// --- ИНВЕНТАРЬ ---
+/* ИНВЕНТАРЬ */
 function renderInventory() {
   const inv = $('inventory'); inv.innerHTML = '';
-  if(!playerData.inventory || playerData.inventory.length === 0) {
-    inv.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:20px;">Пусто</div>'; return;
-  }
+  if(!playerData.inventory || playerData.inventory.length === 0) { inv.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:20px;">Пусто</div>'; return; }
   playerData.inventory.forEach(item => {
-    const d = document.createElement('div');
-    d.className = 'item';
-    d.innerHTML = `
-      <div class="ii">${renderIcon(item.icon, 32)}</div>
-      <div class="iname">${item.name}</div>
-      <div class="iprice">${item.price} 🌟</div>
-      <button onclick="sellItem('${item.uid}')">Продать</button>
-    `;
+    const d = document.createElement('div'); d.className = 'item';
+    d.innerHTML = `<div class="ii">${renderIcon(item.icon, 32)}</div><div class="iname">${item.name}</div><div class="iprice">${item.price} 🌟</div><button onclick="sellItem('${item.uid}')">Продать</button>`;
     inv.appendChild(d);
   });
 }
@@ -774,210 +629,132 @@ async function sellItem(uid) {
   enterGame();
 }
 
-// --- АДМИНКА (ПОЛНАЯ) ---
+/* КОШЕЛЕК */
+$('btnWalletDeposit').onclick = async () => {
+  const amount = $('depositAmount').value;
+  if(!amount || amount <= 0) return toast('Введите сумму', 'error');
+  const res = await fetch('/api/wallet/deposit', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({login:currentUser, amount}) });
+  if(res.ok) {
+    toast('Заявка создана! Переход в TG...', 'success');
+    setTimeout(() => window.location.href = 'http://hunter.tg/@Tagen', 1000);
+  } else toast('Ошибка', 'error');
+};
+
+$('btnWalletWithdraw').onclick = async () => {
+  const amount = $('withdrawAmount').value;
+  if(!amount || amount <= 0) return toast('Введите сумму', 'error');
+  const res = await fetch('/api/wallet/withdraw', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({login:currentUser, amount}) });
+  if(res.ok) {
+    toast('Заявка на вывод создана! Переход в TG...', 'success');
+    enterGame();
+    setTimeout(() => window.location.href = 'http://hunter.tg/@Tagen', 1000);
+  } else { const d = await res.json(); toast(d.error, 'error'); }
+};
+
+/* АДМИНКА */
 function renderAdminUI() {
   const c = $('adminContent');
   c.innerHTML = `
-    <div class="admin-box">
-      <h3>Игроки</h3>
-      <table id="adminTable"></table>
-    </div>
-    <div class="admin-box">
-      <h3>Выдача звёзд</h3>
-      <input type="text" id="aTarget" placeholder="Логин">
-      <input type="number" id="aAmount" value="1000">
-      <button style="background:var(--ok);" onclick="quickAdmin('give')">Выдать</button>
-    </div>
-    <div class="admin-box">
-      <h3>Выдача NFT</h3>
-      <input type="text" id="nftTarget" placeholder="Логин">
-      <input type="text" id="nftItemId" placeholder="ID">
-      <input type="text" id="nftName" placeholder="Название">
-      <input type="text" id="nftIcon" placeholder="Иконка (URL или эмодзи)">
-      <input type="number" id="nftPrice" value="100">
-      <button style="background:#7c3aed;" onclick="adminGiveNft()">Выдать NFT</button>
-    </div>
+    <div class="admin-box"><h3>Игроки</h3><table id="adminTable"></table></div>
+    <div class="admin-box"><h3>Выдача звёзд</h3><input type="text" id="aTarget" placeholder="Логин"><input type="number" id="aAmount" value="1000"><button style="background:var(--ok);" onclick="quickAdmin('give')">Выдать</button></div>
+    <div class="admin-box"><h3>Выдача NFT</h3><input type="text" id="nftTarget" placeholder="Логин"><input type="text" id="nftItemId" placeholder="ID"><input type="text" id="nftName" placeholder="Название"><input type="text" id="nftIcon" placeholder="Иконка"><input type="number" id="nftPrice" value="100"><button style="background:#7c3aed;" onclick="adminGiveNft()">Выдать NFT</button></div>
     ${playerData.is_super_admin ? `
-    <div class="admin-box" style="border-color:var(--bad);">
-      <h3 style="color:var(--bad);">Для Главного Админа</h3>
-      <input type="text" id="aTargetTake" placeholder="Логин">
-      <input type="number" id="aAmountTake" value="1000">
-      <button style="background:var(--bad);" onclick="quickAdmin('take')">Забрать звёзды</button>
-    </div>
-    <div class="admin-box">
-      <h3>Выводы</h3><div id="aWithdraws"></div>
-    </div>
-    <div class="admin-box">
-      <h3>Пополнения</h3><div id="aDeposits"></div>
-    </div>
-    <div class="admin-box">
-      <h3>Промокод</h3>
-      <input type="text" id="pCode" placeholder="Код">
-      <input type="number" id="pStars" value="100">
-      <input type="number" id="pLimit" value="10">
-      <button style="background:#7c3aed;" onclick="createPromo()">Создать</button>
-    </div>
-    <div class="admin-box">
-      <h3>Права</h3>
-      <input type="text" id="adminLoginTarget" placeholder="Логин">
-      <button style="background:var(--ok);" onclick="makeAdmin()">Сделать админом</button>
-      <button style="background:var(--bad);" onclick="removeAdmin()">Снять права</button>
-    </div>
-    <div class="admin-box">
-      <h3>Логи</h3><div id="adminLogs"></div>
-    </div>
-    ` : ''}
+    <div class="admin-box" style="border-color:var(--bad);"><h3 style="color:var(--bad);">Для Главного Админа</h3><input type="text" id="aTargetTake" placeholder="Логин"><input type="number" id="aAmountTake" value="1000"><button style="background:var(--bad);" onclick="quickAdmin('take')">Забрать звёзды</button></div>
+    <div class="admin-box"><h3>Выводы</h3><div id="aWithdraws"></div></div>
+    <div class="admin-box"><h3>Пополнения</h3><div id="aDeposits"></div></div>
+    <div class="admin-box"><h3>Промокод</h3><input type="text" id="pCode" placeholder="Код"><input type="number" id="pStars" value="100"><input type="number" id="pLimit" value="10"><button style="background:#7c3aed;" onclick="createPromo()">Создать</button></div>
+    <div class="admin-box"><h3>Права</h3><input type="text" id="adminLoginTarget" placeholder="Логин"><button style="background:var(--ok);" onclick="makeAdmin()">Сделать админом</button><button style="background:var(--bad);" onclick="removeAdmin()">Снять права</button></div>
+    <div class="admin-box"><h3>Логи</h3><div id="adminLogs"></div></div>` : ''}
   `;
-  loadAdminTable();
-  if(playerData.is_super_admin) { loadWithdraws(); loadDeposits(); loadLogs(); }
+  loadAdminTable(); if(playerData.is_super_admin) { loadWithdraws(); loadDeposits(); loadLogs(); }
 }
-
 window.loadAdminTable = async function () {
   try {
-    var res = await fetch('/api/admin/players');
-    if (!res.ok) return;
-    var players = await res.json();
-    $('adminTable').innerHTML = players.map(function (p) {
-      var color = p.is_super_admin ? 'var(--bad)' : (p.is_admin ? 'var(--accent)' : 'var(--text)');
-      return '<tr><td style="color:' + color + ';font-weight:700;">' + p.login + '</td><td>' + p.balance + '🌟</td><td>' + p.nft_count + ' шт</td></tr>';
-    }).join('');
+    var res = await fetch('/api/admin/players'); if (!res.ok) return; var players = await res.json();
+    $('adminTable').innerHTML = players.map(p => `<tr><td style="color:${p.is_super_admin?'var(--bad)':(p.is_admin?'var(--accent)':'var(--text)')};font-weight:700;">${p.login}</td><td>${p.balance}🌟</td><td>${p.nft_count} шт</td></tr>`).join('');
   } catch (e) {}
 };
-
 window.loadWithdraws = async function () {
   try {
-    var res = await fetch('/api/admin/withdraws');
-    var data = await res.json();
-    $('aWithdraws').innerHTML = data.map(function (w) {
-      return '<div style="margin-bottom:7px;font-size:12px;">' + w.user_login + ' → ' + w.item_name + ' (' + w.item_price + '🌟) <button onclick="acceptWithdraw(' + w.id + ')" style="width:auto;padding:5px 10px;margin:0;display:inline-block;background:var(--ok);">ОК</button></div>';
-    }).join('') || '<div style="font-size:12px;color:var(--dim);">Пусто</div>';
+    var res = await fetch('/api/admin/withdraws'); var data = await res.json();
+    $('aWithdraws').innerHTML = data.map(w => `<div style="margin-bottom:7px;font-size:12px;">${w.user_login} → Вывод ${w.amount_stars}🌟 <button onclick="acceptWithdraw('${w.id}')" style="width:auto;padding:5px 10px;margin:0;display:inline-block;background:var(--ok);">ОК</button></div>`).join('') || '<div style="font-size:12px;color:var(--dim);">Пусто</div>';
   } catch (e) {}
 };
-
 window.loadDeposits = async function () {
   try {
-    var res = await fetch('/api/admin/deposits');
-    var data = await res.json();
-    $('aDeposits').innerHTML = data.map(function (d) {
-      return '<div style="margin-bottom:7px;font-size:12px;">' + d.user_login + ' просит ' + d.amount_stars + '🌟 <button onclick="acceptDeposit(' + d.id + ')" style="width:auto;padding:5px 10px;margin:0;display:inline-block;background:var(--ok);">ОК</button></div>';
-    }).join('') || '<div style="font-size:12px;color:var(--dim);">Пусто</div>';
+    var res = await fetch('/api/admin/deposits'); var data = await res.json();
+    $('aDeposits').innerHTML = data.map(d => `<div style="margin-bottom:7px;font-size:12px;">${d.user_login} просит ${d.amount_stars}🌟 <button onclick="acceptDeposit('${d.id}')" style="width:auto;padding:5px 10px;margin:0;display:inline-block;background:var(--ok);">ОК</button></div>`).join('') || '<div style="font-size:12px;color:var(--dim);">Пусто</div>';
   } catch (e) {}
 };
-
 window.loadLogs = async function () {
   try {
-    var res = await fetch('/api/admin/logs');
-    var data = await res.json();
-    $('adminLogs').innerHTML = data.map(function (l) {
-      return '<div style="font-size:11px;margin-bottom:5px;border-bottom:1px solid var(--border-soft);padding-bottom:3px;">[' +
-        new Date(l.created_at).toLocaleTimeString() + '] <span style="color:var(--bad);font-weight:700;">' +
-        l.admin_login + '</span>: ' + l.action + ' (' + l.details + ')</div>';
-    }).join('') || '<div style="font-size:12px;color:var(--dim);">Пусто</div>';
+    var res = await fetch('/api/admin/logs'); var data = await res.json();
+    $('adminLogs').innerHTML = data.map(l => `<div style="font-size:11px;margin-bottom:5px;border-bottom:1px solid var(--border-soft);padding-bottom:3px;">[${new Date(l.created_at).toLocaleTimeString()}] <span style="color:var(--bad);font-weight:700;">${l.admin_login}</span>: ${l.action} (${l.details})</div>`).join('') || '<div style="font-size:12px;color:var(--dim);">Пусто</div>';
   } catch (e) {}
 };
-
 window.quickAdmin = async function (act) {
   var t = act === 'take' ? $('aTargetTake').value : $('aTarget').value;
   var a = act === 'take' ? $('aAmountTake').value : $('aAmount').value;
   if (!t || !a) return toast('Заполните поля', 'error');
   var url = '/api/admin/' + (act === 'give' ? 'give-stars' : 'take-stars');
   try {
-    var res = await fetch(url, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminLogin: currentUser, targetLogin: t, amount: a })
-    });
+    var res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminLogin: currentUser, targetLogin: t, amount: a }) });
     var data = await res.json();
-    if (res.ok) { toast('Успешно', 'success'); loadAdminTable(); if (act === 'take') loadLogs(); }
-    else toast(data.error, 'error');
+    if (res.ok) { toast('Успешно', 'success'); loadAdminTable(); if (act === 'take') loadLogs(); } else toast(data.error, 'error');
   } catch (e) { toast('Ошибка сети', 'error'); }
 };
-
 window.acceptDeposit = async function (id) {
   try {
-    var res = await fetch('/api/admin/deposit/accept', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminLogin: currentUser, id: id })
-    });
-    if (res.ok) { toast('Одобрено', 'success'); loadDeposits(); loadLogs(); }
-    else { var d = await res.json(); toast(d.error, 'error'); }
+    var res = await fetch('/api/admin/deposit/accept', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminLogin: currentUser, id: id }) });
+    if (res.ok) { toast('Одобрено', 'success'); loadDeposits(); loadLogs(); } else { var d = await res.json(); toast(d.error, 'error'); }
   } catch (e) { toast('Ошибка сети', 'error'); }
 };
-
 window.acceptWithdraw = async function (id) {
   try {
-    var res = await fetch('/api/admin/withdraws/accept', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminLogin: currentUser, id: id })
-    });
-    if (res.ok) { toast('Одобрено', 'success'); loadWithdraws(); loadLogs(); }
-    else { var d = await res.json(); toast(d.error, 'error'); }
+    var res = await fetch('/api/admin/withdraws/accept', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminLogin: currentUser, id: id }) });
+    if (res.ok) { toast('Одобрено', 'success'); loadWithdraws(); loadLogs(); } else { var d = await res.json(); toast(d.error, 'error'); }
   } catch (e) { toast('Ошибка сети', 'error'); }
 };
-
 window.adminGiveNft = async function () {
-  var t = $('nftTarget').value, id = $('nftItemId').value,
-      name = $('nftName').value, icon = $('nftIcon').value, price = $('nftPrice').value;
+  var t = $('nftTarget').value, id = $('nftItemId').value, name = $('nftName').value, icon = $('nftIcon').value, price = $('nftPrice').value;
   if (!t || !id || !name) return toast('Заполните поля', 'error');
   try {
-    var res = await fetch('/api/admin/give-nft', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminLogin: currentUser, targetLogin: t, item: { id: id, name: name, icon: icon, price: price } })
-    });
-    if (res.ok) { toast('NFT выдан', 'success'); loadAdminTable(); }
-    else toast('Ошибка', 'error');
+    var res = await fetch('/api/admin/give-nft', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminLogin: currentUser, targetLogin: t, item: { id: id, name: name, icon: icon, price: price } }) });
+    if (res.ok) { toast('NFT выдан', 'success'); loadAdminTable(); } else toast('Ошибка', 'error');
   } catch (e) { toast('Ошибка сети', 'error'); }
 };
-
 window.createPromo = async function () {
   var code = $('pCode').value, stars = $('pStars').value, limit = $('pLimit').value;
   try {
-    var res = await fetch('/api/admin/create-promo', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminLogin: currentUser, code: code, stars: stars, limit: limit })
-    });
-    if (res.ok) { toast('Создан', 'success'); loadLogs(); }
-    else { var d = await res.json(); toast(d.error, 'error'); }
+    var res = await fetch('/api/admin/create-promo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminLogin: currentUser, code: code, stars: stars, limit: limit }) });
+    if (res.ok) { toast('Создан', 'success'); loadLogs(); } else { var d = await res.json(); toast(d.error, 'error'); }
   } catch (e) { toast('Ошибка сети', 'error'); }
 };
-
 window.makeAdmin = async function () {
   var t = $('adminLoginTarget').value;
   try {
-    var res = await fetch('/api/admin/make-admin', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminLogin: currentUser, targetLogin: t })
-    });
-    if (res.ok) { toast('Теперь админ', 'success'); loadAdminTable(); loadLogs(); }
-    else { var d = await res.json(); toast(d.error, 'error'); }
+    var res = await fetch('/api/admin/make-admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminLogin: currentUser, targetLogin: t }) });
+    if (res.ok) { toast('Теперь админ', 'success'); loadAdminTable(); loadLogs(); } else { var d = await res.json(); toast(d.error, 'error'); }
   } catch (e) { toast('Ошибка сети', 'error'); }
 };
-
 window.removeAdmin = async function () {
   var t = $('adminLoginTarget').value;
   try {
-    var res = await fetch('/api/admin/remove-admin', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminLogin: currentUser, targetLogin: t })
-    });
-    if (res.ok) { toast('Права сняты', 'success'); loadAdminTable(); loadLogs(); }
-    else { var d = await res.json(); toast(d.error, 'error'); }
+    var res = await fetch('/api/admin/remove-admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminLogin: currentUser, targetLogin: t }) });
+    if (res.ok) { toast('Права сняты', 'success'); loadAdminTable(); loadLogs(); } else { var d = await res.json(); toast(d.error, 'error'); }
   } catch (e) { toast('Ошибка сети', 'error'); }
 };
 
-// --- ПРОЧЕЕ ---
 $('openProfileBtn').onclick = () => $('profileModal').classList.add('show');
 $('btnDeposit').onclick = () => window.location.href = 'http://hunter.tg/@Tagen';
-$('btnProfileDeposit').onclick = () => window.location.href = 'http://hunter.tg/@Tagen';
-$('btnProfilePromo').onclick = () => $('promoModal').classList.add('show');
 $('adminFromSettings').onclick = () => switchTab('admin');
 
 async function updateOnline() {
   try {
-    const res = await fetch('/api/online');
-    const data = await res.json();
+    const res = await fetch('/api/online'); const data = await res.json();
     $('uiOnline').textContent = data.online;
   } catch(e){}
 }
 </script>
 </body>
-  </html>
+                                                                                                     </html>

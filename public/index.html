@@ -93,79 +93,50 @@ html[data-theme="t_road"]{
 }
 
 /* --- ФОНЫ И АНИМАЦИИ --- */
-@keyframes fluidMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-@keyframes fogMove {
-  0% { background-position: 0% 0%; }
-  100% { background-position: 100% 100%; }
-}
-@keyframes silkMove {
-  0% { background-position: 0% 0%; }
-  100% { background-position: 100% 100%; }
-}
-@keyframes pulseAngel {
-  0% { opacity: 0.1; transform: scale(1); }
-  50% { opacity: 0.3; transform: scale(1.1); }
-  100% { opacity: 0.1; transform: scale(1); }
-}
-@keyframes spinBlackHole {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+@keyframes fluidMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+@keyframes fogMove { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
+@keyframes silkMove { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
+@keyframes pulseAngel { 0% { opacity: 0.1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(1.1); } 100% { opacity: 0.1; transform: scale(1); } }
+@keyframes spinBlackHole { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 html[data-theme="t_fluid"] body {
   background: radial-gradient(circle at 20% 30%, #2a2a2a, #000), radial-gradient(circle at 80% 70%, #1a1a1a, #000);
-  background-size: 200% 200%;
-  animation: fluidMove 15s ease infinite;
+  background-size: 200% 200%; animation: fluidMove 15s ease infinite;
 }
 html[data-theme="t_forest"] body {
   background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), repeating-linear-gradient(90deg, #000 0%, #111 5%, #000 10%);
-  background-size: 100% 100%, 200% 100%;
-  animation: fogMove 20s linear infinite;
+  background-size: 100% 100%, 200% 100%; animation: fogMove 20s linear infinite;
 }
 html[data-theme="t_silk"] body {
   background: radial-gradient(ellipse at 50% -20%, #333, #000 70%);
-  background-size: 200% 200%;
-  animation: silkMove 10s ease-in-out infinite alternate;
+  background-size: 200% 200%; animation: silkMove 10s ease-in-out infinite alternate;
 }
 html[data-theme="t_angel"] body {
-  background: radial-gradient(circle at 50% 100%, rgba(255,255,255,0.15), #000 60%);
-  background-color: #000;
+  background: radial-gradient(circle at 50% 100%, rgba(255,255,255,0.15), #000 60%); background-color: #000;
 }
 html[data-theme="t_angel"] body::before {
   content:''; position:fixed; inset:0; pointer-events:none; z-index:-1;
   background: radial-gradient(circle at 50% 100%, #fff, transparent 40%);
   animation: pulseAngel 4s infinite; mix-blend-mode: screen;
 }
-html[data-theme="t_blackhole"] body {
+html[data-theme="t_blackhole"] body { background: #000; }
+html[data-theme="t_blackhole"] body::before {
+  content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
   background: radial-gradient(circle at 50% 50%, #111 0%, #000 15%, #222 18%, #000 25%);
-  background-size: 150% 150%;
-  background-position: center;
-  animation: spinBlackHole 30s linear infinite;
+  background-size: 100% 100%; z-index: -1; animation: spinBlackHole 20s linear infinite;
 }
 html[data-theme="t_road"] body {
   background: linear-gradient(to bottom, #000 0%, #111 50%, #000 100%);
-  background-size: 100% 200%;
-  animation: fluidMove 8s ease infinite;
+  background-size: 100% 200%; animation: fluidMove 8s ease infinite;
 }
-
-/* Общие стили для анимированных тем (отключаем градиенты базы) */
 html[data-theme^="t_"] body { background-image: none !important; }
 
 html,body{height:100%}
 body{
   font-family:'Segoe UI',Roboto,-apple-system,'Helvetica Neue',sans-serif;
-  color:var(--text);
-  min-height:100vh;
-  padding:12px 12px 120px;
-  overflow-x:hidden;
-  background-color:var(--bg);
-  background-attachment:fixed;
-  transition:background-color .4s var(--ease), color .4s var(--ease);
-  -webkit-font-smoothing:antialiased;
+  color:var(--text); min-height:100vh; padding:12px 12px 120px; overflow-x:hidden;
+  background-color:var(--bg); background-attachment:fixed;
+  transition:background-color .4s var(--ease), color .4s var(--ease); -webkit-font-smoothing:antialiased;
 }
 .content-section { padding-bottom: 60px; }
 
@@ -177,7 +148,7 @@ body.no-snow #snowLayer{opacity:0}
 
 /* ========== 3D БАЗА ========== */
 .card3d{ background:linear-gradient(180deg,var(--card-2),var(--card)); border:1px solid var(--border); border-radius:var(--r-lg); box-shadow: 0 7px 0 var(--hard), 0 16px 34px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07); transition:box-shadow .35s var(--ease), background .35s var(--ease), border-color .35s var(--ease); }
-html.neon .card3d, html.neon header, html.neon .stat-box, html.neon .case, html.neon .item, html.neon .shop-card, html.neon .nav-item.active{ box-shadow: 0 7px 0 var(--hard), 0 16px 34px rgba(0,0,0,.45), var(--glow), inset 0 1px 0 rgba(255,255,255,.09); }
+html.neon .card3d, html.neon header, html.neon .stat-box, html.neon .case, html.neon .item, html.neon .nav-item.active{ box-shadow: 0 7px 0 var(--hard), 0 16px 34px rgba(0,0,0,.45), var(--glow), inset 0 1px 0 rgba(255,255,255,.09); }
 
 /* ========== ЭКРАН АВТОРИЗАЦИИ ========== */
 #authScreen{ display:none; flex-direction:column; align-items:center; justify-content:center; min-height:calc(100vh - 120px); gap:16px; animation:fadeUp .5s var(--ease); }
@@ -278,7 +249,20 @@ body.logged-in .bottom-nav { display: flex; }
 .upgrade-wrapper{width:100%; max-width:440px; margin:0 auto; display:flex; flex-direction:column; align-items:center;}
 .upg-circle-wrap{position:relative; width:240px; height:240px; margin-bottom:10px;}
 .upg-svg{width:100%; height:100%; transform:rotate(-90deg); filter:drop-shadow(0 0 10px rgba(0,0,0,0.6));}
-#upgCenterItem{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:65px; filter:drop-shadow(0 5px 10px rgba(0,0,0,0.5)); transition:all 0.3s;}
+#upgCenterItem{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:65px; filter:drop-shadow(0 5px 10px rgba(0,0,0,0.5)); transition:all 0.3s; z-index:2;}
+
+/* СТРЕЛКА ДЛЯ АПГРЕЙДА */
+#upgPointer {
+  position: absolute; top: 50%; left: 50%; width: 4px; height: 102px;
+  background: linear-gradient(to top, transparent, #ffd700);
+  transform-origin: bottom center; transform: translate(-50%, -100%) rotate(0deg);
+  z-index: 5; border-radius: 4px; pointer-events: none; opacity: 0;
+}
+#upgPointer::after {
+  content: ''; position: absolute; top: -6px; left: -4px;
+  width: 12px; height: 12px; background: #ffd700; border-radius: 50%; box-shadow: 0 0 15px #ffd700;
+}
+
 .upgrade-btn{ background:linear-gradient(180deg,#ffd700,#f59e0b); color:#000; border:none; padding:15px; border-radius:14px; font-weight:900; cursor:pointer; width:100%; font-size:16px; font-family:inherit; text-transform:uppercase; box-shadow:0 6px 0 #b45309, inset 0 1px 0 rgba(255,255,255,0.3); transition:transform .1s var(--ease), box-shadow .1s var(--ease); }
 .upgrade-btn:active,.upgrade-btn.pressed{transform:translateY(4px); box-shadow:0 2px 0 #b45309, inset 0 1px 0 rgba(255,255,255,0.2);}
 .upgrade-btn:disabled{filter:grayscale(.6); cursor:not-allowed;}
@@ -298,14 +282,6 @@ body.logged-in .bottom-nav { display: flex; }
 .battle-case .bprice{font-size:10px; color:var(--gold); font-weight:800; margin-top:2px}
 .battle-vs{font-size:26px; font-weight:900; color:var(--bad); margin:14px 0; text-shadow:0 0 20px rgba(239,68,68,.5)}
 #battleStatus{font-size:13px; color:var(--gold); margin-top:12px; font-weight:700; min-height:18px}
-
-/* ---------- МАГАЗИН ---------- */
-.shop-group{margin-bottom:22px}
-.shop-group h3{font-size:14px; margin-bottom:10px; font-weight:900; color:var(--accent); letter-spacing:.3px}
-.shop-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(74px,1fr)); gap:9px}
-.shop-card{ background:linear-gradient(180deg,var(--card-2),var(--card)); border:1px solid var(--border); border-radius:var(--r-md); padding:12px 6px; cursor:pointer; text-align:center; box-shadow:0 4px 0 var(--hard), 0 9px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06); transition:transform .12s var(--ease), box-shadow .12s var(--ease), border-color .2s; color:var(--text); font-family:inherit; font-size:11px; font-weight:800; }
-.shop-card:active,.shop-card.pressed{transform:translateY(4px); box-shadow:0 1px 0 var(--hard), 0 4px 10px rgba(0,0,0,.35)}
-.shop-card .sc-emoji{font-size:26px; display:block; margin-bottom:4px}
 
 /* ---------- АДМИНКА ---------- */
 .admin-box{ background:linear-gradient(180deg,var(--card-2),var(--card)); padding:16px; border-radius:var(--r-lg); max-width:800px; margin:0 auto 24px; text-align:left; border:1px solid var(--border); box-shadow:0 6px 0 var(--hard), 0 14px 28px rgba(0,0,0,.4); }
@@ -387,6 +363,7 @@ body.logged-in .drop-feed { display: flex; }
 <div id="toastContainer"></div>
 <div class="drop-feed" id="dropFeed"></div>
 
+<!-- ЗВУКИ (положи файлы в public/sounds/) -->
 <audio id="soundSpin" src="/sounds/spin.mp3" preload="auto"></audio>
 <audio id="soundWin" src="/sounds/win.mp3" preload="auto"></audio>
 <audio id="soundClick" src="/sounds/click.mp3" preload="auto"></audio>
@@ -426,7 +403,6 @@ body.logged-in .drop-feed { display: flex; }
     <div class="logo">КЕЙСЫ</div>
     <div class="top-actions">
       <div class="online-chip">● <span id="uiOnline">0</span></div>
-      <button class="icon-btn" id="openSettingsBtn" title="Настройки">⚙️</button>
       <div class="balance-top" id="openPromoBtn"><span id="uiBalanceTop">0</span> 🌟</div>
     </div>
   </header>
@@ -471,6 +447,10 @@ body.logged-in .drop-feed { display: flex; }
           <circle id="upgProgressCircle" cx="100" cy="100" r="85" fill="none" stroke="#ffd700" stroke-width="12" stroke-linecap="round" stroke-dasharray="534" stroke-dashoffset="534" style="transition: stroke-dashoffset 0.8s ease-in-out, stroke 0.5s;"/>
         </svg>
         <div id="upgCenterItem"><span style="opacity:0.2;">❓</span></div>
+        
+        <!-- СТРЕЛКА АПГРЕЙДА -->
+        <div id="upgPointer"></div>
+        
         <div style="position:absolute; bottom:-5px; left:50%; transform:translateX(-50%); color:#ffd700; font-size:16px;">▲</div>
       </div>
 
@@ -517,20 +497,6 @@ body.logged-in .drop-feed { display: flex; }
     </div>
   </div>
 
-  <!-- МАГАЗИН -->
-  <div id="section-shop" class="content-section">
-    <div class="admin-box">
-      <div class="shop-group">
-        <h3>🖼 Аватарки — 500 🌟</h3>
-        <div class="shop-grid" id="shopAvatars"></div>
-      </div>
-      <div class="shop-group" style="margin-bottom:0;">
-        <h3>✨ Рамки — 1000 🌟</h3>
-        <div class="shop-grid" id="shopFrames"></div>
-      </div>
-    </div>
-  </div>
-
   <!-- АДМИНКА -->
   <div id="section-admin" class="content-section" style="padding-bottom: 80px;">
     <h2 id="adminTitle" style="text-align:center; font-size:19px; margin-bottom:14px;">Админка</h2>
@@ -545,7 +511,7 @@ body.logged-in .drop-feed { display: flex; }
   <button class="nav-item" data-tab="inventory"><span class="ni">🎒</span>Инвентарь</button>
   <button class="nav-item" data-tab="upgrade"><span class="ni">⚡</span>Апгрейд</button>
   <button class="nav-item" data-tab="battle"><span class="ni">⚔️</span>Батл</button>
-  <button class="nav-item" data-tab="shop"><span class="ni">🛒</span>Магазин</button>
+  <button class="nav-item" id="navSettingsBtn"><span class="ni">⚙️</span>Настройки</button>
 </nav>
 
 <!-- ========== МОДАЛКИ ========== -->
@@ -656,14 +622,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var SETTINGS = { theme: 'purple', neon: false, snow: true };
   
-  // Список тем (только CSS, никаких картинок)
   var THEMES = [
     { id: 'purple', name: 'Фиолетовая', bg: 'linear-gradient(135deg, #08060f, #a855f7)' },
     { id: 'red',    name: 'Красная',    bg: 'linear-gradient(135deg, #0d0406, #ef4444)' },
     { id: 'gray',   name: 'Серая',      bg: 'linear-gradient(135deg, #eef1f6, #3b82f6)' },
     { id: 'green',  name: 'Зеленая',    bg: 'linear-gradient(135deg, #040b08, #10b981)' },
     
-    // Анимированные кастомные темы
     { id: 't_fluid', name: 'Dark Fluid', bg: 'radial-gradient(circle at 20% 30%, #2a2a2a, #000)' },
     { id: 't_forest', name: 'Foggy Forest', bg: 'linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), repeating-linear-gradient(90deg, #000 0%, #111 5%, #000 10%)' },
     { id: 't_silk', name: 'Black Silk', bg: 'radial-gradient(ellipse at 50% -20%, #333, #000 70%)' },
@@ -805,7 +769,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   document.addEventListener('click', function (e) {
-    if (e.target.closest('.btn-main, .nav-item, .case, .shop-card, .icon-btn, .upgrade-btn')) {
+    if (e.target.closest('.btn-main, .nav-item, .case, .icon-btn, .upgrade-btn')) {
       playSound(clickSound, 0.3);
     }
   });
@@ -942,10 +906,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var navItems = document.querySelectorAll('.nav-item');
   Array.prototype.forEach.call(navItems, function (item) {
+    if (item.id === 'navSettingsBtn') return;
     item.onclick = function () {
       switchTab(item.dataset.tab);
     };
   });
+
+  // Открытие настроек по кнопке из нижней панели
+  el('navSettingsBtn').onclick = function() {
+    applySettings();
+    el('settingsModal').classList.add('show');
+  };
 
   function switchTab(id) {
     Array.prototype.forEach.call(document.querySelectorAll('.content-section'), function (s) {
@@ -960,7 +931,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (id === 'admin') renderAdminUI();
     if (id === 'upgrade') renderUpgradeTab();
     if (id === 'battle') renderBattleTab();
-    if (id === 'shop') renderShopTab();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -1254,50 +1224,6 @@ document.addEventListener('DOMContentLoaded', function () {
     } catch (e) {}
   }
 
-  function renderShopTab() {
-    var avatars = ['👤', '😎', '👽', '🐸', '👑', '💎', '🔥', '💀'];
-    var frames = [
-      { id: 'none', name: 'Нет', emoji: '⭕' },
-      { id: 'gold', name: 'Золотая', emoji: '🥇' },
-      { id: 'neon', name: 'Неон', emoji: '💠' },
-      { id: 'fire', name: 'Огонь', emoji: '🔥' }
-    ];
-
-    var avContainer = el('shopAvatars');
-    avContainer.innerHTML = '';
-    avatars.forEach(function (av) {
-      var btn = document.createElement('button');
-      btn.className = 'shop-card';
-      btn.innerHTML = '<span class="sc-emoji">' + av + '</span>';
-      btn.onclick = function () { buyCustomization('avatar', av); };
-      avContainer.appendChild(btn);
-    });
-
-    var frContainer = el('shopFrames');
-    frContainer.innerHTML = '';
-    frames.forEach(function (fr) {
-      var btn = document.createElement('button');
-      btn.className = 'shop-card';
-      btn.innerHTML = '<span class="sc-emoji">' + fr.emoji + '</span>' + fr.name;
-      btn.onclick = function () { buyCustomization('frame', fr.id); };
-      frContainer.appendChild(btn);
-    });
-  }
-
-  async function buyCustomization(type, item) {
-    var price = type === 'avatar' ? 500 : 1000;
-    if (!confirm('Купить за ' + price + ' 🌟?')) return;
-    try {
-      var res = await fetch('/api/customization/buy', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ login: currentUser, type: type, item: item })
-      });
-      var data = await res.json();
-      if (res.ok) { toast('Куплено!', 'success'); await enterGame(); }
-      else toast(data.error, 'error');
-    } catch (e) { toast('Ошибка сети', 'error'); }
-  }
-
   /* ================= АПГРЕЙД ================= */
   function renderUpgradeTab() {
     el('upgradeMySlot').onclick = function () {
@@ -1489,16 +1415,44 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!isFast) {
         playSound(spinSound, 0.6);
         btn.textContent = 'Крутим...';
-        
+
         var circle = el('upgProgressCircle');
+        var pointer = el('upgPointer');
+
+        // Сброс стрелки
+        pointer.style.transition = 'none';
+        pointer.style.transform = 'translate(-50%, -100%) rotate(0deg)';
+        pointer.style.opacity = '1';
+
+        // Настройка кольца
         circle.style.transition = 'none';
-        circle.style.strokeDashoffset = 0; 
-        circle.style.stroke = '#3b82f6';
+        circle.style.strokeDashoffset = 534; 
         
-        setTimeout(function () {
-          circle.style.transition = 'stroke-dashoffset 0.5s ease-in-out, stroke 0.5s';
-          finishUpgrade(data, btn);
-        }, 1500);
+        // Принудительный рефлоу (чтобы сброс сработал)
+        void pointer.offsetWidth;
+
+        // Вычисляем углы
+        var finalAngle = (data.chance / 100) * 360;
+        var spins = 360 * 5; // 5 полных оборотов
+
+        // Запуск анимации (3 секунды)
+        setTimeout(function() {
+            pointer.style.transition = 'transform 3s cubic-bezier(0.1, 0.8, 0.2, 1)';
+            pointer.style.transform = `translate(-50%, -100%) rotate(${spins + finalAngle}deg)`;
+            
+            circle.style.transition = 'stroke-dashoffset 3s cubic-bezier(0.1, 0.8, 0.2, 1)';
+            circle.style.strokeDashoffset = 534 - (data.chance / 100) * 534;
+
+            if (data.chance < 15) circle.style.stroke = '#ef4444';
+            else if (data.chance < 30) circle.style.stroke = '#f59e0b';
+            else circle.style.stroke = '#ffd700';
+
+            setTimeout(function () {
+              pointer.style.opacity = '0'; // Скрываем стрелку
+              finishUpgrade(data, btn);
+            }, 3100);
+        }, 50);
+
       } else {
         finishUpgrade(data, btn);
       }
@@ -1800,10 +1754,6 @@ document.addEventListener('DOMContentLoaded', function () {
     } catch (e) { toast('Ошибка сети', 'error'); }
   };
 
-  el('openSettingsBtn').onclick = function () {
-    applySettings();
-    el('settingsModal').classList.add('show');
-  };
   el('closeSettingsBtn').onclick = function () { el('settingsModal').classList.remove('show'); };
 
   el('setNeon').onchange = function () {

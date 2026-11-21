@@ -70,9 +70,9 @@ header{ display:flex; align-items:center; justify-content:space-between; gap:10p
 
 /* ========== КЕЙСЫ ========== */
 .cases-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.case-card { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:20px 10px; text-align:center; cursor:pointer; box-shadow:0 6px 0 var(--hard); transition:0.1s; }
+.case-card { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:20px 10px; text-align:center; cursor:pointer; box-shadow:0 6px 0 var(--hard); transition:0.1s; display:flex; flex-direction:column; align-items:center; }
 .case-card:active { transform:translateY(4px); box-shadow:0 2px 0 var(--hard); }
-.case-card .c-icon { font-size:50px; margin-bottom:10px; }
+.case-card .c-icon { width:100px; height:100px; margin-bottom:10px; display:flex; justify-content:center; align-items:center; }
 .case-card .c-name { font-size:15px; font-weight:900; }
 .case-card .c-price { color:var(--gold); font-weight:800; margin-top:5px; font-size:13px; }
 
@@ -201,10 +201,33 @@ input:checked + .slider:before { transform: translateX(22px); }
       <div id="casesList">
         <div class="cases-grid">
           <div class="case-card" onclick="startCase('starter', 100)">
-            <div class="c-icon">📦</div><div class="c-name">Стартовый</div><div class="c-price">100 🌟</div>
+            <div class="c-icon"><img src="/items/case_starter.png" style="width:100%;height:100%;object-fit:contain;" onerror="this.style.display='none';this.parentElement.innerHTML='📦';"></div>
+            <div class="c-name">Стартовый</div><div class="c-price">100 🌟</div>
           </div>
+          
           <div class="case-card" onclick="startCase('pro', 1000)">
-            <div class="c-icon">🎁</div><div class="c-name">Про</div><div class="c-price">1000 🌟</div>
+            <div class="c-icon"><img src="/items/case_pro.png" style="width:100%;height:100%;object-fit:contain;" onerror="this.style.display='none';this.parentElement.innerHTML='🎁';"></div>
+            <div class="c-name">Про</div><div class="c-price">1000 🌟</div>
+          </div>
+          
+          <div class="case-card" onclick="startCase('magic', 2500)">
+            <div class="c-icon"><img src="/items/case_magic.png" style="width:100%;height:100%;object-fit:contain;" onerror="this.style.display='none';this.parentElement.innerHTML='🔮';"></div>
+            <div class="c-name">Магический</div><div class="c-price">2500 🌟</div>
+          </div>
+
+          <div class="case-card" onclick="startCase('winter', 3000)">
+            <div class="c-icon"><img src="/items/case_winter.png" style="width:100%;height:100%;object-fit:contain;" onerror="this.style.display='none';this.parentElement.innerHTML='❄️';"></div>
+            <div class="c-name">Зимний</div><div class="c-price">3000 🌟</div>
+          </div>
+
+          <div class="case-card" onclick="startCase('legend', 5000)">
+            <div class="c-icon"><img src="/items/case_legend.png" style="width:100%;height:100%;object-fit:contain;" onerror="this.style.display='none';this.parentElement.innerHTML='⚡';"></div>
+            <div class="c-name">Легенда</div><div class="c-price">5000 🌟</div>
+          </div>
+
+          <div class="case-card" onclick="startCase('inferno', 7500)">
+            <div class="c-icon"><img src="/items/case_inferno.png" style="width:100%;height:100%;object-fit:contain;" onerror="this.style.display='none';this.parentElement.innerHTML='🔥';"></div>
+            <div class="c-name">Адский</div><div class="c-price">7500 🌟</div>
           </div>
         </div>
       </div>
@@ -514,7 +537,7 @@ async function startCase(caseId, price) {
   activeCaseData = { price, caseId };
   $('casesList').style.display = 'none'; 
   $('caseRoller').style.display = 'block'; 
-  $('caseActions').style.display = 'none'; // Прячем кнопки
+  $('caseActions').style.display = 'none'; 
   playSound($('soundSpin'));
   
   try {
@@ -525,17 +548,16 @@ async function startCase(caseId, price) {
     const data = await res.json();
     if(!res.ok) throw new Error(data.error);
     
-    // Обновляем баланс
     playerData.balance = data.balance;
     $('uiBalanceTop').textContent = playerData.balance;
     
-    currentWinItem = data.item; // Сохраняем выигрыш
+    currentWinItem = data.item; 
     const pool = data.pool;
     
     const strip = $('rouletteStrip');
     let html = ''; let items = [];
     for(let i=0; i<50; i++) items.push(pool[Math.floor(Math.random() * pool.length)]);
-    items[45] = currentWinItem; // Ставим выигрыш на 45 позицию
+    items[45] = currentWinItem; 
 
     items.forEach(it => { html += `<div class="roulette-item"><div class="r-img">${renderIcon(it.icon, 40)}</div><div class="r-name">${it.name}</div></div>`; });
     strip.innerHTML = html;
@@ -549,10 +571,9 @@ async function startCase(caseId, price) {
       setTimeout(() => {
         playSound($('soundWin')); 
         toast(`Вы выбили: ${currentWinItem.name}`, 'success');
-        // Показываем кнопки "Продать" и "Еще раз"
         $('caseActions').style.display = 'flex';
         isCaseOpening = false;
-        enterGame(); // Обновляем инвентарь в фоне
+        enterGame(); 
       }, 4100);
     }, 100);
 
@@ -563,7 +584,6 @@ async function startCase(caseId, price) {
   }
 }
 
-// Продать выигранный предмет
 $('btnCaseSell').onclick = async () => {
   if(!currentWinItem) return;
   $('caseActions').style.display = 'none';
@@ -571,7 +591,6 @@ $('btnCaseSell').onclick = async () => {
   await sellItem(currentWinItem.uid);
 };
 
-// Крутить еще раз
 $('btnCaseAgain').onclick = () => {
   $('caseActions').style.display = 'none';
   startCase(activeCaseData.caseId, activeCaseData.price);
@@ -625,16 +644,14 @@ function clickMine(cell, idx, total) {
   cell.classList.add('opened');
   
   if(minesBombs[idx]) {
-    // ПРОИГРЫШ
     cell.textContent = '💣'; cell.classList.add('bomb'); playSound($('soundWin')); 
     minesActive = false;
-    $('btnCashout').style.display = 'none'; // СКРЫВАЕМ КНОПКУ ЗАБРАТЬ
+    $('btnCashout').style.display = 'none';
     
     document.querySelectorAll('.mine-cell').forEach((c, i) => { if(minesBombs[i]) { c.textContent = '💣'; c.classList.add('bomb'); } });
     toast('Вы подорвались!', 'error'); 
     setTimeout(() => { resetMines(); enterGame(); }, 2000);
   } else {
-    // ВЫИГРЫШ
     cell.textContent = '💎'; playSound($('soundCoin')); minesOpened++; updateMultiplier(total);
     $('btnCashout').style.display = 'block'; $('cashoutVal').textContent = Math.floor(minesBet * getMult(total));
   }
@@ -649,7 +666,7 @@ $('btnCashout').onclick = async () => {
   const total = currentGridSize * currentGridSize; 
   const winAmt = Math.floor(minesBet * getMult(total));
   
-  minesActive = false; // Блокируем дальнейшие клики
+  minesActive = false; 
   $('btnCashout').style.display = 'none'; $('minesGrid').style.pointerEvents = 'none';
   
   try {
@@ -688,7 +705,6 @@ function openSelectModal(items, callback) {
   $('selectItemModal').classList.add('show');
 }
 
-// Открытие модалки для ВЫБОРА СТАВКИ (из инвентаря)
 $('upgradeMySlot').onclick = () => {
   if(!playerData.inventory || playerData.inventory.length === 0) return toast('Инвентарь пуст', 'error');
   openSelectModal(playerData.inventory, (item) => {
@@ -699,7 +715,6 @@ $('upgradeMySlot').onclick = () => {
   });
 };
 
-// Открытие модалки для ЦЕЛИ (из базы предметов)
 $('upgradeTargetSlot').onclick = () => {
   openSelectModal(SERVER_ITEMS, (item) => {
     targetUpgradeItem = item;
@@ -755,7 +770,6 @@ function updateUpgradeUI() {
   $('upgProgressCircle').style.strokeDashoffset = offset;
 }
 
-// Кнопка УЛУЧШИТЬ
 $('btnDoUpgrade').onclick = async () => {
   if(!myUpgradeItem || !targetUpgradeItem) return toast('Выберите предметы', 'error');
   if(myUpgradeItem.price >= targetUpgradeItem.price) return toast('Цель должна быть дороже', 'error');
@@ -764,13 +778,12 @@ $('btnDoUpgrade').onclick = async () => {
   const pointer = $('upgPointer');
   const circle = $('upgProgressCircle');
   
-  // Сброс стрелки
   pointer.style.transition = 'none';
   pointer.style.transform = 'translate(-50%, -100%) rotate(0deg)';
   pointer.style.opacity = '1';
   circle.style.transition = 'none';
   circle.style.strokeDashoffset = 534;
-  void pointer.offsetWidth; // рефлоу
+  void pointer.offsetWidth;
   
   try {
     const res = await fetch('/api/upgrade', {
@@ -780,7 +793,6 @@ $('btnDoUpgrade').onclick = async () => {
     const data = await res.json();
     if(!res.ok) throw new Error(data.error);
     
-    // Запускаем анимацию
     setTimeout(() => {
       const finalAngle = (data.chance / 100) * 360;
       const spins = 360 * 5;
@@ -963,4 +975,4 @@ async function updateOnline() {
 }
 </script>
 </body>
-  </html>
+            </html>

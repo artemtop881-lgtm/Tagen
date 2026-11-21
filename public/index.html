@@ -12,7 +12,7 @@
   --ease:cubic-bezier(.22,1,.36,1);
 }
 
-/* ---------- ТЕМЫ ---------- */
+/* ---------- БАЗОВЫЕ ТЕМЫ ---------- */
 html[data-theme="purple"]{
   --bg:#08060f; --bg-grad1:rgba(124,58,237,.22); --bg-grad2:rgba(168,85,247,.14);
   --card:#171428; --card-2:#1f1b38; --card-3:#282147;
@@ -54,6 +54,107 @@ html[data-theme="green"]{
   --nav-bg:rgba(9,20,15,.93); --flake:#c8ffe6;
 }
 
+/* ---------- АНИМИРОВАННЫЕ CSS ТЕМЫ ---------- */
+html[data-theme="t_fluid"]{
+  --bg:#000; --card:#111; --card-2:#1a1a1a; --card-3:#222; --border:#333; --border-soft:#2a2a2a;
+  --text:#e0e0e0; --dim:#777; --accent:#888; --accent-2:#555; --accent-dk:#333;
+  --gold:#ccc; --ok:#aaa; --bad:#666; --warn:#999; --info:#888;
+  --hard:#000; --glow:0 0 24px rgba(255,255,255,.15); --nav-bg:rgba(10,10,10,.95); --flake:#aaa;
+}
+html[data-theme="t_forest"]{
+  --bg:#0a0a0a; --card:#111; --card-2:#1a1a1a; --card-3:#222; --border:#333; --border-soft:#2a2a2a;
+  --text:#e0e0e0; --dim:#777; --accent:#ccc; --accent-2:#999; --accent-dk:#444;
+  --gold:#ddd; --ok:#aaa; --bad:#666; --warn:#999; --info:#888;
+  --hard:#000; --glow:0 0 24px rgba(255,255,255,.2); --nav-bg:rgba(10,10,10,.95); --flake:#fff;
+}
+html[data-theme="t_silk"]{
+  --bg:#000; --card:#0a0a0a; --card-2:#111; --card-3:#1a1a1a; --border:#222; --border-soft:#1a1a1a;
+  --text:#ccc; --dim:#666; --accent:#666; --accent-2:#444; --accent-dk:#222;
+  --gold:#999; --ok:#777; --bad:#555; --warn:#888; --info:#777;
+  --hard:#000; --glow:0 0 24px rgba(255,255,255,.1); --nav-bg:rgba(5,5,5,.95); --flake:#888;
+}
+html[data-theme="t_angel"]{
+  --bg:#050505; --card:#111; --card-2:#1a1a1a; --card-3:#222; --border:#333; --border-soft:#2a2a2a;
+  --text:#fff; --dim:#888; --accent:#fff; --accent-2:#ccc; --accent-dk:#555;
+  --gold:#fff; --ok:#aaa; --bad:#777; --warn:#ccc; --info:#999;
+  --hard:#000; --glow:0 0 24px rgba(255,255,255,.3); --nav-bg:rgba(10,10,10,.95); --flake:#fff;
+}
+html[data-theme="t_blackhole"]{
+  --bg:#000; --card:#111; --card-2:#1a1a1a; --card-3:#222; --border:#333; --border-soft:#2a2a2a;
+  --text:#fff; --dim:#888; --accent:#fff; --accent-2:#aaa; --accent-dk:#444;
+  --gold:#fff; --ok:#aaa; --bad:#777; --warn:#ccc; --info:#999;
+  --hard:#000; --glow:0 0 24px rgba(255,255,255,.25); --nav-bg:rgba(0,0,0,.95); --flake:#fff;
+}
+html[data-theme="t_road"]{
+  --bg:#000; --card:#111; --card-2:#1a1a1a; --card-3:#222; --border:#333; --border-soft:#2a2a2a;
+  --text:#fff; --dim:#888; --accent:#fff; --accent-2:#ccc; --accent-dk:#555;
+  --gold:#fff; --ok:#aaa; --bad:#777; --warn:#ccc; --info:#999;
+  --hard:#000; --glow:0 0 24px rgba(255,255,255,.25); --nav-bg:rgba(10,10,10,.95); --flake:#fff;
+}
+
+/* --- ФОНЫ И АНИМАЦИИ --- */
+@keyframes fluidMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes fogMove {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+@keyframes silkMove {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+@keyframes pulseAngel {
+  0% { opacity: 0.1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.1); }
+  100% { opacity: 0.1; transform: scale(1); }
+}
+@keyframes spinBlackHole {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+html[data-theme="t_fluid"] body {
+  background: radial-gradient(circle at 20% 30%, #2a2a2a, #000), radial-gradient(circle at 80% 70%, #1a1a1a, #000);
+  background-size: 200% 200%;
+  animation: fluidMove 15s ease infinite;
+}
+html[data-theme="t_forest"] body {
+  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), repeating-linear-gradient(90deg, #000 0%, #111 5%, #000 10%);
+  background-size: 100% 100%, 200% 100%;
+  animation: fogMove 20s linear infinite;
+}
+html[data-theme="t_silk"] body {
+  background: radial-gradient(ellipse at 50% -20%, #333, #000 70%);
+  background-size: 200% 200%;
+  animation: silkMove 10s ease-in-out infinite alternate;
+}
+html[data-theme="t_angel"] body {
+  background: radial-gradient(circle at 50% 100%, rgba(255,255,255,0.15), #000 60%);
+  background-color: #000;
+}
+html[data-theme="t_angel"] body::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:-1;
+  background: radial-gradient(circle at 50% 100%, #fff, transparent 40%);
+  animation: pulseAngel 4s infinite; mix-blend-mode: screen;
+}
+html[data-theme="t_blackhole"] body {
+  background: radial-gradient(circle at 50% 50%, #111 0%, #000 15%, #222 18%, #000 25%);
+  background-size: 150% 150%;
+  background-position: center;
+  animation: spinBlackHole 30s linear infinite;
+}
+html[data-theme="t_road"] body {
+  background: linear-gradient(to bottom, #000 0%, #111 50%, #000 100%);
+  background-size: 100% 200%;
+  animation: fluidMove 8s ease infinite;
+}
+
+/* Общие стили для анимированных тем (отключаем градиенты базы) */
+html[data-theme^="t_"] body { background-image: none !important; }
+
 html,body{height:100%}
 body{
   font-family:'Segoe UI',Roboto,-apple-system,'Helvetica Neue',sans-serif;
@@ -62,9 +163,6 @@ body{
   padding:12px 12px 120px;
   overflow-x:hidden;
   background-color:var(--bg);
-  background-image:
-    radial-gradient(75% 55% at 12% 0%, var(--bg-grad1), transparent 72%),
-    radial-gradient(75% 55% at 88% 100%, var(--bg-grad2), transparent 72%);
   background-attachment:fixed;
   transition:background-color .4s var(--ease), color .4s var(--ease);
   -webkit-font-smoothing:antialiased;
@@ -74,45 +172,17 @@ body{
 /* ========== СНЕГ ========== */
 #snowLayer{position:fixed;inset:0;pointer-events:none;z-index:9000;overflow:hidden;transition:opacity .4s}
 body.no-snow #snowLayer{opacity:0}
-.flake{
-  position:absolute;top:-24px;border-radius:50%;
-  background:var(--flake);
-  box-shadow:0 0 6px var(--flake);
-  animation:snowfall linear infinite;
-  will-change:transform;
-}
-@keyframes snowfall{
-  0%{transform:translate3d(0,-10vh,0)}
-  50%{transform:translate3d(22px,50vh,0)}
-  100%{transform:translate3d(-18px,112vh,0)}
-}
+.flake{ position:absolute;top:-24px;border-radius:50%; background:var(--flake); box-shadow:0 0 6px var(--flake); animation:snowfall linear infinite; will-change:transform; }
+@keyframes snowfall{ 0%{transform:translate3d(0,-10vh,0)} 50%{transform:translate3d(22px,50vh,0)} 100%{transform:translate3d(-18px,112vh,0)} }
 
 /* ========== 3D БАЗА ========== */
-.card3d{
-  background:linear-gradient(180deg,var(--card-2),var(--card));
-  border:1px solid var(--border);
-  border-radius:var(--r-lg);
-  box-shadow: 0 7px 0 var(--hard), 0 16px 34px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07);
-  transition:box-shadow .35s var(--ease), background .35s var(--ease), border-color .35s var(--ease);
-}
-html.neon .card3d,
-html.neon header,
-html.neon .stat-box,
-html.neon .case,
-html.neon .item,
-html.neon .shop-card,
-html.neon .nav-item.active{
-  box-shadow: 0 7px 0 var(--hard), 0 16px 34px rgba(0,0,0,.45), var(--glow), inset 0 1px 0 rgba(255,255,255,.09);
-}
+.card3d{ background:linear-gradient(180deg,var(--card-2),var(--card)); border:1px solid var(--border); border-radius:var(--r-lg); box-shadow: 0 7px 0 var(--hard), 0 16px 34px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07); transition:box-shadow .35s var(--ease), background .35s var(--ease), border-color .35s var(--ease); }
+html.neon .card3d, html.neon header, html.neon .stat-box, html.neon .case, html.neon .item, html.neon .shop-card, html.neon .nav-item.active{ box-shadow: 0 7px 0 var(--hard), 0 16px 34px rgba(0,0,0,.45), var(--glow), inset 0 1px 0 rgba(255,255,255,.09); }
 
 /* ========== ЭКРАН АВТОРИЗАЦИИ ========== */
-#authScreen{
-  display:none; flex-direction:column; align-items:center; justify-content:center;
-  min-height:calc(100vh - 120px); gap:16px; animation:fadeUp .5s var(--ease);
-}
+#authScreen{ display:none; flex-direction:column; align-items:center; justify-content:center; min-height:calc(100vh - 120px); gap:16px; animation:fadeUp .5s var(--ease); }
 #authScreen.show{display:flex}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-
 .welcome-card{ width:100%; max-width:420px; padding:32px 24px 26px; text-align:center; position:relative; overflow:hidden; }
 .welcome-card::after{ content:''; position:absolute; top:-60%; left:-30%; width:160%; height:160%; background:radial-gradient(circle at 50% 0%, var(--accent), transparent 62%); opacity:.14; pointer-events:none; }
 .welcome-badge{ font-size:64px; line-height:1; margin-bottom:12px; filter:drop-shadow(0 8px 18px rgba(0,0,0,.5)); animation:floaty 3.4s ease-in-out infinite; }
@@ -123,24 +193,12 @@ html.neon .nav-item.active{
 .feat{ background:var(--card-3); border:1px solid var(--border-soft); border-radius:var(--r-sm); padding:10px 8px; font-size:11px; font-weight:600; color:var(--text); display:flex; flex-direction:column; gap:4px; align-items:center; box-shadow:0 3px 0 var(--hard), inset 0 1px 0 rgba(255,255,255,.06); }
 .feat span{font-size:18px}
 
-.btn-main{
-  width:100%; padding:15px; border:none; border-radius:var(--r-md);
-  background:linear-gradient(180deg,var(--accent),var(--accent-2));
-  color:#fff; font-size:15px; font-weight:800; letter-spacing:.4px;
-  cursor:pointer; position:relative;
-  box-shadow:0 6px 0 var(--accent-dk), 0 12px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.28);
-  transition:transform .1s var(--ease), box-shadow .1s var(--ease), filter .2s;
-}
-.btn-main:active,.btn-main.pressed{
-  transform:translateY(5px);
-  box-shadow:0 1px 0 var(--accent-dk), 0 4px 10px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.2);
-}
+.btn-main{ width:100%; padding:15px; border:none; border-radius:var(--r-md); background:linear-gradient(180deg,var(--accent),var(--accent-2)); color:#fff; font-size:15px; font-weight:800; letter-spacing:.4px; cursor:pointer; position:relative; box-shadow:0 6px 0 var(--accent-dk), 0 12px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.28); transition:transform .1s var(--ease), box-shadow .1s var(--ease), filter .2s; }
+.btn-main:active,.btn-main.pressed{ transform:translateY(5px); box-shadow:0 1px 0 var(--accent-dk), 0 4px 10px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.2); }
 .btn-main:disabled{filter:grayscale(.6) brightness(.7); cursor:not-allowed}
 .btn-hero{font-size:16px; padding:17px; margin-bottom:14px}
-
 .auth-switch{font-size:13px; color:var(--dim); text-align:center}
 .link-btn{ background:none; border:none; color:var(--accent); font-weight:800; cursor:pointer; font-size:13px; text-decoration:underline; text-underline-offset:3px; font-family:inherit; }
-
 .auth-form-wrap{ width:100%; max-width:400px; padding:22px 22px 26px; display:none; position:relative; }
 #authScreen.form .welcome-card{display:none}
 #authScreen.form .auth-form-wrap{display:block; animation:fadeUp .35s var(--ease)}
@@ -154,7 +212,6 @@ html.neon .nav-item.active{
 /* ========== ГЛАВНЫЙ ЭКРАН ========== */
 #mainScreen{display:none;max-width:840px;margin:0 auto;animation:fadeUp .4s var(--ease)}
 #mainScreen.show{display:block}
-
 header{ display:flex; align-items:center; gap:10px; background:linear-gradient(180deg,var(--card-2),var(--card)); padding:11px 14px; border-radius:var(--r-lg); margin-bottom:14px; border:1px solid var(--border); box-shadow:0 5px 0 var(--hard), 0 12px 26px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.07); position:sticky; top:8px; z-index:60; }
 .logo{ font-size:19px; font-weight:900; letter-spacing:1.5px; background:linear-gradient(180deg,var(--accent),var(--accent-2)); -webkit-background-clip:text; background-clip:text; color:transparent; white-space:nowrap; }
 .top-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
@@ -167,7 +224,6 @@ header{ display:flex; align-items:center; gap:10px; background:linear-gradient(1
 /* ========== НИЖНЯЯ НАВИГАЦИЯ 3D ========== */
 .bottom-nav{ display: none; position:fixed; left:0; right:0; bottom:0; z-index:120; gap:3px; align-items:stretch; padding:9px 8px calc(9px + env(safe-area-inset-bottom)); background:var(--nav-bg); backdrop-filter:blur(16px) saturate(1.4); -webkit-backdrop-filter:blur(16px) saturate(1.4); border-top:1px solid var(--border); box-shadow:0 -10px 30px rgba(0,0,0,.45); }
 body.logged-in .bottom-nav { display: flex; }
-
 .nav-item{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:7px 2px 6px; border-radius:13px; cursor:pointer; border:none; background:transparent; color:var(--dim); font-size:9px; font-weight:800; letter-spacing:.1px; font-family:inherit; transition:transform .13s var(--ease), box-shadow .18s var(--ease), background .22s, color .22s; position:relative; user-select:none; }
 .nav-item .ni{font-size:19px; line-height:1; filter:grayscale(.45) opacity(.85); transition:transform .2s var(--ease), filter .2s}
 .nav-item.active{ color:#fff; background:linear-gradient(180deg,var(--accent),var(--accent-2)); box-shadow:0 5px 0 var(--accent-dk), 0 10px 20px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.3); transform:translateY(-2px); }
@@ -272,12 +328,14 @@ body.logged-in .bottom-nav { display: flex; }
 /* ---------- НАСТРОЙКИ ---------- */
 .set-group{margin-bottom:18px; text-align:left}
 .set-title{font-size:11px; font-weight:900; color:var(--dim); letter-spacing:1px; text-transform:uppercase; margin-bottom:9px}
-.theme-grid{display:grid; grid-template-columns:1fr 1fr; gap:9px}
-.theme-card{ border-radius:var(--r-md); padding:11px 10px; cursor:pointer; border:2px solid var(--border); background:var(--card-3); display:flex; align-items:center; gap:9px; transition:transform .12s var(--ease), border-color .2s, box-shadow .2s; font-family:inherit; color:var(--text); font-size:11.5px; font-weight:800; }
-.theme-card:active{transform:scale(.97)}
-.theme-card.sel{border-color:var(--accent); box-shadow:0 0 18px color-mix(in srgb,var(--accent) 45%,transparent)}
-.theme-dots{display:flex; gap:3px; flex-shrink:0}
-.theme-dots i{width:11px;height:11px;border-radius:50%;display:block;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.theme-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:10px; max-height:350px; overflow-y:auto; padding-right:5px;}
+.theme-card{ position:relative; border-radius:var(--r-md); cursor:pointer; border:2px solid transparent; background:var(--card-3); overflow:hidden; display:flex; flex-direction:column; transition:transform .15s var(--ease), border-color .2s, box-shadow .2s; aspect-ratio: 3/4; }
+.theme-card:active{transform:scale(.95)}
+.theme-card.sel{border-color:var(--accent); box-shadow:0 0 20px color-mix(in srgb,var(--accent) 60%,transparent); }
+.theme-preview{ flex:1; position:relative; overflow:hidden; }
+.theme-preview::after{ content:''; position:absolute; inset:0; background:linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.9)); }
+.theme-name{ position:absolute; bottom:0; left:0; right:0; padding:8px 4px; text-align:center; font-size:11px; font-weight:800; color:#fff; text-shadow:0 1px 3px #000; z-index:2; }
+
 .set-row{ display:flex; align-items:center; justify-content:space-between; padding:12px 2px; border-bottom:1px solid var(--border-soft); font-size:13.5px; font-weight:700; }
 .set-row:last-of-type{border-bottom:none}
 .switch{position:relative; display:inline-block; width:48px; height:27px; flex-shrink:0}
@@ -329,7 +387,6 @@ body.logged-in .drop-feed { display: flex; }
 <div id="toastContainer"></div>
 <div class="drop-feed" id="dropFeed"></div>
 
-<!-- ЛОКАЛЬНЫЕ ЗВУКИ (положи файлы в public/sounds/) -->
 <audio id="soundSpin" src="/sounds/spin.mp3" preload="auto"></audio>
 <audio id="soundWin" src="/sounds/win.mp3" preload="auto"></audio>
 <audio id="soundClick" src="/sounds/click.mp3" preload="auto"></audio>
@@ -407,7 +464,7 @@ body.logged-in .drop-feed { display: flex; }
 
   <!-- АПГРЕЙД -->
   <div id="section-upgrade" class="content-section">
-    <div class="upgrade-wrapper" style="display:flex; flex-direction:column; align-items:center; background:#0f111a; padding:15px; border-radius:20px; border:1px solid #2a2a4a; box-shadow:inset 0 0 20px rgba(0,0,0,0.5);">
+    <div class="upgrade-wrapper" style="display:flex; flex-direction:column; align-items:center; background:var(--card); padding:15px; border-radius:20px; border:1px solid var(--border); box-shadow:inset 0 0 20px rgba(0,0,0,0.5);">
       <div class="upg-circle-wrap">
         <svg class="upg-svg" viewBox="0 0 200 200">
           <circle cx="100" cy="100" r="85" fill="none" stroke="#1f2233" stroke-width="12" />
@@ -417,32 +474,32 @@ body.logged-in .drop-feed { display: flex; }
         <div style="position:absolute; bottom:-5px; left:50%; transform:translateX(-50%); color:#ffd700; font-size:16px;">▲</div>
       </div>
 
-      <div style="font-size:14px; color:#8890b5; margin-bottom:15px;">Шанс <span id="upgradeChanceText" style="font-size:22px; font-weight:900; color:#ffd700;">0,0 %</span></div>
+      <div style="font-size:14px; color:var(--dim); margin-bottom:15px;">Шанс <span id="upgradeChanceText" style="font-size:22px; font-weight:900; color:var(--gold);">0,0 %</span></div>
 
       <div style="display:flex; width:100%; justify-content:space-between; gap:10px; margin-bottom:15px;">
-        <div id="upgradeMySlot" style="flex:1; background:#171928; border:1px solid #2a2f4c; border-radius:12px; padding:10px; display:flex; flex-direction:column; cursor:pointer; transition: transform 0.1s;">
-          <div style="font-size:10px; color:#8890b5;">Ваша ставка</div>
+        <div id="upgradeMySlot" style="flex:1; background:var(--card-3); border:1px solid var(--border-soft); border-radius:12px; padding:10px; display:flex; flex-direction:column; cursor:pointer; transition: transform 0.1s;">
+          <div style="font-size:10px; color:var(--dim);">Ваша ставка</div>
           <div style="display:flex; align-items:center; gap:5px; margin-top:5px;">
             <span id="upgMyIcon" style="font-size:20px;">⭐</span>
-            <span id="upgMyName" style="font-size:12px; font-weight:bold;">Выбрать</span>
+            <span id="upgMyName" style="font-size:12px; font-weight:bold; color:var(--text);">Выбрать</span>
           </div>
-          <div id="upgMyPrice" style="font-size:11px; color:#ffd700; margin-top:2px;">0 🌟</div>
+          <div id="upgMyPrice" style="font-size:11px; color:var(--gold); margin-top:2px;">0 🌟</div>
         </div>
         
-        <div style="display:flex; align-items:center; color:#8890b5;">➔</div>
+        <div style="display:flex; align-items:center; color:var(--dim);">➔</div>
 
-        <div id="upgradeTargetSlot" style="flex:1; background:#171928; border:1px solid #2a2f4c; border-radius:12px; padding:10px; display:flex; flex-direction:column; cursor:pointer; transition: transform 0.1s;">
-          <div style="font-size:10px; color:#8890b5;">Хочу получить</div>
+        <div id="upgradeTargetSlot" style="flex:1; background:var(--card-3); border:1px solid var(--border-soft); border-radius:12px; padding:10px; display:flex; flex-direction:column; cursor:pointer; transition: transform 0.1s;">
+          <div style="font-size:10px; color:var(--dim);">Хочу получить</div>
           <div style="display:flex; align-items:center; gap:5px; margin-top:5px;">
             <span id="upgTargetIcon" style="font-size:20px;">🎁</span>
-            <span id="upgTargetName" style="font-size:12px; font-weight:bold;">Выбрать</span>
+            <span id="upgTargetName" style="font-size:12px; font-weight:bold; color:var(--text);">Выбрать</span>
           </div>
-          <div id="upgTargetPrice" style="font-size:11px; color:#ffd700; margin-top:2px;">0 🌟</div>
+          <div id="upgTargetPrice" style="font-size:11px; color:var(--gold); margin-top:2px;">0 🌟</div>
         </div>
       </div>
 
       <div style="display:flex; gap:5px; width:100%; overflow-x:auto; padding-bottom:5px; margin-bottom:10px;" id="upgradeMultipliers"></div>
-      <div id="upgradeItemsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(70px, 1fr)); gap:8px; width:100%; max-height:200px; overflow-y:auto; margin-bottom:15px; padding:5px; background:#0a0c14; border-radius:12px;"></div>
+      <div id="upgradeItemsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(70px, 1fr)); gap:8px; width:100%; max-height:200px; overflow-y:auto; margin-bottom:15px; padding:5px; background:var(--bg); border-radius:12px;"></div>
 
       <div class="toggle-fast"><input type="checkbox" id="fastUpgradeToggle"> Быстрый апгрейд</div>
       <button class="upgrade-btn" id="btnDoUpgrade">В УЛУЧШИТЬ</button>
@@ -528,12 +585,13 @@ body.logged-in .drop-feed { display: flex; }
   </div>
 </div>
 
+<!-- НАСТРОЙКИ -->
 <div class="modal" id="settingsModal">
   <div class="box" style="text-align:left;">
     <h2 style="text-align:center;">⚙️ Настройки</h2>
 
     <div class="set-group">
-      <div class="set-title">Тема оформления</div>
+      <div class="set-title">Выберите тему</div>
       <div class="theme-grid" id="themeGrid"></div>
     </div>
 
@@ -597,11 +655,21 @@ document.addEventListener('DOMContentLoaded', function () {
   var selectedBattleCase = null;
 
   var SETTINGS = { theme: 'purple', neon: false, snow: true };
+  
+  // Список тем (только CSS, никаких картинок)
   var THEMES = [
-    { id: 'purple', name: 'Чёрно-фиолетовая', colors: ['#0a0a12', '#a855f7', '#ece9ff'] },
-    { id: 'red',    name: 'Красно-тёмная',    colors: ['#120608', '#ef4444', '#ffeaea'] },
-    { id: 'gray',   name: 'Серо-белая',       colors: ['#eef1f6', '#3b82f6', '#1e293b'] },
-    { id: 'green',  name: 'Зелёно-чёрная',    colors: ['#040b08', '#10b981', '#dffbea'] }
+    { id: 'purple', name: 'Фиолетовая', bg: 'linear-gradient(135deg, #08060f, #a855f7)' },
+    { id: 'red',    name: 'Красная',    bg: 'linear-gradient(135deg, #0d0406, #ef4444)' },
+    { id: 'gray',   name: 'Серая',      bg: 'linear-gradient(135deg, #eef1f6, #3b82f6)' },
+    { id: 'green',  name: 'Зеленая',    bg: 'linear-gradient(135deg, #040b08, #10b981)' },
+    
+    // Анимированные кастомные темы
+    { id: 't_fluid', name: 'Dark Fluid', bg: 'radial-gradient(circle at 20% 30%, #2a2a2a, #000)' },
+    { id: 't_forest', name: 'Foggy Forest', bg: 'linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), repeating-linear-gradient(90deg, #000 0%, #111 5%, #000 10%)' },
+    { id: 't_silk', name: 'Black Silk', bg: 'radial-gradient(ellipse at 50% -20%, #333, #000 70%)' },
+    { id: 't_angel', name: 'Dark Angel', bg: 'radial-gradient(circle at 50% 100%, rgba(255,255,255,0.15), #000 60%)' },
+    { id: 't_blackhole', name: 'Black Hole', bg: 'radial-gradient(circle at 50% 50%, #111 0%, #000 15%, #222 18%, #000 25%)' },
+    { id: 't_road', name: 'Night Road', bg: 'linear-gradient(to bottom, #000 0%, #111 50%, #000 100%)' }
   ];
 
   function toast(msg, type) {
@@ -687,19 +755,20 @@ document.addEventListener('DOMContentLoaded', function () {
     var grid = el('themeGrid');
     if (!grid) return;
     grid.innerHTML = '';
+    
     THEMES.forEach(function (t) {
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'theme-card' + (SETTINGS.theme === t.id ? ' sel' : '');
       btn.dataset.theme = t.id;
-      btn.innerHTML =
-        '<span class="theme-dots">' +
-          t.colors.map(function (c) { return '<i style="background:' + c + '"></i>'; }).join('') +
-        '</span>' + t.name;
+      btn.innerHTML = 
+        '<div class="theme-preview" style="background: ' + t.bg + '; background-size: cover;"></div>' +
+        '<div class="theme-name">' + t.name + '</div>';
       btn.onclick = function () {
         SETTINGS.theme = t.id;
         saveSettings();
         applySettings();
+        playSound(clickSound, 0.3);
       };
       grid.appendChild(btn);
     });
@@ -724,7 +793,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   document.addEventListener('pointerdown', function (e) {
-    var t = e.target.closest ? e.target.closest('.case,.item,.nav-item,.btn-main,.shop-card,.battle-case,.balance-top,.icon-btn,.upgrade-btn') : null;
+    var t = e.target.closest ? e.target.closest('.case,.item,.nav-item,.btn-main,.shop-card,.battle-case,.balance-top,.icon-btn,.upgrade-btn,.theme-card') : null;
     if (t) t.classList.add('pressed');
   }, { passive: true });
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (evt) {
@@ -1259,7 +1328,7 @@ document.addEventListener('DOMContentLoaded', function () {
     mults.forEach(m => {
       var b = document.createElement('button');
       b.textContent = 'x' + m;
-      b.style.cssText = 'flex:1; min-width:45px; padding:8px 5px; background:#1f2233; border:1px solid #2a2f4c; color:#8890b5; border-radius:8px; font-weight:bold; font-size:12px; cursor:pointer; transition:0.2s;';
+      b.style.cssText = 'flex:1; min-width:45px; padding:8px 5px; background:var(--card-3); border:1px solid var(--border); color:var(--dim); border-radius:8px; font-weight:bold; font-size:12px; cursor:pointer; transition:0.2s;';
       b.onclick = function () {
         currentMultiplier = m;
         applyMultiplier();
@@ -1278,9 +1347,9 @@ document.addEventListener('DOMContentLoaded', function () {
     for (var i = 0; i < btns.length; i++) {
         var val = parseInt(btns[i].textContent.replace('x', ''));
         if (val === currentMultiplier) {
-            btns[i].style.background = '#ffd700'; btns[i].style.color = '#000'; btns[i].style.borderColor = '#ffd700';
+            btns[i].style.background = 'var(--accent)'; btns[i].style.color = '#000'; btns[i].style.borderColor = 'var(--accent)';
         } else {
-            btns[i].style.background = '#1f2233'; btns[i].style.color = '#8890b5'; btns[i].style.borderColor = '#2a2f4c';
+            btns[i].style.background = 'var(--card-3)'; btns[i].style.color = 'var(--dim)'; btns[i].style.borderColor = 'var(--border)';
         }
     }
 
@@ -1314,11 +1383,11 @@ document.addEventListener('DOMContentLoaded', function () {
     available.forEach(item => {
       var isSel = upgradeSelectedTarget && upgradeSelectedTarget.id === item.id;
       var div = document.createElement('div');
-      div.style.cssText = 'background:' + (isSel ? '#2a2f4c' : '#171928') + '; border:1px solid ' + (isSel ? '#ffd700' : '#2a2f4c') + '; border-radius:10px; padding:8px 4px; text-align:center; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: 0.1s;';
+      div.style.cssText = 'background:' + (isSel ? 'var(--accent)' : 'var(--card-3)') + '; border:1px solid ' + (isSel ? 'var(--accent)' : 'var(--border)') + '; border-radius:10px; padding:8px 4px; text-align:center; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: 0.1s;';
       div.innerHTML = `
         <div>${iconHtml(item.icon, 24)}</div>
-        <div style="font-size:9px; color:#ccc; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">${item.name}</div>
-        <div style="font-size:10px; color:#ffd700; font-weight:bold; margin-top:2px;">${item.price} 🌟</div>
+        <div style="font-size:9px; color:var(--text); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">${item.name}</div>
+        <div style="font-size:10px; color:var(--gold); font-weight:bold; margin-top:2px;">${item.price} 🌟</div>
       `;
       div.onclick = function() {
         upgradeSelectedTarget = item;
@@ -1771,4 +1840,4 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 </body>
-                                </html>
+      </html>

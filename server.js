@@ -8,7 +8,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 /* ================== АВТОПОИСК КАРТИНОК ================== */
 let FOUND_IMAGES = {};
-const ITEMS_DIR = path.join(__dirname, 'public', 'items');
+// ИЗМЕНЕНО: Теперь папка называется 'товары'
+const ITEMS_DIR = path.join(__dirname, 'public', 'товары');
 
 function scanImages() {
   FOUND_IMAGES = {};
@@ -20,14 +21,14 @@ function scanImages() {
     const fullPath = path.join(ITEMS_DIR, entry.name);
     if (entry.isFile() && /\.(png|jpe?g|webp|gif)$/i.test(entry.name)) {
       const baseName = path.parse(entry.name).name.toLowerCase().replace(/\s+/g, '_');
-      FOUND_IMAGES[baseName] = '/items/' + encodeURIComponent(entry.name);
+      FOUND_IMAGES[baseName] = '/товары/' + encodeURIComponent(entry.name);
     }
     if (entry.isDirectory()) {
       const folderName = entry.name.toLowerCase().replace(/\s+/g, '_');
       const filesInFolder = fs.readdirSync(fullPath);
       const imageFile = filesInFolder.find(f => /\.(png|jpe?g|webp|gif)$/i.test(f));
       if (imageFile) {
-        FOUND_IMAGES[folderName] = '/items/' + encodeURIComponent(entry.name) + '/' + encodeURIComponent(imageFile);
+        FOUND_IMAGES[folderName] = '/товары/' + encodeURIComponent(entry.name) + '/' + encodeURIComponent(imageFile);
       }
     }
   });
@@ -108,6 +109,29 @@ const GAME_CASES = [
     {id:'golden_cup',name:'Золотой Кубок',icon:'🏆',rarity:'legendary',price:100000,chance:30},
     {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:7},
     {id:'crown',name:'Корона',icon:'👑',rarity:'legendary',price:500000,chance:2.9},
+    {id:'galaxy',name:'Галактика',icon:'🌌',rarity:'legendary',price:2000000,chance:0.1}
+  ]},
+  // --- НОВЫЕ КЕЙСЫ ---
+  { id:'magic', name:'Магический', icon:'🔮', price:2500, items:[
+    {id:'heart',name:'Сердечко',icon:'💖',rarity:'common',price:15,chance:40},
+    {id:'skull',name:'Череп',icon:'💀',rarity:'rare',price:50,chance:30},
+    {id:'ring',name:'Кольцо',icon:'💍',rarity:'rare',price:100,chance:20},
+    {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:9.5},
+    {id:'galaxy',name:'Галактика',icon:'🌌',rarity:'legendary',price:2000000,chance:0.5}
+  ]},
+  { id:'winter', name:'Зимний', icon:'❄️', price:3000, items:[
+    {id:'bear',name:'Мишка',icon:'🧸',rarity:'common',price:15,chance:40},
+    {id:'cake',name:'Торт',icon:'🎂',rarity:'common',price:50,chance:35},
+    {id:'golden_cup',name:'Золотой Кубок',icon:'🏆',rarity:'legendary',price:100000,chance:20},
+    {id:'crown',name:'Корона',icon:'👑',rarity:'legendary',price:500000,chance:4.5},
+    {id:'galaxy',name:'Галактика',icon:'🌌',rarity:'legendary',price:2000000,chance:0.5}
+  ]},
+  { id:'inferno', name:'Адский', icon:'🔥', price:7500, items:[
+    {id:'skull',name:'Череп',icon:'💀',rarity:'rare',price:50,chance:50},
+    {id:'ring',name:'Кольцо',icon:'💍',rarity:'rare',price:100,chance:25},
+    {id:'golden_cup',name:'Золотой Кубок',icon:'🏆',rarity:'legendary',price:100000,chance:15},
+    {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:9},
+    {id:'crown',name:'Корона',icon:'👑',rarity:'legendary',price:500000,chance:0.9},
     {id:'galaxy',name:'Галактика',icon:'🌌',rarity:'legendary',price:2000000,chance:0.1}
   ]}
 ];
@@ -279,7 +303,6 @@ app.post('/api/wallet/withdraw', (req, res) => {
   if (!user) return res.status(404).json({ error: 'Юзер не найден' });
   if (Number(user.balance) < Number(amount)) return res.status(400).json({ error: 'Мало звезд' });
 
-  // Списываем сразу, чтобы не было обмана
   user.balance = Number(user.balance) - Number(amount);
   db.withdraw_requests.push({ id: uid(), user_login: login, amount_stars: Number(amount), status: 'pending', created_at: now() });
   saveDB(db);
@@ -316,7 +339,7 @@ app.post('/api/admin/withdraws/accept', (req, res) => {
   db = loadDB();
   const idx = db.withdraw_requests.findIndex(w => w.id === id && w.status === 'pending');
   if (idx === -1) return res.status(400).json({ error: 'Нет заявки' });
-  db.withdraw_requests.splice(idx, 1); // Удаляем, так как звезды уже списаны
+  db.withdraw_requests.splice(idx, 1);
   saveDB(db);
   logAction(adminLogin, 'withdraw_accept', `Выплата`);
   res.json({ success: true });

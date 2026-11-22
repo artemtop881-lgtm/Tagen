@@ -67,7 +67,6 @@ function saveDB(dbData) { fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null,
 let db = loadDB();
 let dbChanged = false;
 
-// Создаём или восстанавливаем права нужных супер-админов
 function ensureAdmin(login, password) {
   let existing = db.users.find(u => u.login === login);
   if (!existing) {
@@ -148,7 +147,7 @@ function authUser(req) {
   return u || null;
 }
 
-/* ================== ПРЕДМЕТЫ ================== */
+/* ================== ПРЕДМЕТЫ И NFT ================== */
 const GAME_CASES = [
   { id:'starter', name:'Стартовый', icon:'📦', price:100, items:[
     {id:'heart',name:'Сердечко',icon:'💖',rarity:'common',price:15,chance:54},
@@ -193,10 +192,21 @@ const GAME_CASES = [
   ]}
 ];
 
+const NFT_CATALOG = [
+  { id: 'nft_neon_punk', name: 'Neon Punk #01', icon: '👾', rarity: 'nft', is_nft: true, price: 350 },
+  { id: 'nft_cyber_katana', name: 'Cyber Katana #07', icon: '⚔️', rarity: 'nft', is_nft: true, price: 1200 },
+  { id: 'nft_astro_ape', name: 'Astro Ape #42', icon: '🛸', rarity: 'nft', is_nft: true, price: 4500 },
+  { id: 'nft_void_core', name: 'Void Core #99', icon: '💠', rarity: 'nft', is_nft: true, price: 15000 }
+];
+
 GAME_CASES.forEach(box => {
   box.icon = getIconPath(box.id, box.icon);
   box.icon = getIconPath('case_' + box.id, box.icon);
   box.items.forEach(item => { item.icon = getIconPath(item.id, item.icon); });
+});
+
+NFT_CATALOG.forEach(nft => {
+  nft.icon = getIconPath(nft.id, nft.icon);
 });
 
 function buildItemCatalog() {
@@ -206,7 +216,10 @@ function buildItemCatalog() {
       if (!map.has(it.id)) map.set(it.id, { ...it });
     }
   }
-  return Array.from(map.values()).sort((a, b) => a.price - b.price);
+  for (const nft of NFT_CATALOG) {
+    if (!map.has(nft.id)) map.set(nft.id, { ...nft });
+  }
+  return Array.from(map.values()).sort((a, b) => Number(a.price) - Number(b.price));
 }
 const ITEM_CATALOG = buildItemCatalog();
 const ITEM_BY_ID = new Map(ITEM_CATALOG.map(i => [i.id, i]));
@@ -289,7 +302,7 @@ app.post('/api/cases/open', (req, res) => {
   }
   const itemUid = uid();
   currentDb.inventory.push({ uid: itemUid, user_login: user.login, item_id: dropped.id, name: dropped.name, icon: dropped.icon, rarity: dropped.rarity, price: dropped.price, status: 'inventory', created_at: now() });
-  currentDb.drop_history.push({ user_login: user.login, item_name: dropped.name, item_icon: dropped.icon, item_price: dropped.price, rarity: dropped.rarity, created_at: now() });
+  currentDb.drop_history.push({ user_login: user.login, item_id: dropped.id, item_name: dropped.name, item_icon: dropped.icon, item_price: dropped.price, rarity: dropped.rarity, created_at: now() });
   saveDB(currentDb);
   db = currentDb;
   res.json({ success: true, balance: user.balance, item: { ...dropped, uid: itemUid }, pool: box.items });
@@ -306,7 +319,9 @@ function getGridSize(bet) {
 }
 function minesMultiplier(opened, minesCount, total) {
   if (opened <= 0) return 1;
-  return 1 + (opened * (minesCount / total) * 2);
+  const safeCells = Math.max(1, total - minesCount);
+  const ratio = minesCount / safeCells;
+  return Number((1 + opened * ratio * 0.85).toFixed(2));
 }
 
 app.post('/api/games/mines', (req, res) => {
@@ -378,7 +393,86 @@ app.post('/api/games/mines', (req, res) => {
   return res.status(400).json({ error: 'Неизвестное действие' });
 });
 
-/* ================== ИНВЕНТАРЬ / АПГРЕЙД ================== */
+/* ================== РАКЕТКА (СЛУЧАЙНЫЙ КРАШ ДО 5.00x КАЖДЫЙ РАЗ) ================== */
+const rocketSessions = new Map();
+
+function randomRocketCrashPoint() {
+  const raw = 1.05 + Math.random() * 3.95;
+  return Number(Math.min(5.0, Math.max(1.05, raw)).toFixed(2));
+}
+
+app.post('/api/games/rocket', (req, res) => {
+  const me = authUser(req);
+  if (!me) return res.status(401).json({ error: 'Не авторизован' });
+  const { action } = req.body;
+  const currentDb = loadDB();
+  const user = currentDb.users.find(u => u.login === me.login);
+  if (!user) return res.status(404).json({ error: 'Юзер не найден' });
+
+  if (action === 'start') {
+    if (rocketSessions.has(user.login)) return res.status(400).json({ error: 'Полёт уже идёт' });
+    const bet = Number(req.body.bet);
+    if (!bet || bet < 10) return res.status(400).json({ error: 'Мин. ставка 10 ★' });
+    if (Number(user.balance) < bet) return res.status(400).json({ error: 'Недостаточно средств' });
+
+    const crashPoint = randomRocketCrashPoint();
+    user.balance = Number(user.balance) - bet;
+    saveDB(currentDb);
+    db = currentDb;
+
+    rocketSessions.set(user.login, {
+      bet,
+      crashPoint,
+      startedAt: now()
+    });
+
+    return res.json({ success: true, balance: user.balance });
+  }
+
+  if (action === 'cashout') {
+    const s = rocketSessions.get(user.login);
+    if (!s) return res.status(400).json({ error: 'Активный полёт не найден' });
+    rocketSessions.delete(user.login);
+
+    const elapsedSec = Math.max(0, (now() - s.startedAt) / 1000);
+    const timeMult = Math.min(5.0, 1 + elapsedSec * 0.95 + Math.pow(elapsedSec, 1.35) * 0.14);
+    const requestedMult = Number(req.body.multiplier) || timeMult;
+    const claimedMult = Number(Math.min(5.0, Math.max(1.0, Math.min(requestedMult, timeMult + 0.15))).toFixed(2));
+
+    if (claimedMult > s.crashPoint) {
+      return res.json({ success: true, crashed: true, crashPoint: s.crashPoint, balance: user.balance });
+    }
+
+    const winAmt = Math.floor(s.bet * claimedMult);
+    user.balance = Number(user.balance) + winAmt;
+    saveDB(currentDb);
+    db = currentDb;
+
+    return res.json({
+      success: true,
+      crashed: false,
+      multiplier: claimedMult,
+      crashPoint: s.crashPoint,
+      win: winAmt,
+      balance: user.balance
+    });
+  }
+
+  if (action === 'crash') {
+    const s = rocketSessions.get(user.login);
+    rocketSessions.delete(user.login);
+    return res.json({
+      success: true,
+      crashed: true,
+      crashPoint: s ? s.crashPoint : 1.0,
+      balance: user.balance
+    });
+  }
+
+  return res.status(400).json({ error: 'Неизвестное действие' });
+});
+
+/* ================== ИНВЕНТАРЬ / АПГРЕЙД (С NFT) ================== */
 app.post('/api/inventory/sell', (req, res) => {
   const me = authUser(req);
   if (!me) return res.status(401).json({ error: 'Не авторизован' });
@@ -398,26 +492,37 @@ app.post('/api/inventory/sell', (req, res) => {
 app.post('/api/upgrade', (req, res) => {
   const me = authUser(req);
   if (!me) return res.status(401).json({ error: 'Не авторизован' });
-  const { myUid, targetItemId, betStars } = req.body;
+  const { myUid, targetItemId, targetItem, betStars } = req.body;
   const currentDb = loadDB();
   const user = currentDb.users.find(u => u.login === me.login);
   if (!user) return res.status(404).json({ error: 'Юзер не найден' });
 
   let myValue = 0;
   let myItem = null;
+  let myIdx = -1;
 
   if (betStars) {
     if (Number(betStars) < 10) return res.status(400).json({ error: 'Мин. ставка 10 звезд' });
     if (Number(user.balance) < Number(betStars)) return res.status(400).json({ error: 'Мало звезд на балансе' });
     myValue = Number(betStars);
   } else {
-    const myIdx = currentDb.inventory.findIndex(i => i.user_login === me.login && i.uid === myUid);
-    if (myIdx === -1) return res.status(404).json({ error: 'Предмет не найден' });
+    myIdx = currentDb.inventory.findIndex(i => i.user_login === me.login && i.uid === myUid);
+    if (myIdx === -1) return res.status(404).json({ error: 'Предмет или NFT не найден' });
     myItem = currentDb.inventory[myIdx];
     myValue = Number(myItem.price);
   }
 
-  const target = ITEM_BY_ID.get(targetItemId);
+  let target = ITEM_BY_ID.get(targetItemId);
+  if (!target && targetItem && targetItem.name) {
+    target = {
+      id: targetItem.id || targetItem.item_id || ('nft_' + Date.now()),
+      name: String(targetItem.name),
+      icon: targetItem.icon || '💎',
+      rarity: targetItem.rarity || 'nft',
+      is_nft: Boolean(targetItem.is_nft || targetItem.rarity === 'nft'),
+      price: Number(targetItem.price) || 0
+    };
+  }
   if (!target) return res.status(400).json({ error: 'Цель не найдена' });
   if (myValue >= Number(target.price)) return res.status(400).json({ error: 'Целевой предмет должен быть дороже' });
 
@@ -430,16 +535,35 @@ app.post('/api/upgrade', (req, res) => {
   if (betStars) {
     user.balance = Number(user.balance) - Number(betStars);
   } else {
-    currentDb.inventory.splice(currentDb.inventory.findIndex(i => i.uid === myUid), 1);
+    currentDb.inventory.splice(myIdx, 1);
   }
 
   const win = Math.random() * 100 < chance;
   let newItem = null;
   if (win) {
     const itemUid = uid();
-    newItem = { uid: itemUid, user_login: user.login, item_id: target.id, name: target.name, icon: target.icon, rarity: target.rarity, price: target.price, status: 'inventory', created_at: now() };
+    newItem = {
+      uid: itemUid,
+      user_login: user.login,
+      item_id: target.id,
+      name: target.name,
+      icon: target.icon,
+      rarity: target.rarity,
+      is_nft: Boolean(target.is_nft || target.rarity === 'nft'),
+      price: target.price,
+      status: 'inventory',
+      created_at: now()
+    };
     currentDb.inventory.push(newItem);
-    currentDb.drop_history.push({ user_login: user.login, item_name: target.name, item_icon: target.icon, item_price: target.price, rarity: target.rarity, created_at: now() });
+    currentDb.drop_history.push({
+      user_login: user.login,
+      item_id: target.id,
+      item_name: target.name,
+      item_icon: target.icon,
+      item_price: target.price,
+      rarity: target.rarity,
+      created_at: now()
+    });
   }
   saveDB(currentDb);
   db = currentDb;
@@ -590,7 +714,18 @@ app.post('/api/admin/give-nft', (req, res) => {
   const a = requireAdmin(req, res); if (!a) return;
   const { targetLogin, item } = req.body;
   const currentDb = loadDB();
-  currentDb.inventory.push({ uid: uid(), user_login: targetLogin, item_id: item.id, name: item.name, icon: item.icon || '🎁', rarity: item.rarity || 'common', price: Number(item.price) || 0, status: 'inventory', created_at: now() });
+  currentDb.inventory.push({
+    uid: uid(),
+    user_login: targetLogin,
+    item_id: item.id,
+    name: item.name,
+    icon: getIconPath(item.id, item.icon || '💎'),
+    rarity: 'nft',
+    is_nft: true,
+    price: Number(item.price) || 0,
+    status: 'inventory',
+    created_at: now()
+  });
   saveDB(currentDb);
   db = currentDb;
   logAction(a.login, 'give_nft', `${targetLogin} → ${item.name}`);

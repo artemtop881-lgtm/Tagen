@@ -93,7 +93,6 @@ header{ display:flex; align-items:center; justify-content:space-between; gap:10p
     flex-direction: column;
     align-items: center;
     padding: 20px 0;
-    padding-bottom: 90px; /* Отступ для фиксированной кнопки */
 }
 .upg-circle-wrap {
     position: relative;
@@ -176,15 +175,9 @@ header{ display:flex; align-items:center; justify-content:space-between; gap:10p
 .upg-chance-text { text-align: center; margin-bottom: 15px; font-size: 18px; font-weight: 900; }
 .upg-chance-text span { color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.5); }
 
-/* ФИКСИРОВАННАЯ КНОПКА УЛУЧШИТЬ */
+/* Кнопка улучшить (в потоке) */
 #btnDoUpgrade {
-    position: fixed;
-    bottom: 80px; /* Над нижней навигацией */
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 24px);
-    max-width: 576px;
-    z-index: 100;
+    width: 100%;
     padding: 16px;
     font-size: 18px;
     letter-spacing: 1px;
@@ -193,11 +186,12 @@ header{ display:flex; align-items:center; justify-content:space-between; gap:10p
     border: none;
     border-radius: 14px;
     font-weight: 900;
-    box-shadow: 0 5px 0 #312e81, 0 10px 20px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 0 #312e81;
     cursor: pointer;
     transition: 0.1s;
+    margin-top: 10px;
 }
-#btnDoUpgrade:active { transform: translate(-50%, 4px); box-shadow: 0 1px 0 #312e81; }
+#btnDoUpgrade:active { transform: translateY(4px); box-shadow: 0 1px 0 #312e81; }
 #btnDoUpgrade:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ========== МИНЫ ========== */
@@ -448,7 +442,7 @@ input:checked + .slider:before { transform: translateX(22px); }
           <!-- Сетка целей -->
           <div class="items-grid" id="upgradeItemsGrid"></div>
           
-          <!-- Кнопка улучшить (фиксированная) -->
+          <!-- Кнопка улучшить -->
           <button class="btn-main btn-blue" id="btnDoUpgrade">Улучшить</button>
       </div>
     </div>
@@ -1045,7 +1039,6 @@ function updateUpgradeUI() {
   $('upgradeChanceText').textContent = chance.toFixed(1) + '%';
   $('upgCenterItem').innerHTML = renderIcon(targetUpgradeItem.icon, 60);
   
-  // Рисуем белую полосу
   const arcLength = (chance / 100) * 534;
   circle.style.strokeDasharray = `${arcLength} 534`;
 }
@@ -1058,7 +1051,6 @@ $('btnDoUpgrade').onclick = async () => {
   const pointer = $('upgPointer');
   const circle = $('upgProgressCircle');
   
-  // Сброс стрелки
   pointer.classList.remove('spinning');
   pointer.style.transform = 'translate(-50%, -100%) rotate(0deg)';
   
@@ -1078,19 +1070,18 @@ $('btnDoUpgrade').onclick = async () => {
       const pointer = $('upgPointer');
       pointer.classList.add('spinning');
       
-      // Расчет угла: если выигрыш, останавливаемся в белой зоне. Если проигрыш - в серой.
-      let targetAngle = 0;
       const chanceDeg = (data.chance / 100) * 360;
+      let targetAngle = 0;
       
       if (data.win) {
-        // Выигрыш: останавливаемся где-то внутри белой зоны (от 0 до chanceDeg)
-        targetAngle = Math.random() * chanceDeg; 
+        // ВЫИГРЫШ: останавливаем стрелку ВНУТРИ белой зоны (от 0 до chanceDeg)
+        targetAngle = Math.random() * (chanceDeg * 0.9); // 0.9 чтобы не зацепить край
       } else {
-        // Проигрыш: останавливаемся где-то в серой зоне (от chanceDeg до 360)
+        // ПРОИГРЫШ: останавливаем стрелку В СЕРОЙ зоне (от chanceDeg до 360)
         targetAngle = chanceDeg + Math.random() * (360 - chanceDeg);
       }
       
-      const totalSpins = 360 * 5; // 5 оборотов
+      const totalSpins = 360 * 5;
       const finalAngle = totalSpins + targetAngle;
       
       pointer.style.transform = `translate(-50%, -100%) rotate(${finalAngle}deg)`;
@@ -1115,7 +1106,7 @@ $('btnDoUpgrade').onclick = async () => {
         } else {
           toast('НЕУДАЧА', 'error');
         }
-      }, 4600); // 4.5s анимация + запас
+      }, 4600);
     }, 50);
     
   } catch(e) {
@@ -1269,4 +1260,4 @@ async function updateOnline() {
 }
 </script>
 </body>
-            </html>
+      </html>

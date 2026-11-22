@@ -42,7 +42,7 @@ function getIconPath(id, fallbackEmoji) {
 /* ================== ХРАНИЛИЩЕ ================== */
 const DB_FILE = process.env.DB_PATH || path.join(__dirname, 'database.json');
 const EMPTY_DB = () => ({
-  users: [], inventory: [], user_customization: [], drop_history: [],
+  users: [], inventory: [], user_customization: [], drop_history: [], // <-- ДОБАВИЛ drop_history
   withdraw_requests: [], deposit_requests: [], promocodes: [], promo_history: [],
   admin_logs: [], admin_notes: [], broadcasts: []
 });
@@ -87,7 +87,7 @@ function addBalance(login, amount) {
   return { balance: u.balance };
 }
 
-/* ================== ПРЕДМЕТЫ (ПОФИКШЕННЫЕ ШАНСЫ) ================== */
+/* ================== ПРЕДМЕТЫ ================== */
 const GAME_CASES = [
   { id:'starter', name:'Стартовый', icon:'📦', price:100, items:[
     {id:'heart',name:'Сердечко',icon:'💖',rarity:'common',price:15,chance:54},
@@ -157,12 +157,10 @@ app.post('/api/register', (req, res) => {
   db = loadDB();
   if (db.users.find(u => u.login === login)) return res.status(400).json({ error: 'Логин уже занят' });
   
-  // ИЗМЕНЕНО: Стартовый баланс 100 звёзд
   db.users.push({ login, password, balance: 100, is_admin: false, is_super_admin: false, last_seen: now(), last_bonus: null });
   db.user_customization.push({ user_login: login, avatar: '👤', frame: 'none' });
   saveDB(db);
   
-  // ИЗМЕНЕНО: Возвращаем 100 звёзд
   res.json({ success: true, user: { login, balance: 100 } });
 });
 
@@ -216,7 +214,11 @@ app.post('/api/cases/open', (req, res) => {
   }
   const itemUid = uid();
   db.inventory.push({ uid: itemUid, user_login: login, item_id: dropped.id, name: dropped.name, icon: dropped.icon, rarity: dropped.rarity, price: dropped.price, status: 'inventory', created_at: now() });
+  
+  // ДОБАВЛЯЕМ В ИСТОРИЮ ДРОПОВ
+  db.drop_history.push({ user_login: login, item_name: dropped.name, item_icon: dropped.icon, item_price: dropped.price, rarity: dropped.rarity, created_at: now() });
   saveDB(db);
+  
   res.json({ success: true, balance: user.balance, item: { ...dropped, uid: itemUid }, pool: box.items });
 });
 
@@ -280,9 +282,20 @@ app.post('/api/upgrade', (req, res) => {
     const itemUid = uid();
     newItem = { uid: itemUid, user_login: login, item_id: target.id, name: target.name, icon: target.icon, rarity: target.rarity, price: target.price, status: 'inventory', created_at: now() };
     db.inventory.push(newItem);
+    
+    // ДОБАВЛЯЕМ В ИСТОРИЮ ДРОПОВ (ЕСЛИ ВЫИГРАЛ)
+    db.drop_history.push({ user_login: login, item_name: target.name, item_icon: target.icon, item_price: target.price, rarity: target.rarity, created_at: now() });
   }
   saveDB(db);
   res.json({ success: true, win, chance, item: win ? { ...target, uid: newItem.uid } : target, myItem });
+});
+
+// НОВЫЙ ЭНДПОИНТ ДЛЯ ПОЛУЧЕНИЯ ПОСЛЕДНИХ ДРОПОВ
+app.get('/api/drops', (req, res) => {
+  db = loadDB();
+  // Берем последние 20 дропов, сортируем по времени (новые сверху)
+  const recent = db.drop_history.slice(-20).reverse();
+  res.json(recent);
 });
 
 /* ================== КОШЕЛЕК (ЗАЯВКИ) ================== */

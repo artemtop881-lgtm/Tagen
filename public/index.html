@@ -113,10 +113,10 @@ header{
   box-shadow:0 0 8px var(--cyan), 0 0 14px var(--cyan);
 }
 
-/* УЛУЧШЕННАЯ ВИДИМАЯ КАРТОЧКА И ЛЕНТА ДРОПОВ */
+/* КАРТОЧКА ЛАЙВ-ДРОПОВ С ДВИЖЕНИЕМ СЛЕВА НАПРАВО */
 .live-table-card {
   background: linear-gradient(155deg, #2b1846 0%, #190e2b 58%, #120920 100%);
-  border-radius:24px; padding:18px;
+  border-radius:24px; padding:16px;
   border:1.5px solid rgba(224, 170, 255, 0.65);
   margin-bottom:20px; position:relative; overflow:hidden;
   box-shadow: var(--depth-shadow), var(--neon-strong);
@@ -126,7 +126,7 @@ header{
   background: radial-gradient(circle, rgba(199,125,255,0.34), transparent 70%);
   pointer-events:none;
 }
-.live-table-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.live-table-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
 .live-tag {
   background:rgba(199,125,255,0.22); color:#fff;
   font-size:10.5px; font-weight:900; padding:5px 11px; border-radius:8px;
@@ -138,49 +138,61 @@ header{
   background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.45);
   padding:4px 9px; border-radius:999px;
 }
-.multiplier-big {
-  font-size:28px; font-weight:900; color:#fff; line-height:1.08; margin-bottom:10px;
-  text-shadow: 0 3px 0 #2b0c4a, 0 0 16px rgba(199,125,255,0.45);
-}
 
 .drop-ticker {
-  background:#0d0618; border-radius:16px; padding:11px 10px 11px 0;
-  overflow:hidden; border:1.5px solid rgba(224,170,255,0.58);
-  position:relative; display:flex; align-items:center; min-height:56px;
-  box-shadow: inset 0 2px 12px rgba(0,0,0,0.75), 0 0 16px rgba(199,125,255,0.32);
+  background:#0d0618; border-radius:18px; padding:10px 0;
+  overflow:hidden; border:1.5px solid rgba(224,170,255,0.55);
+  position:relative; display:flex; align-items:center; min-height:74px;
+  box-shadow: inset 0 2px 12px rgba(0,0,0,0.75), 0 0 16px rgba(199,125,255,0.28);
 }
-.drop-ticker-title {
-  background:linear-gradient(145deg, var(--accent-bright), var(--accent-dk));
-  color:#090510; padding:7px 12px; border-radius:10px; font-size:10.5px; font-weight:900;
-  text-transform:uppercase; margin-left:10px; z-index:2;
-  border:1px solid rgba(255,255,255,0.55); flex-shrink:0;
-  box-shadow: 0 3px 0 #3c096c, 0 0 12px rgba(199,125,255,0.45);
+.drop-ticker::before, .drop-ticker::after {
+  content:''; position:absolute; top:0; bottom:0; width:22px; z-index:3; pointer-events:none;
+}
+.drop-ticker::before {
+  left:0; background:linear-gradient(90deg, #0d0618 0%, rgba(13,6,24,0) 100%);
+}
+.drop-ticker::after {
+  right:0; background:linear-gradient(270deg, #0d0618 0%, rgba(13,6,24,0) 100%);
 }
 .drop-ticker-track {
-  display:flex; gap:14px; white-space:nowrap;
-  animation: ticker 28s linear infinite; padding-left:14px; will-change: transform;
+  display:flex; gap:10px; white-space:nowrap;
+  animation: tickerLeftToRight 24s linear infinite;
+  padding-left:10px; will-change: transform;
 }
 .drop-ticker:hover .drop-ticker-track { animation-play-state: paused; }
-.drop-item {
-  display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:800;
-  background: linear-gradient(155deg, rgba(44,25,71,0.95), rgba(24,13,40,0.95));
-  border:1px solid rgba(224,170,255,0.42); border-radius:12px; padding:6px 11px;
-  box-shadow: 0 3px 0 #090411, 0 0 10px rgba(157,78,221,0.24);
+
+.drop-card {
+  display:inline-flex; align-items:center; gap:9px;
+  background: linear-gradient(160deg, rgba(48,27,78,0.96), rgba(22,12,38,0.98));
+  border:1px solid rgba(224,170,255,0.42);
+  border-radius:15px; padding:7px 12px; min-width:168px;
+  box-shadow: 0 3px 0 #090411, 0 0 10px rgba(157,78,221,0.22);
 }
-.drop-item.is-nft {
-  border-color: rgba(56,189,248,0.75);
-  box-shadow: 0 3px 0 #090411, 0 0 12px rgba(56,189,248,0.35);
+.drop-card.is-nft {
+  border-color: rgba(56,189,248,0.78);
+  box-shadow: 0 3px 0 #090411, 0 0 13px rgba(56,189,248,0.34);
 }
-.drop-item img { width:26px; height:26px; object-fit:contain; border-radius:6px; background:rgba(255,255,255,0.06); padding:2px; }
-.drop-item .f-icon span { font-size:21px; }
-.drop-item .user { color:var(--accent-bright); font-weight:900; }
-.drop-item .item-name { color:#ffffff; }
+.drop-card-icon {
+  width:36px; height:36px; border-radius:11px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(224,170,255,0.25);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.drop-card-icon img { width:28px; height:28px; object-fit:contain; }
+.drop-card-meta { display:flex; flex-direction:column; line-height:1.18; min-width:0; }
+.drop-card-top { display:flex; align-items:center; gap:5px; }
+.drop-card-user { color:var(--accent-bright); font-size:11px; font-weight:900; max-width:86px; overflow:hidden; text-overflow:ellipsis; }
 .drop-nft-tag {
-  font-size:9px; font-weight:900; color:#7dd3fc; background:rgba(56,189,248,0.18);
+  font-size:8.5px; font-weight:900; color:#7dd3fc; background:rgba(56,189,248,0.18);
   border:1px solid rgba(56,189,248,0.5); padding:1px 5px; border-radius:5px; text-transform:uppercase;
 }
-.drop-item .price { color:var(--gold); margin-left:2px; font-weight:900; text-shadow: 0 0 8px rgba(255,215,0,0.45); }
-@keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+.drop-card-name { color:#ffffff; font-size:12px; font-weight:800; max-width:118px; overflow:hidden; text-overflow:ellipsis; }
+.drop-card-price { color:var(--gold); font-size:12px; font-weight:900; margin-top:1px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+
+@keyframes tickerLeftToRight {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
+}
 
 .section-title {
   font-size:14px; font-weight:900; text-transform:uppercase; letter-spacing:1.2px;
@@ -385,7 +397,7 @@ header{
 .rocket-hist-chip {
   font-size: 11px;
   font-weight: 800;
-  padding: 4px 8px;
+  padding: 5px 9px;
   border-radius: 8px;
   background: rgba(199,125,255,0.14);
   border: 1px solid rgba(199,125,255,0.38);
@@ -533,7 +545,7 @@ header{
 }
 .btn-grey:active { transform:translateY(2px); box-shadow: 0 2px 0 #0b0514; }
 
-/* ========== МОДАЛКИ ========== */
+/* ========== МОДАЛКИ И ФОРМЫ ========== */
 .modal{ display:none; position:fixed; inset:0; background:rgba(5,2,10,0.86); backdrop-filter:blur(7px); align-items:center; justify-content:center; z-index:300; padding:14px; }
 .modal.show{display:flex;}
 .modal .box{
@@ -542,13 +554,17 @@ header{
   padding:22px 18px; width:100%; max-width:400px; max-height:90vh; overflow-y:auto;
   box-shadow: var(--depth-shadow), var(--neon-strong);
 }
-input[type="text"], input[type="number"], input[type="password"] {
+input[type="text"], input[type="number"], input[type="password"], select.admin-select {
   width:100%; padding:13px 14px; background:rgba(11, 6, 20, 0.85);
   border:1px solid rgba(199,125,255,0.42); border-radius:13px;
   color:#fff; font-size:15px; margin-bottom:12px; outline:none;
   box-shadow: inset 0 2px 6px rgba(0,0,0,0.6), 0 0 10px rgba(157,78,221,0.16);
 }
-input:focus {
+select.admin-select option {
+  background: #160d24;
+  color: #fff;
+}
+input:focus, select.admin-select:focus {
   border-color: var(--accent-bright);
   box-shadow: inset 0 2px 6px rgba(0,0,0,0.6), 0 0 14px rgba(199,125,255,0.45);
 }
@@ -681,11 +697,16 @@ input:focus {
       <div class="live-tag">ДРОП ЛАЙВ</div>
       <div class="live-status-pill" id="liveDropsCount">● Лента активна</div>
     </div>
-    <div class="multiplier-big">Топ дропы</div>
     <div class="drop-ticker">
-      <div class="drop-ticker-title">Дропы</div>
       <div class="drop-ticker-track" id="liveDropTrack">
-        <div class="drop-item"><span class="user">Загрузка дропов...</span></div>
+        <div class="drop-card">
+          <div class="drop-card-icon">🎁</div>
+          <div class="drop-card-meta">
+            <div class="drop-card-top"><span class="drop-card-user">TagenGame</span></div>
+            <div class="drop-card-name">Загрузка...</div>
+            <div class="drop-card-price">★</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1080,11 +1101,31 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function renderIcon(icon, size = 40) {
-  if (!icon) return `<span style="font-size:${size}px">❓</span>`;
+  if (!icon) return `<span style="font-size:${size}px">🎁</span>`;
   if (typeof icon === 'string' && (icon.startsWith('/') || icon.startsWith('http'))) {
-    return `<img src="${icon}" style="width:${size}px;height:${size}px;object-fit:contain;vertical-align:middle;" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=\\'font-size:${size}px;line-height:1\\'>💎</span>')">`;
+    return `<img src="${icon}" style="width:${size}px;height:${size}px;object-fit:contain;vertical-align:middle;" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=\\'font-size:${size}px;line-height:1\\'>🎁</span>')">`;
   }
   return `<span style="font-size:${size}px;line-height:1">${icon}</span>`;
+}
+
+function buildDropCardHtml(d) {
+  const nftFlag = isNftItem({ rarity: d.rarity, item_id: d.item_id, name: d.item_name });
+  const nick = d.user_login || 'Игрок';
+  const itemName = d.item_name || 'Подарок';
+  const price = Number(d.item_price) || 0;
+  return `
+    <div class="drop-card ${nftFlag ? 'is-nft' : ''}">
+      <div class="drop-card-icon">${renderIcon(d.item_icon || '🎁', 28)}</div>
+      <div class="drop-card-meta">
+        <div class="drop-card-top">
+          <span class="drop-card-user">${nick}</span>
+          ${nftFlag ? '<span class="drop-nft-tag">NFT</span>' : ''}
+        </div>
+        <div class="drop-card-name">${itemName}</div>
+        <div class="drop-card-price">${price} ★</div>
+      </div>
+    </div>
+  `;
 }
 
 async function loadLiveDrops() {
@@ -1096,24 +1137,20 @@ async function loadLiveDrops() {
     if(!res.ok) return;
     const drops = await res.json();
     if (!Array.isArray(drops) || drops.length === 0) {
-      if (badge) badge.textContent = '● Ожидание дропов';
-      track.innerHTML = `<div class="drop-item"><span class="user">TagenGame</span> <span class="item-name">Лента готова к новым выигрышам</span> <span class="price">★</span></div>`;
+      if (badge) badge.textContent = '● Лента активна';
+      const demo = [
+        { user_login: 'tagen', item_name: 'Подарок', item_icon: '🎁', item_price: 100 },
+        { user_login: 'tgweb', item_name: 'Neon Punk #01', item_icon: '👾', item_price: 350, rarity: 'nft' },
+        { user_login: 'player', item_name: 'Кольцо', item_icon: '💍', item_price: 100 }
+      ];
+      const baseHtml = demo.map(buildDropCardHtml).join('');
+      track.innerHTML = baseHtml + baseHtml;
       return;
     }
     if (badge) badge.textContent = `● ${drops.length} недавних`;
-    const renderDrops = (arr) => arr.map(d => {
-      const nftFlag = isNftItem({ rarity: d.rarity, item_id: d.item_id, name: d.item_name });
-      return `
-        <div class="drop-item ${nftFlag ? 'is-nft' : ''}">
-          <span class="user">${d.user_login}</span>
-          <span class="f-icon">${renderIcon(d.item_icon, 24)}</span>
-          <span class="item-name">${d.item_name}</span>
-          ${nftFlag ? '<span class="drop-nft-tag">NFT</span>' : ''}
-          <span class="price">${d.item_price} ★</span>
-        </div>
-      `;
-    }).join('');
-    track.innerHTML = renderDrops(drops) + renderDrops(drops);
+    const list = drops.length >= 4 ? drops : [...drops, ...drops, ...drops, ...drops].slice(0, 6);
+    const baseHtml = list.map(buildDropCardHtml).join('');
+    track.innerHTML = baseHtml + baseHtml;
   } catch(e) {}
 }
 
@@ -1468,9 +1505,8 @@ function updateRocketVisual(mult, state = 'idle') {
   multEl.classList.remove('cashed', 'crashed');
   shipEl.classList.remove('crashed');
 
-  // Подъём ракеты вверх пропорционально множителю (от 1.00x до 5.00x)
   const clamped = Math.max(1, Math.min(5, mult));
-  const progress = (clamped - 1) / 4; // 0..1
+  const progress = (clamped - 1) / 4;
   const liftPx = Math.round(progress * 145);
   const swayX = state === 'flying' ? Math.sin(performance.now() / 90) * 6 : 0;
 
@@ -1521,7 +1557,9 @@ function renderRocketHistory() {
   }
   box.innerHTML = rocketHistory.slice(0, 8).map(r => {
     const cls = r.crashPoint < 1.5 ? 'low' : (r.crashPoint >= 3.0 ? 'high' : '');
-    const tag = r.won ? `✅ ${r.mult.toFixed(2)}x` : `💥 ${r.crashPoint.toFixed(2)}x`;
+    const tag = r.won
+      ? `✅ ${r.mult.toFixed(2)}x (краш ${r.crashPoint.toFixed(2)}x)`
+      : `💥 Краш ${r.crashPoint.toFixed(2)}x`;
     return `<span class="rocket-hist-chip ${cls}">${tag}</span>`;
   }).join('');
 }
@@ -1552,15 +1590,16 @@ $('btnRocketAction').onclick = async () => {
       playerData.balance = data.balance;
       $('uiBalanceTop').textContent = playerData.balance;
       const actualMult = Number(data.multiplier || claimMult);
+      const actualCrash = Number(data.crashPoint || actualMult);
       updateRocketVisual(actualMult, 'cashed');
-      $('rocketWinPreview').textContent = `Выигрыш: +${data.win} ★`;
-      rocketHistory.unshift({ crashPoint: Number(data.crashPoint || actualMult), mult: actualMult, won: true });
+      $('rocketWinPreview').textContent = `Выигрыш: +${data.win} ★ (краш был на ${actualCrash.toFixed(2)}x)`;
+      rocketHistory.unshift({ crashPoint: actualCrash, mult: actualMult, won: true });
       renderRocketHistory();
       playSfx('coin');
-      toast(`Забрано ${actualMult.toFixed(2)}x (+${data.win} ★)`, 'success');
+      toast(`Забрано ${actualMult.toFixed(2)}x (+${data.win} ★) • Краш: ${actualCrash.toFixed(2)}x`, 'success');
       setTimeout(() => {
         if (!rocketRunning) updateRocketVisual(1.0, 'idle');
-      }, 1500);
+      }, 1800);
     } catch (e) {
       rocketCashingOut = false;
       $('btnRocketAction').disabled = false;
@@ -1595,7 +1634,6 @@ $('btnRocketAction').onclick = async () => {
     function tick(nowTs) {
       if (!rocketRunning) return;
       const elapsedSec = (nowTs - rocketStartTime) / 1000;
-      // Плавный рост икса, чтобы до 5.00x летело ~4.2 сек
       const nextMult = Number(Math.min(5.0, 1 + elapsedSec * 0.95 + Math.pow(elapsedSec, 1.35) * 0.14).toFixed(2));
       rocketCurrentMult = nextMult;
       updateRocketVisual(rocketCurrentMult, 'flying');
@@ -1907,10 +1945,27 @@ $('btnWalletWithdraw').onclick = async () => {
 /* ================= АДМИНКА ================= */
 function renderAdminUI() {
   const c = $('adminContent');
+  const nftCatalog = SERVER_ITEMS.filter(it => isNftItem(it));
+  const presetOptions = nftCatalog.map(it =>
+    `<option value="${it.id}">${it.name} (${it.price} ★)</option>`
+  ).join('');
+
   c.innerHTML = `
     <div class="admin-box"><h3>Игроки</h3><table id="adminTable" style="width:100%; border-collapse:collapse; font-size:12px;"></table></div>
     <div class="admin-box"><h3>Выдача звёзд</h3><input type="text" id="aTarget" placeholder="Логин"><input type="number" id="aAmount" value="1000"><button onclick="quickAdmin('give')">Выдать</button></div>
-    <div class="admin-box"><h3>Выдача NFT</h3><input type="text" id="nftTarget" placeholder="Логин"><input type="text" id="nftItemId" placeholder="ID (например nft_cyber)"><input type="text" id="nftName" placeholder="Название"><input type="text" id="nftIcon" placeholder="Иконка (эмодзи или /items/...)"><input type="number" id="nftPrice" value="500"><button onclick="adminGiveNft()">Выдать NFT</button></div>
+    <div class="admin-box">
+      <h3>Выдача NFT</h3>
+      <input type="text" id="nftTarget" placeholder="Логин">
+      <select id="nftPresetSelect" class="admin-select" onchange="applyNftPreset()">
+        <option value="">— Выбрать готовый NFT из каталога —</option>
+        ${presetOptions}
+      </select>
+      <input type="text" id="nftItemId" placeholder="ID (например nft_neon_punk)">
+      <input type="text" id="nftName" placeholder="Название">
+      <input type="text" id="nftIcon" placeholder="Иконка (эмодзи или /items/...)">
+      <input type="number" id="nftPrice" value="350">
+      <button onclick="adminGiveNft()">Выдать NFT</button>
+    </div>
     ${playerData.is_super_admin ? `
     <div class="admin-box"><h3 style="color:var(--bad);">Для Главного Админа</h3><input type="text" id="aTargetTake" placeholder="Логин"><input type="number" id="aAmountTake" value="1000"><button style="background:var(--bad); color:#fff;" onclick="quickAdmin('take')">Забрать звёзды</button></div>
     <div class="admin-box"><h3>Выводы</h3><div id="aWithdraws"></div></div>
@@ -1921,6 +1976,18 @@ function renderAdminUI() {
   `;
   loadAdminTable(); if(playerData.is_super_admin) { loadWithdraws(); loadDeposits(); loadLogs(); }
 }
+
+window.applyNftPreset = function () {
+  const sel = $('nftPresetSelect');
+  if (!sel || !sel.value) return;
+  const found = SERVER_ITEMS.find(it => it.id === sel.value);
+  if (!found) return;
+  $('nftItemId').value = found.id;
+  $('nftName').value = found.name;
+  $('nftIcon').value = found.icon || '💎';
+  $('nftPrice').value = Number(found.price) || 100;
+};
+
 window.loadAdminTable = async function () {
   try {
     var res = await apiGet('/api/admin/players'); if (!res.ok) return; var players = await res.json();

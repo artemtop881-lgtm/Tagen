@@ -91,7 +91,7 @@ header{ display:flex; align-items:center; justify-content:space-between; gap:10p
 .upg-svg{width:100%; height:100%; transform:rotate(-90deg);}
 #upgCenterItem{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:60px; z-index:2;}
 #upgCenterItem img { max-width: 60px; max-height: 60px; }
-#upgPointer { position: absolute; top: 50%; left: 50%; width: 4px; height: 94px; background: linear-gradient(to top, transparent, #fff); transform-origin: bottom center; transform: translate(-50%, -100%) rotate(0deg); z-index: 5; border-radius: 4px; pointer-events: none; opacity: 0; transition: transform 3s cubic-bezier(0.1, 0.8, 0.2, 1), opacity 0.2s; }
+#upgPointer { position: absolute; top: 50%; left: 50%; width: 4px; height: 94px; background: linear-gradient(to top, transparent, #fff); transform-origin: bottom center; transform: translate(-50%, -100%) rotate(0deg); z-index: 5; border-radius: 4px; pointer-events: none; opacity: 1; transition: transform 3s cubic-bezier(0.1, 0.8, 0.2, 1), opacity 0.2s; }
 #upgPointer::after { content: ''; position: absolute; top: -6px; left: -4px; width: 12px; height: 12px; background: #fff; border-radius: 50%; box-shadow: 0 0 15px #fff; }
 
 /* ========== МИНЫ ========== */
@@ -149,6 +149,47 @@ input[type="text"], input[type="number"], input[type="password"] { width:100%; p
 .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
 input:checked + .slider { background-color: var(--accent); }
 input:checked + .slider:before { transform: translateX(22px); }
+
+/* ========== ЛЕНТА ДРОПОВ ========== */
+#dropFeedContainer {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  width: 100%;
+  height: 35px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+.drop-feed-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  position: absolute;
+  right: -300px; /* Начало за экраном */
+  animation: slideInOut 15s linear forwards;
+}
+.drop-feed-item .f-icon img { width: 20px; height: 20px; object-fit: contain; vertical-align: middle; }
+.drop-feed-item .f-user { color: var(--dim); }
+.drop-feed-item .f-name { color: var(--text); }
+.drop-feed-item .f-price { color: var(--gold); margin-left: 5px; }
+
+@keyframes slideInOut {
+  0% { right: -300px; }
+  10% { right: 100%; } /* Выезд слева */
+  90% { right: 100%; }
+  100% { right: -300px; }
+}
 </style>
 </head>
 <body>
@@ -270,6 +311,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 
     <!-- Апгрейд -->
     <div id="gameUpgrade" style="display:none;">
+      <div id="dropFeedContainer"></div> <!-- КОНТЕЙНЕР ДЛЯ ЛЕНТЫ ДРОПОВ -->
       <button class="btn-grey" onclick="openGame('menu')" style="margin-bottom:15px; padding:10px; border-radius:12px; font-weight:800; width:100%; cursor:pointer;">← Назад</button>
       <div class="upg-circle-wrap">
         <svg class="upg-svg" viewBox="0 0 200 200">
@@ -406,6 +448,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(updateOnline, 30000);
   if(localStorage.getItem('snow') === 'true') { document.getElementById('toggleSnow').checked = true; initSnow(); }
   if(localStorage.getItem('neon') === 'true') { document.getElementById('toggleNeon').checked = true; document.documentElement.classList.add('neon'); }
+  
+  // Запускаем ленту дропов
+  setInterval(loadDropFeed, 5000); 
+  loadDropFeed();
 });
 
 const $ = id => document.getElementById(id);
@@ -417,6 +463,54 @@ function renderIcon(icon, size = 40) {
   }
   return `<span style="font-size:${size}px;line-height:1">${icon}</span>`;
 }
+
+// ==== ЛЕНТА ДРОПОВ ====
+async function loadDropFeed() {
+  const container = $('dropFeedContainer');
+  if(!container) return;
+  
+  try {
+    const res = await fetch('/api/drops');
+    if(!res.ok) return;
+    const drops = await res.json();
+    
+    // Очищаем старые элементы, чтобы они не забивали экран
+    if(container.children.length > 5) {
+        container.innerHTML = ''; 
+    }
+
+    drops.forEach(drop => {
+      // Создаем элемент только если его еще нет (проверка по времени, чтобы не дублировать)
+      const dropId = drop.created_at;
+      if (document.querySelector(`.drop-feed-item[data-id="${dropId}"]`)) return;
+
+      const div = document.createElement('div');
+      div.className = 'drop-feed-item';
+      div.dataset.id = dropId;
+      
+      // Рандомное смещение, чтобы они не наезжали друг на друга
+      div.style.top = `${Math.random() * 20}px`;
+      // Случайная задержка анимации
+      div.style.animationDelay = `${Math.random() * 2}s`;
+
+      div.innerHTML = `
+        <span class="f-user">${drop.user_login}</span> выбил
+        <span class="f-icon">${renderIcon(drop.item_icon, 20)}</span>
+        <span class="f-name">${drop.item_name}</span>
+        <span class="f-price">${drop.item_price} 🌟</span>
+      `;
+      
+      container.appendChild(div);
+
+      // Удаляем элемент из DOM после завершения анимации (15 сек)
+      setTimeout(() => {
+        if (div.parentNode) div.remove();
+      }, 15000);
+    });
+
+  } catch(e) { console.error('Ошибка загрузки дропов', e); }
+}
+// ===================
 
 function toast(msg, type = 'info') {
   const c = $('toastContainer');
@@ -848,7 +942,7 @@ $('btnDoUpgrade').onclick = async () => {
       circle.style.strokeDashoffset = 534 - (data.chance / 100) * 534;
       
       setTimeout(() => {
-        pointer.style.opacity = '0';
+        pointer.style.opacity = '1';
         $('btnDoUpgrade').disabled = false;
         myUpgradeItem = null;
         targetUpgradeItem = null;
@@ -1017,4 +1111,4 @@ async function updateOnline() {
 }
 </script>
 </body>
-            </html>
+                                                                                                                                                                                             </html>

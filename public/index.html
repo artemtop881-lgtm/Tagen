@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>TagenGame</title>
 <style>
-/* ========== БАЗА И НЕОНОВЫЙ 3D-СТИЛЬ ========== */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#090510;
@@ -55,7 +54,6 @@ body::before {
 }
 .page-screen.active { display: flex; }
 
-/* ========== ШАПКА ========== */
 header{
   display:flex; align-items:center; justify-content:space-between;
   padding:14px 0; background:transparent; flex-shrink: 0;
@@ -88,7 +86,6 @@ header{
 }
 .balance-pill:active { transform: translateY(2px); box-shadow: 0 2px 0 #0c0616, var(--neon-strong); }
 
-/* ========== ГЛАВНЫЙ ЭКРАН ========== */
 #screen-games { padding-left: 16px; padding-right: 16px; }
 .hero-banner { position:relative; padding: 14px 0 12px; }
 .hero-subtitle {
@@ -113,7 +110,7 @@ header{
   box-shadow:0 0 8px var(--cyan), 0 0 14px var(--cyan);
 }
 
-/* КАРТОЧКА ЛАЙВ-ДРОПОВ С ДВИЖЕНИЕМ СЛЕВА НАПРАВО */
+/* ЛАЙВ-ЛЕНТА ДРОПОВ: ДВИЖЕНИЕ СЛЕВА НАПРАВО */
 .live-table-card {
   background: linear-gradient(155deg, #2b1846 0%, #190e2b 58%, #120920 100%);
   border-radius:24px; padding:16px;
@@ -142,11 +139,11 @@ header{
 .drop-ticker {
   background:#0d0618; border-radius:18px; padding:10px 0;
   overflow:hidden; border:1.5px solid rgba(224,170,255,0.55);
-  position:relative; display:flex; align-items:center; min-height:74px;
+  position:relative; display:flex; align-items:center; min-height:76px;
   box-shadow: inset 0 2px 12px rgba(0,0,0,0.75), 0 0 16px rgba(199,125,255,0.28);
 }
 .drop-ticker::before, .drop-ticker::after {
-  content:''; position:absolute; top:0; bottom:0; width:22px; z-index:3; pointer-events:none;
+  content:''; position:absolute; top:0; bottom:0; width:24px; z-index:3; pointer-events:none;
 }
 .drop-ticker::before {
   left:0; background:linear-gradient(90deg, #0d0618 0%, rgba(13,6,24,0) 100%);
@@ -156,7 +153,7 @@ header{
 }
 .drop-ticker-track {
   display:flex; gap:10px; white-space:nowrap;
-  animation: tickerLeftToRight 24s linear infinite;
+  animation: liveSlideLeftToRight 18s linear infinite;
   padding-left:10px; will-change: transform;
 }
 .drop-ticker:hover .drop-ticker-track { animation-play-state: paused; }
@@ -164,32 +161,32 @@ header{
 .drop-card {
   display:inline-flex; align-items:center; gap:9px;
   background: linear-gradient(160deg, rgba(48,27,78,0.96), rgba(22,12,38,0.98));
-  border:1px solid rgba(224,170,255,0.42);
-  border-radius:15px; padding:7px 12px; min-width:168px;
-  box-shadow: 0 3px 0 #090411, 0 0 10px rgba(157,78,221,0.22);
+  border:1px solid rgba(224,170,255,0.45);
+  border-radius:15px; padding:7px 12px; min-width:176px;
+  box-shadow: 0 3px 0 #090411, 0 0 10px rgba(157,78,221,0.25);
 }
 .drop-card.is-nft {
   border-color: rgba(56,189,248,0.78);
-  box-shadow: 0 3px 0 #090411, 0 0 13px rgba(56,189,248,0.34);
+  box-shadow: 0 3px 0 #090411, 0 0 13px rgba(56,189,248,0.35);
 }
 .drop-card-icon {
-  width:36px; height:36px; border-radius:11px;
+  width:38px; height:38px; border-radius:11px;
   background:rgba(255,255,255,0.06);
-  border:1px solid rgba(224,170,255,0.25);
+  border:1px solid rgba(224,170,255,0.28);
   display:flex; align-items:center; justify-content:center; flex-shrink:0;
 }
-.drop-card-icon img { width:28px; height:28px; object-fit:contain; }
+.drop-card-icon img { width:30px; height:30px; object-fit:contain; }
 .drop-card-meta { display:flex; flex-direction:column; line-height:1.18; min-width:0; }
 .drop-card-top { display:flex; align-items:center; gap:5px; }
-.drop-card-user { color:var(--accent-bright); font-size:11px; font-weight:900; max-width:86px; overflow:hidden; text-overflow:ellipsis; }
+.drop-card-user { color:var(--accent-bright); font-size:11px; font-weight:900; max-width:92px; overflow:hidden; text-overflow:ellipsis; }
 .drop-nft-tag {
   font-size:8.5px; font-weight:900; color:#7dd3fc; background:rgba(56,189,248,0.18);
   border:1px solid rgba(56,189,248,0.5); padding:1px 5px; border-radius:5px; text-transform:uppercase;
 }
-.drop-card-name { color:#ffffff; font-size:12px; font-weight:800; max-width:118px; overflow:hidden; text-overflow:ellipsis; }
+.drop-card-name { color:#ffffff; font-size:12px; font-weight:800; max-width:124px; overflow:hidden; text-overflow:ellipsis; }
 .drop-card-price { color:var(--gold); font-size:12px; font-weight:900; margin-top:1px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
 
-@keyframes tickerLeftToRight {
+@keyframes liveSlideLeftToRight {
   0% { transform: translateX(-50%); }
   100% { transform: translateX(0%); }
 }
@@ -243,7 +240,6 @@ header{
   transform:rotate(-14deg); filter: drop-shadow(0 0 10px rgba(199,125,255,0.45));
 }
 
-/* ========== ИГРОВЫЕ ЭКРАНЫ ========== */
 .game-header { display:flex; align-items:center; gap:14px; margin-bottom:18px; padding: 15px 16px 0; }
 .back-btn {
   width:42px; height:42px;
@@ -260,7 +256,6 @@ header{
 }
 .game-content { padding: 0 16px; }
 
-/* ========== МИНЫ ========== */
 .mines-top-bar {
   display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;
   background:linear-gradient(155deg, var(--card-2), var(--card));
@@ -297,7 +292,6 @@ header{
   box-shadow: 0 4px 0 #0b0514, var(--neon-strong);
 }
 
-/* ========== РАКЕТКА ========== */
 .rocket-stage {
   position: relative;
   height: 250px;
@@ -414,7 +408,6 @@ header{
   color: #6ee7b7;
 }
 
-/* ========== КЕЙСЫ ========== */
 .cases-grid { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
 .case-card {
   background:linear-gradient(160deg, var(--card-2), var(--card));
@@ -444,7 +437,6 @@ header{
 .roulette-item .r-name { font-size:9px; color:var(--dim); margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%; text-align:center; }
 .roulette-pointer{ position:absolute; left:50%; top:0; bottom:0; width:4px; background:var(--accent-bright); transform:translateX(-50%); z-index:10; box-shadow:0 0 16px var(--accent), 0 0 26px var(--accent-bright); }
 
-/* ========== АПГРЕЙД ========== */
 .upgrade-container { display: flex; flex-direction: column; align-items: center; padding: 12px 0; }
 .upg-circle-wrap { position: relative; width: 232px; height: 232px; margin-bottom: 14px; filter: drop-shadow(0 0 18px rgba(199,125,255,0.32)); }
 .upg-svg { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
@@ -495,7 +487,6 @@ header{
 .upg-chance-text { text-align: center; margin-bottom: 12px; font-size: 16px; font-weight: 900; color:var(--dim); }
 .upg-chance-text span { color: var(--accent-bright); font-size:21px; text-shadow: 0 0 12px rgba(199,125,255,0.6); }
 
-/* ========== НИЖНЯЯ НАВИГАЦИЯ ========== */
 .bottom-nav {
   position: fixed; left: 10px; right: 10px; bottom: 8px; z-index: 120;
   display: flex; justify-content: space-around;
@@ -519,7 +510,6 @@ header{
   box-shadow: 0 0 14px rgba(199, 125, 255, 0.35);
 }
 
-/* ========== КНОПКИ И ПОЛЯ ========== */
 .btn-main {
   width:100%; padding:15px; border:1px solid rgba(255,255,255,0.35);
   border-radius:16px;
@@ -545,7 +535,6 @@ header{
 }
 .btn-grey:active { transform:translateY(2px); box-shadow: 0 2px 0 #0b0514; }
 
-/* ========== МОДАЛКИ И ФОРМЫ ========== */
 .modal{ display:none; position:fixed; inset:0; background:rgba(5,2,10,0.86); backdrop-filter:blur(7px); align-items:center; justify-content:center; z-index:300; padding:14px; }
 .modal.show{display:flex;}
 .modal .box{
@@ -604,7 +593,6 @@ input:focus, select.admin-select:focus {
 }
 @keyframes fadeInOut { 0% { opacity: 0; transform: translateY(-10px); } 10% { opacity: 1; transform: translateY(0); } 90% { opacity: 1; } 100% { opacity: 0; } }
 
-/* Инвентарь, Кошелёк, Настройки, Админка */
 .inventory{display:grid; grid-template-columns:repeat(auto-fill,minmax(98px,1fr)); gap:11px; padding:0 16px;}
 .item{
   background:linear-gradient(155deg, var(--card-2), var(--card));
@@ -703,8 +691,8 @@ input:focus, select.admin-select:focus {
           <div class="drop-card-icon">🎁</div>
           <div class="drop-card-meta">
             <div class="drop-card-top"><span class="drop-card-user">TagenGame</span></div>
-            <div class="drop-card-name">Загрузка...</div>
-            <div class="drop-card-price">★</div>
+            <div class="drop-card-name">Подарок</div>
+            <div class="drop-card-price">100 ★</div>
           </div>
         </div>
       </div>
@@ -1014,7 +1002,6 @@ let playerData = { balance: 0, inventory: [], is_admin: false, is_super_admin: f
 let SERVER_ITEMS = [];
 let activeCaseData = { price: 0, caseId: '' };
 
-/* ================= ЗВУКИ И РЕГУЛИРОВКА ГРОМКОСТИ ================= */
 const sfx = {
   click: new Audio('/sounds/click.mp3'),
   coin: new Audio('/sounds/coin.mp3'),
@@ -1062,7 +1049,6 @@ function playBGM() {
 
 document.body.addEventListener('click', playBGM, { once: true });
 
-/* ====== АВТОРИЗАЦИЯ / ТОКЕН ====== */
 let AUTH_TOKEN = localStorage.getItem('auth_token') || '';
 function authHeaders(extra){ return Object.assign({'Content-Type':'application/json','x-auth-token':AUTH_TOKEN}, extra||{}); }
 async function apiGet(path){ return fetch(path, { headers: { 'x-auth-token': AUTH_TOKEN } }); }
@@ -1115,7 +1101,7 @@ function buildDropCardHtml(d) {
   const price = Number(d.item_price) || 0;
   return `
     <div class="drop-card ${nftFlag ? 'is-nft' : ''}">
-      <div class="drop-card-icon">${renderIcon(d.item_icon || '🎁', 28)}</div>
+      <div class="drop-card-icon">${renderIcon(d.item_icon || '🎁', 30)}</div>
       <div class="drop-card-meta">
         <div class="drop-card-top">
           <span class="drop-card-user">${nick}</span>
@@ -1132,26 +1118,29 @@ async function loadLiveDrops() {
   const track = $('liveDropTrack');
   const badge = $('liveDropsCount');
   if(!track) return;
+
+  const fallbackList = [
+    { user_login: 'tagen', item_name: 'Подарок', item_icon: '🎁', item_price: 100 },
+    { user_login: 'tgweb', item_name: 'Neon Punk #01', item_icon: '👾', item_price: 350, rarity: 'nft' },
+    { user_login: 'player', item_name: 'Кольцо', item_icon: '💍', item_price: 100 },
+    { user_login: 'lucky', item_name: 'Cyber Katana #07', item_icon: '⚔️', item_price: 1200, rarity: 'nft' }
+  ];
+
   try {
     const res = await fetch('/api/drops');
-    if(!res.ok) return;
-    const drops = await res.json();
-    if (!Array.isArray(drops) || drops.length === 0) {
-      if (badge) badge.textContent = '● Лента активна';
-      const demo = [
-        { user_login: 'tagen', item_name: 'Подарок', item_icon: '🎁', item_price: 100 },
-        { user_login: 'tgweb', item_name: 'Neon Punk #01', item_icon: '👾', item_price: 350, rarity: 'nft' },
-        { user_login: 'player', item_name: 'Кольцо', item_icon: '💍', item_price: 100 }
-      ];
-      const baseHtml = demo.map(buildDropCardHtml).join('');
-      track.innerHTML = baseHtml + baseHtml;
-      return;
+    const drops = res.ok ? await res.json() : [];
+    const hasReal = Array.isArray(drops) && drops.length > 0;
+    const rawList = hasReal ? drops : fallbackList;
+    if (badge) {
+      badge.textContent = hasReal ? `● ${drops.length} недавних` : '● Лента активна';
     }
-    if (badge) badge.textContent = `● ${drops.length} недавних`;
-    const list = drops.length >= 4 ? drops : [...drops, ...drops, ...drops, ...drops].slice(0, 6);
-    const baseHtml = list.map(buildDropCardHtml).join('');
-    track.innerHTML = baseHtml + baseHtml;
-  } catch(e) {}
+    const items = rawList.length >= 4 ? rawList : [...rawList, ...rawList, ...rawList, ...rawList].slice(0, 6);
+    const segment = items.map(buildDropCardHtml).join('');
+    track.innerHTML = segment + segment;
+  } catch(e) {
+    const segment = fallbackList.map(buildDropCardHtml).join('');
+    track.innerHTML = segment + segment;
+  }
 }
 
 function toast(msg, type = 'info') {
@@ -1245,6 +1234,7 @@ function switchTab(tabId) {
   if(targetScreen) targetScreen.classList.add('active');
   const navBtn = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
   if(navBtn) navBtn.classList.add('active');
+  if(tabId === 'games') loadLiveDrops();
   if(tabId === 'admin') renderAdminUI();
   if(tabId === 'inventory') renderInventory();
 }
@@ -1262,7 +1252,6 @@ function backToCases() {
   isCaseOpening = false;
 }
 
-/* ================= СКАЧИВАНИЕ ДАННЫХ И БД ================= */
 async function triggerDownload(url, fallbackFilename) {
   try {
     const res = await apiGet(url);
@@ -1287,7 +1276,6 @@ async function triggerDownload(url, fallbackFilename) {
 $('btnDownloadMyData').onclick = () => triggerDownload('/api/export/my-data', `tagengame-${currentUser || 'user'}-data.json`);
 $('btnDownloadDB').onclick = () => triggerDownload('/api/admin/download-db', 'database.json');
 
-/* ================= КЕЙСЫ ================= */
 let isCaseOpening = false;
 let currentWinItem = null;
 
@@ -1356,7 +1344,6 @@ $('btnCaseAgain').onclick = () => {
   startCase(activeCaseData.caseId, activeCaseData.price);
 };
 
-/* ================= МИНЫ (СЕРВЕРНЫЕ) ================= */
 let minesActive = false, minesBet = 0, minesCount = 3, currentGridSize = 3, minesTotal = 9;
 function setMines(c) {
   minesCount = c;
@@ -1479,7 +1466,6 @@ function resetMines() {
   $('minesMultLbl').textContent = '1.00x';
 }
 
-/* ================= РАКЕТКА (ПОЛЁТ ВВЕРХ, РОСТ ИКСА, КРАШ ДО 5.00x) ================= */
 let rocketRunning = false;
 let rocketCashingOut = false;
 let rocketRafId = null;
@@ -1686,9 +1672,8 @@ function triggerRocketCrash(crashPoint) {
   }, 1600);
 }
 
-/* ================= АПГРЕЙД (С ПОДДЕРЖКОЙ NFT И ПРЕДМЕТОВ) ================= */
 let myUpgradeItem = null, targetUpgradeItem = null;
-let myBetType = null; // 'stars' | 'item' | 'nft'
+let myBetType = null;
 
 function openMyUpgradeSelect() {
   $('selectItemTitle').textContent = 'Что ставим?';
@@ -1903,7 +1888,6 @@ $('btnDoUpgrade').onclick = async () => {
   }
 };
 
-/* ================= ИНВЕНТАРЬ ================= */
 function renderInventory() {
   const inv = $('inventory'); inv.innerHTML = '';
   if(!playerData.inventory || playerData.inventory.length === 0) { inv.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:20px;">Пусто</div>'; return; }
@@ -1923,7 +1907,6 @@ async function sellItem(uid) {
   } catch(e) {}
 }
 
-/* ================= КОШЕЛЕК ================= */
 $('btnWalletDeposit').onclick = async () => {
   const amount = $('depositAmount').value;
   if(!amount || amount <= 0) return toast('Введите сумму', 'error');
@@ -1942,7 +1925,6 @@ $('btnWalletWithdraw').onclick = async () => {
   } else { const d = await res.json(); toast(d.error, 'error'); }
 };
 
-/* ================= АДМИНКА ================= */
 function renderAdminUI() {
   const c = $('adminContent');
   const nftCatalog = SERVER_ITEMS.filter(it => isNftItem(it));

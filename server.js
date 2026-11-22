@@ -57,11 +57,24 @@ function loadDB() {
 function saveDB(db) { fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2)); }
 
 let db = loadDB();
-if (!db.users.find(u => u.is_super_admin)) {
-  db.users.push({ login: 'admin', password: 'admin123', balance: 999999, is_admin: true, is_super_admin: true, last_seen: Date.now(), last_bonus: null });
-  db.user_customization.push({ user_login: 'admin', avatar: '👤', frame: 'none' });
+let dbChanged = false;
+
+// Функция для автоматического создания админов, если их еще нет
+function ensureAdmin(login, password) {
+  if (!db.users.find(u => u.login === login)) {
+    db.users.push({ login: login, password: password, balance: 999999, is_admin: true, is_super_admin: true, last_seen: Date.now(), last_bonus: null });
+    db.user_customization.push({ user_login: login, avatar: '👤', frame: 'none' });
+    dbChanged = true;
+    console.log(`👑 Создан админ: ${login} / ${password}`);
+  }
+}
+
+// Создаем нужных админов
+ensureAdmin('tgweb', '202220222022');
+ensureAdmin('tagen', 'tag20222022');
+
+if (dbChanged) {
   saveDB(db);
-  console.log('👑 Создан админ: admin / admin123');
 }
 
 const now = () => Date.now();
@@ -83,13 +96,12 @@ function addBalance(login, amount) {
   return { balance: u.balance };
 }
 
-/* === ТОКЕН-АВТОРИЗАЦИЯ (ключевое исправление) === */
+/* === ТОКЕН-АВТОРИЗАЦИЯ === */
 function createSession(login) {
   db = loadDB();
   const token = genToken();
   const weekAgo = now() - 7 * 24 * 60 * 60 * 1000;
   db.sessions = (db.sessions || []).filter(s => s.created_at >= weekAgo);
-  // не больше 8 сессий на юзера
   const userSessions = db.sessions.filter(s => s.login === login);
   if (userSessions.length >= 8) {
     const oldest = userSessions.sort((a, b) => a.created_at - b.created_at)[0];
@@ -246,7 +258,7 @@ app.post('/api/cases/open', (req, res) => {
 });
 
 /* ================== МИНЫ (СЕРВЕРНАЯ ЛОГИКА) ================== */
-const minesSessions = new Map(); // login -> { bombs:Set, total, gridSize, minesCount, opened:Set, bet }
+const minesSessions = new Map(); 
 
 function getGridSize(bet) {
   if (bet < 100) return 3;
@@ -425,7 +437,7 @@ app.post('/api/wallet/withdraw', (req, res) => {
   res.json({ success: true, message: 'Заявка на вывод создана.' });
 });
 
-/* ================== АДМИНКА (ТОЛЬКО ПО ТОКЕНУ) ================== */
+/* ================== АДМИНКА ================== */
 function requireAdmin(req, res) {
   const a = authUser(req);
   if (!a || !a.is_admin) { res.status(403).json({ error: 'Нет доступа' }); return null; }

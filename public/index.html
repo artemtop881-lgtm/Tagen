@@ -110,7 +110,7 @@ header{
   box-shadow:0 0 8px var(--cyan), 0 0 14px var(--cyan);
 }
 
-/* ЛАЙВ-ЛЕНТА ДРОПОВ: ДВИЖЕНИЕ СЛЕВА НАПРАВО */
+/* ЛАЙВ-ЛЕНТА ДРОПОВ: НИК + ВЫИГРАЛ + ПОДАРОК (СЛЕВА НАПРАВО) */
 .live-table-card {
   background: linear-gradient(155deg, #2b1846 0%, #190e2b 58%, #120920 100%);
   border-radius:24px; padding:16px;
@@ -139,11 +139,11 @@ header{
 .drop-ticker {
   background:#0d0618; border-radius:18px; padding:10px 0;
   overflow:hidden; border:1.5px solid rgba(224,170,255,0.55);
-  position:relative; display:flex; align-items:center; min-height:76px;
+  position:relative; display:flex; align-items:center; min-height:66px;
   box-shadow: inset 0 2px 12px rgba(0,0,0,0.75), 0 0 16px rgba(199,125,255,0.28);
 }
 .drop-ticker::before, .drop-ticker::after {
-  content:''; position:absolute; top:0; bottom:0; width:24px; z-index:3; pointer-events:none;
+  content:''; position:absolute; top:0; bottom:0; width:22px; z-index:3; pointer-events:none;
 }
 .drop-ticker::before {
   left:0; background:linear-gradient(90deg, #0d0618 0%, rgba(13,6,24,0) 100%);
@@ -152,39 +152,31 @@ header{
   right:0; background:linear-gradient(270deg, #0d0618 0%, rgba(13,6,24,0) 100%);
 }
 .drop-ticker-track {
-  display:flex; gap:10px; white-space:nowrap;
-  animation: liveSlideLeftToRight 18s linear infinite;
+  display:flex; flex-direction:row; flex-wrap:nowrap; flex-shrink:0;
+  width:max-content; gap:10px;
+  animation: liveSlideLeftToRight 16s linear infinite;
   padding-left:10px; will-change: transform;
 }
 .drop-ticker:hover .drop-ticker-track { animation-play-state: paused; }
 
 .drop-card {
-  display:inline-flex; align-items:center; gap:9px;
+  display:inline-flex; align-items:center; gap:8px; flex-shrink:0;
   background: linear-gradient(160deg, rgba(48,27,78,0.96), rgba(22,12,38,0.98));
   border:1px solid rgba(224,170,255,0.45);
-  border-radius:15px; padding:7px 12px; min-width:176px;
+  border-radius:14px; padding:8px 12px;
   box-shadow: 0 3px 0 #090411, 0 0 10px rgba(157,78,221,0.25);
+  white-space:nowrap;
 }
-.drop-card.is-nft {
-  border-color: rgba(56,189,248,0.78);
-  box-shadow: 0 3px 0 #090411, 0 0 13px rgba(56,189,248,0.35);
+.drop-card-nick {
+  color:var(--accent-bright); font-size:12.5px; font-weight:900;
+}
+.drop-card-text {
+  color:#ffffff; font-size:12.5px; font-weight:700;
 }
 .drop-card-icon {
-  width:38px; height:38px; border-radius:11px;
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(224,170,255,0.28);
-  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  width:26px; height:26px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
 }
-.drop-card-icon img { width:30px; height:30px; object-fit:contain; }
-.drop-card-meta { display:flex; flex-direction:column; line-height:1.18; min-width:0; }
-.drop-card-top { display:flex; align-items:center; gap:5px; }
-.drop-card-user { color:var(--accent-bright); font-size:11px; font-weight:900; max-width:92px; overflow:hidden; text-overflow:ellipsis; }
-.drop-nft-tag {
-  font-size:8.5px; font-weight:900; color:#7dd3fc; background:rgba(56,189,248,0.18);
-  border:1px solid rgba(56,189,248,0.5); padding:1px 5px; border-radius:5px; text-transform:uppercase;
-}
-.drop-card-name { color:#ffffff; font-size:12px; font-weight:800; max-width:124px; overflow:hidden; text-overflow:ellipsis; }
-.drop-card-price { color:var(--gold); font-size:12px; font-weight:900; margin-top:1px; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+.drop-card-icon img { width:24px; height:24px; object-fit:contain; }
 
 @keyframes liveSlideLeftToRight {
   0% { transform: translateX(-50%); }
@@ -688,12 +680,24 @@ input:focus, select.admin-select:focus {
     <div class="drop-ticker">
       <div class="drop-ticker-track" id="liveDropTrack">
         <div class="drop-card">
-          <div class="drop-card-icon">🎁</div>
-          <div class="drop-card-meta">
-            <div class="drop-card-top"><span class="drop-card-user">TagenGame</span></div>
-            <div class="drop-card-name">Подарок</div>
-            <div class="drop-card-price">100 ★</div>
-          </div>
+          <span class="drop-card-nick">tagen</span>
+          <span class="drop-card-text">выиграл</span>
+          <span class="drop-card-icon">🎁</span>
+        </div>
+        <div class="drop-card">
+          <span class="drop-card-nick">tgweb</span>
+          <span class="drop-card-text">выиграл</span>
+          <span class="drop-card-icon">👾</span>
+        </div>
+        <div class="drop-card">
+          <span class="drop-card-nick">tagen</span>
+          <span class="drop-card-text">выиграл</span>
+          <span class="drop-card-icon">🎁</span>
+        </div>
+        <div class="drop-card">
+          <span class="drop-card-nick">tgweb</span>
+          <span class="drop-card-text">выиграл</span>
+          <span class="drop-card-icon">👾</span>
         </div>
       </div>
     </div>
@@ -1086,8 +1090,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(loadLiveDrops, 8000);
 });
 
-function renderIcon(icon, size = 40) {
-  if (!icon) return `<span style="font-size:${size}px">🎁</span>`;
+function renderIcon(icon, size = 24) {
+  if (!icon) return `<span style="font-size:${size}px;line-height:1">🎁</span>`;
   if (typeof icon === 'string' && (icon.startsWith('/') || icon.startsWith('http'))) {
     return `<img src="${icon}" style="width:${size}px;height:${size}px;object-fit:contain;vertical-align:middle;" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=\\'font-size:${size}px;line-height:1\\'>🎁</span>')">`;
   }
@@ -1095,21 +1099,13 @@ function renderIcon(icon, size = 40) {
 }
 
 function buildDropCardHtml(d) {
-  const nftFlag = isNftItem({ rarity: d.rarity, item_id: d.item_id, name: d.item_name });
-  const nick = d.user_login || 'Игрок';
-  const itemName = d.item_name || 'Подарок';
-  const price = Number(d.item_price) || 0;
+  const nick = (d && d.user_login) ? String(d.user_login) : 'Игрок';
+  const icon = (d && d.item_icon) ? d.item_icon : '🎁';
   return `
-    <div class="drop-card ${nftFlag ? 'is-nft' : ''}">
-      <div class="drop-card-icon">${renderIcon(d.item_icon || '🎁', 30)}</div>
-      <div class="drop-card-meta">
-        <div class="drop-card-top">
-          <span class="drop-card-user">${nick}</span>
-          ${nftFlag ? '<span class="drop-nft-tag">NFT</span>' : ''}
-        </div>
-        <div class="drop-card-name">${itemName}</div>
-        <div class="drop-card-price">${price} ★</div>
-      </div>
+    <div class="drop-card">
+      <span class="drop-card-nick">${nick}</span>
+      <span class="drop-card-text">выиграл</span>
+      <span class="drop-card-icon">${renderIcon(icon, 24)}</span>
     </div>
   `;
 }
@@ -1117,13 +1113,13 @@ function buildDropCardHtml(d) {
 async function loadLiveDrops() {
   const track = $('liveDropTrack');
   const badge = $('liveDropsCount');
-  if(!track) return;
+  if (!track) return;
 
   const fallbackList = [
-    { user_login: 'tagen', item_name: 'Подарок', item_icon: '🎁', item_price: 100 },
-    { user_login: 'tgweb', item_name: 'Neon Punk #01', item_icon: '👾', item_price: 350, rarity: 'nft' },
-    { user_login: 'player', item_name: 'Кольцо', item_icon: '💍', item_price: 100 },
-    { user_login: 'lucky', item_name: 'Cyber Katana #07', item_icon: '⚔️', item_price: 1200, rarity: 'nft' }
+    { user_login: 'tagen', item_icon: '🎁' },
+    { user_login: 'tgweb', item_icon: '👾' },
+    { user_login: 'admin', item_icon: '💍' },
+    { user_login: 'player', item_icon: '💎' }
   ];
 
   try {
@@ -1131,13 +1127,18 @@ async function loadLiveDrops() {
     const drops = res.ok ? await res.json() : [];
     const hasReal = Array.isArray(drops) && drops.length > 0;
     const rawList = hasReal ? drops : fallbackList;
+
     if (badge) {
       badge.textContent = hasReal ? `● ${drops.length} недавних` : '● Лента активна';
     }
-    const items = rawList.length >= 4 ? rawList : [...rawList, ...rawList, ...rawList, ...rawList].slice(0, 6);
-    const segment = items.map(buildDropCardHtml).join('');
+
+    let items = [...rawList];
+    while (items.length < 6) {
+      items = items.concat(rawList);
+    }
+    const segment = items.slice(0, 8).map(buildDropCardHtml).join('');
     track.innerHTML = segment + segment;
-  } catch(e) {
+  } catch (e) {
     const segment = fallbackList.map(buildDropCardHtml).join('');
     track.innerHTML = segment + segment;
   }
@@ -1147,7 +1148,7 @@ function toast(msg, type = 'info') {
   const c = $('toastContainer');
   const d = document.createElement('div');
   d.className = 'toast';
-  if(type === 'error') {
+  if (type === 'error') {
     d.style.background = 'linear-gradient(145deg, #f87171, var(--bad))';
     d.style.color = '#fff';
     d.style.borderColor = '#fca5a5';
@@ -1162,9 +1163,9 @@ function toast(msg, type = 'info') {
 function closeModal(id) { $(id).classList.remove('show'); }
 
 function openProfile() {
-    $('profileName').textContent = currentUser || 'Игрок';
-    $('profileBalance').textContent = (playerData.balance || 0) + ' ★';
-    $('profileModal').classList.add('show');
+  $('profileName').textContent = currentUser || 'Игрок';
+  $('profileBalance').textContent = (playerData.balance || 0) + ' ★';
+  $('profileModal').classList.add('show');
 }
 
 $('switchAuthMode').onclick = () => {
@@ -1176,13 +1177,13 @@ $('switchAuthMode').onclick = () => {
 $('mainAuthBtn').onclick = async () => {
   const login = $('authLogin').value.trim();
   const pass = $('authPassword').value;
-  if(!login || pass.length < 6) return toast('Логин и пароль (мин. 6 символов)', 'error');
+  if (!login || pass.length < 6) return toast('Логин и пароль (мин. 6 символов)', 'error');
   try {
     const res = await fetch(authMode === 'login' ? '/api/login' : '/api/register', {
-      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({login, password: pass})
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login, password: pass })
     });
     const data = await res.json();
-    if(!res.ok) throw new Error(data.error);
+    if (!res.ok) throw new Error(data.error);
     currentUser = (data.user && data.user.login) || login;
     AUTH_TOKEN = data.token || '';
     localStorage.setItem('saved_user', currentUser);
@@ -1191,18 +1192,18 @@ $('mainAuthBtn').onclick = async () => {
     $('bottomNav').style.display = 'flex';
     switchTab('games');
     enterGame();
-  } catch(e) { toast(e.message, 'error'); }
+  } catch (e) { toast(e.message, 'error'); }
 };
 
 async function enterGame() {
   try {
     const r = await fetch('/api/items');
-    if(r.ok) SERVER_ITEMS = await r.json();
+    if (r.ok) SERVER_ITEMS = await r.json();
     const res = await apiGet(`/api/user/${encodeURIComponent(currentUser)}`);
-    if(res.ok) {
+    if (res.ok) {
       playerData = await res.json();
       $('uiBalanceTop').textContent = playerData.balance;
-      if(playerData.is_admin || playerData.is_super_admin) $('adminFromSettings').style.display = 'block';
+      if (playerData.is_admin || playerData.is_super_admin) $('adminFromSettings').style.display = 'block';
       else $('adminFromSettings').style.display = 'none';
       renderInventory();
     } else {
@@ -1210,12 +1211,12 @@ async function enterGame() {
       localStorage.removeItem('auth_token');
       location.reload();
     }
-  } catch(e) {}
+  } catch (e) {}
 }
 
 function checkLogin() {
   const saved = localStorage.getItem('saved_user');
-  if(saved && AUTH_TOKEN) {
+  if (saved && AUTH_TOKEN) {
     currentUser = saved;
     $('authScreen').classList.remove('active');
     $('bottomNav').style.display = 'flex';
@@ -1231,18 +1232,18 @@ function switchTab(tabId) {
   document.querySelectorAll('.page-screen').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   const targetScreen = $(`screen-${tabId}`);
-  if(targetScreen) targetScreen.classList.add('active');
+  if (targetScreen) targetScreen.classList.add('active');
   const navBtn = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
-  if(navBtn) navBtn.classList.add('active');
-  if(tabId === 'games') loadLiveDrops();
-  if(tabId === 'admin') renderAdminUI();
-  if(tabId === 'inventory') renderInventory();
+  if (navBtn) navBtn.classList.add('active');
+  if (tabId === 'games') loadLiveDrops();
+  if (tabId === 'admin') renderAdminUI();
+  if (tabId === 'inventory') renderInventory();
 }
 
 function openGame(game) {
   switchTab(game);
-  if(game === 'upgrade') { renderUpgradeGrid(); updateUpgradeUI(); }
-  if(game === 'rocket') { renderRocketHistory(); }
+  if (game === 'upgrade') { renderUpgradeGrid(); updateUpgradeUI(); }
+  if (game === 'rocket') { renderRocketHistory(); }
 }
 
 function backToCases() {
@@ -1280,9 +1281,9 @@ let isCaseOpening = false;
 let currentWinItem = null;
 
 async function startCase(caseId, price) {
-  if(isCaseOpening) return;
-  if(playerData.balance < price) return toast('Мало звезд!', 'error');
-  if(!confirm(`Открыть кейс за ${price} ★?`)) return;
+  if (isCaseOpening) return;
+  if (playerData.balance < price) return toast('Мало звезд!', 'error');
+  if (!confirm(`Открыть кейс за ${price} ★?`)) return;
 
   isCaseOpening = true;
   activeCaseData = { price, caseId };
@@ -1293,7 +1294,7 @@ async function startCase(caseId, price) {
   try {
     const res = await apiPost('/api/cases/open', { caseId });
     const data = await res.json();
-    if(!res.ok) throw new Error(data.error);
+    if (!res.ok) throw new Error(data.error);
 
     playerData.balance = data.balance;
     $('uiBalanceTop').textContent = playerData.balance;
@@ -1302,7 +1303,7 @@ async function startCase(caseId, price) {
     const pool = data.pool;
     const strip = $('rouletteStrip');
     let html = ''; let items = [];
-    for(let i=0; i<50; i++) items.push(pool[Math.floor(Math.random() * pool.length)]);
+    for (let i = 0; i < 50; i++) items.push(pool[Math.floor(Math.random() * pool.length)]);
     items[45] = currentWinItem;
 
     items.forEach(it => { html += `<div class="roulette-item"><div class="r-img">${renderIcon(it.icon, 40)}</div><div class="r-name">${it.name}</div></div>`; });
@@ -1325,7 +1326,7 @@ async function startCase(caseId, price) {
         loadLiveDrops();
       }, 4100);
     }, 100);
-  } catch(e) {
+  } catch (e) {
     toast(e.message, 'error');
     isCaseOpening = false;
     $('casesList').style.display = 'block'; $('caseRoller').style.display = 'none';
@@ -1333,7 +1334,7 @@ async function startCase(caseId, price) {
 }
 
 $('btnCaseSell').onclick = async () => {
-  if(!currentWinItem) return;
+  if (!currentWinItem) return;
   $('caseActions').style.display = 'none';
   $('casesList').style.display = 'block'; $('caseRoller').style.display = 'none';
   await sellItem(currentWinItem.uid);
@@ -1354,14 +1355,14 @@ function setMines(c) {
 }
 
 $('btnStartMines').onclick = async () => {
-  if(minesActive) return;
+  if (minesActive) return;
   const bet = parseInt($('minesBetInput').value) || 0;
-  if(bet < 10) return toast('Мин. ставка 10 ★', 'error');
-  if(bet > playerData.balance) return toast('Недостаточно средств', 'error');
+  if (bet < 10) return toast('Мин. ставка 10 ★', 'error');
+  if (bet > playerData.balance) return toast('Недостаточно средств', 'error');
   try {
-    const res = await apiPost('/api/games/mines', { action:'start', bet, minesCount });
+    const res = await apiPost('/api/games/mines', { action: 'start', bet, minesCount });
     const data = await res.json();
-    if(!res.ok) throw new Error(data.error);
+    if (!res.ok) throw new Error(data.error);
 
     playerData.balance = data.balance;
     $('uiBalanceTop').textContent = playerData.balance;
@@ -1385,31 +1386,31 @@ $('btnStartMines').onclick = async () => {
     $('btnCashout').style.display = 'none';
     $('btnStartMines').style.display = 'none';
 
-    for(let i=0;i<minesTotal;i++){
+    for (let i = 0; i < minesTotal; i++) {
       const cell = document.createElement('div');
       cell.className = 'mine-cell';
       cell.dataset.idx = i;
       cell.onclick = () => clickMine(cell, i);
       grid.appendChild(cell);
     }
-  } catch(e) { toast(e.message, 'error'); }
+  } catch (e) { toast(e.message, 'error'); }
 };
 
 async function clickMine(cell, idx) {
-  if(!minesActive || cell.classList.contains('opened')) return;
+  if (!minesActive || cell.classList.contains('opened')) return;
   cell.classList.add('opened');
   try {
-    const res = await apiPost('/api/games/mines', { action:'click', cell: idx });
+    const res = await apiPost('/api/games/mines', { action: 'click', cell: idx });
     const data = await res.json();
-    if(!res.ok) throw new Error(data.error);
+    if (!res.ok) throw new Error(data.error);
 
-    if(data.bomb) {
+    if (data.bomb) {
       cell.textContent = '💣'; cell.classList.add('bomb');
       minesActive = false;
       $('btnCashout').style.display = 'none';
       document.querySelectorAll('.mine-cell').forEach(c => {
         const i = Number(c.dataset.idx);
-        if(Array.isArray(data.bombs) && data.bombs.includes(i) && !c.classList.contains('opened')) {
+        if (Array.isArray(data.bombs) && data.bombs.includes(i) && !c.classList.contains('opened')) {
           c.textContent = '💣'; c.classList.add('bomb');
         }
       });
@@ -1423,7 +1424,7 @@ async function clickMine(cell, idx) {
       $('btnCashout').style.display = 'block';
       $('cashoutVal').textContent = data.potentialWin;
     }
-  } catch(e) {
+  } catch (e) {
     cell.classList.remove('opened');
     toast(e.message, 'error');
     if (e.message && e.message.includes('не найдена')) resetMines();
@@ -1431,11 +1432,11 @@ async function clickMine(cell, idx) {
 }
 
 $('btnCashout').onclick = async () => {
-  if(!minesActive) return;
+  if (!minesActive) return;
   try {
-    const res = await apiPost('/api/games/mines', { action:'cashout' });
+    const res = await apiPost('/api/games/mines', { action: 'cashout' });
     const data = await res.json();
-    if(!res.ok) throw new Error(data.error);
+    if (!res.ok) throw new Error(data.error);
 
     minesActive = false;
     playerData.balance = data.balance;
@@ -1445,7 +1446,7 @@ $('btnCashout').onclick = async () => {
 
     document.querySelectorAll('.mine-cell').forEach(c => {
       const i = Number(c.dataset.idx);
-      if(Array.isArray(data.bombs) && data.bombs.includes(i) && !c.classList.contains('opened')) {
+      if (Array.isArray(data.bombs) && data.bombs.includes(i) && !c.classList.contains('opened')) {
         c.textContent = '💣';
       }
     });
@@ -1453,7 +1454,7 @@ $('btnCashout').onclick = async () => {
     playSfx('coin');
     toast(`Вы забрали ${data.win} ★`, 'success');
     setTimeout(() => resetMines(), 1400);
-  } catch(e) { toast(e.message, 'error'); }
+  } catch (e) { toast(e.message, 'error'); }
 };
 
 function resetMines() {
@@ -1471,6 +1472,7 @@ let rocketCashingOut = false;
 let rocketRafId = null;
 let rocketStartTime = 0;
 let rocketCurrentMult = 1.0;
+let rocketTargetCrash = 1.0;
 let rocketBetAmount = 0;
 const rocketHistory = [];
 
@@ -1557,6 +1559,10 @@ $('rocketBetInput').addEventListener('input', () => {
 $('btnRocketAction').onclick = async () => {
   if (rocketRunning) {
     if (rocketCashingOut) return;
+    if (rocketCurrentMult >= rocketTargetCrash) {
+      resolveRocketCrashAtServer(rocketTargetCrash);
+      return;
+    }
     rocketCashingOut = true;
     $('btnRocketAction').disabled = true;
     const claimMult = Number(rocketCurrentMult.toFixed(2));
@@ -1608,6 +1614,7 @@ $('btnRocketAction').onclick = async () => {
     $('uiBalanceTop').textContent = playerData.balance;
     rocketBetAmount = bet;
     rocketCurrentMult = 1.0;
+    rocketTargetCrash = Number(data.crashPoint || 1.15);
     rocketRunning = true;
     rocketCashingOut = false;
     rocketStartTime = performance.now();
@@ -1622,12 +1629,13 @@ $('btnRocketAction').onclick = async () => {
       const elapsedSec = (nowTs - rocketStartTime) / 1000;
       const nextMult = Number(Math.min(5.0, 1 + elapsedSec * 0.95 + Math.pow(elapsedSec, 1.35) * 0.14).toFixed(2));
       rocketCurrentMult = nextMult;
-      updateRocketVisual(rocketCurrentMult, 'flying');
 
-      if (rocketCurrentMult >= 5.0) {
-        resolveRocketCrashAtServer();
+      if (rocketCurrentMult >= rocketTargetCrash) {
+        resolveRocketCrashAtServer(rocketTargetCrash);
         return;
       }
+
+      updateRocketVisual(rocketCurrentMult, 'flying');
       rocketRafId = requestAnimationFrame(tick);
     }
     rocketRafId = requestAnimationFrame(tick);
@@ -1644,17 +1652,17 @@ function stopRocketLoop() {
   }
 }
 
-async function resolveRocketCrashAtServer() {
+async function resolveRocketCrashAtServer(fallbackCrash) {
   stopRocketLoop();
   if (!rocketRunning) return;
   rocketRunning = false;
   try {
     const res = await apiPost('/api/games/rocket', { action: 'crash' });
     const data = await res.json();
-    const cp = data && data.crashPoint ? Number(data.crashPoint) : rocketCurrentMult;
+    const cp = data && data.crashPoint ? Number(data.crashPoint) : fallbackCrash;
     triggerRocketCrash(cp);
   } catch (e) {
-    triggerRocketCrash(rocketCurrentMult);
+    triggerRocketCrash(fallbackCrash);
   }
 }
 
@@ -1713,7 +1721,7 @@ function selectMyBet(type) {
       return;
     }
 
-    filtered.sort((a,b) => Number(a.price) - Number(b.price)).forEach(item => {
+    filtered.sort((a, b) => Number(a.price) - Number(b.price)).forEach(item => {
       const nftFlag = isNftItem(item);
       const d = document.createElement('div');
       d.style.cssText = `background:var(--card-2); border:1px solid ${nftFlag ? 'rgba(56,189,248,0.7)' : 'var(--border)'}; border-radius:10px; padding:9px; text-align:center; cursor:pointer;`;
@@ -1747,7 +1755,7 @@ function openTargetUpgradeSelect() {
     if (!uniqueMap.has(key)) uniqueMap.set(key, it);
   });
 
-  Array.from(uniqueMap.values()).sort((a,b) => Number(a.price) - Number(b.price)).forEach(item => {
+  Array.from(uniqueMap.values()).sort((a, b) => Number(a.price) - Number(b.price)).forEach(item => {
     const nftFlag = isNftItem(item);
     const d = document.createElement('div');
     d.style.cssText = `background:var(--card-2); border:1px solid ${nftFlag ? 'rgba(56,189,248,0.7)' : 'var(--border)'}; border-radius:10px; padding:9px; text-align:center; cursor:pointer;`;
@@ -1773,7 +1781,7 @@ function renderUpgradeGrid() {
     const key = it.id || it.item_id || it.uid;
     if (!uniqueMap.has(key)) uniqueMap.set(key, it);
   });
-  const pool = Array.from(uniqueMap.values()).sort((a,b) => Number(a.price) - Number(b.price));
+  const pool = Array.from(uniqueMap.values()).sort((a, b) => Number(a.price) - Number(b.price));
 
   pool.forEach(item => {
     const nftFlag = isNftItem(item);
@@ -1823,8 +1831,8 @@ function updateUpgradeUI() {
 }
 
 $('btnDoUpgrade').onclick = async () => {
-  if(!myUpgradeItem || !targetUpgradeItem) return toast('Выберите ставку и цель', 'error');
-  if(Number(myUpgradeItem.price) >= Number(targetUpgradeItem.price)) return toast('Цель должна быть дороже', 'error');
+  if (!myUpgradeItem || !targetUpgradeItem) return toast('Выберите ставку и цель', 'error');
+  if (Number(myUpgradeItem.price) >= Number(targetUpgradeItem.price)) return toast('Цель должна быть дороже', 'error');
 
   $('btnDoUpgrade').disabled = true;
   const pointer = $('upgPointer');
@@ -1841,7 +1849,7 @@ $('btnDoUpgrade').onclick = async () => {
 
     const res = await apiPost('/api/upgrade', bodyData);
     const data = await res.json();
-    if(!res.ok) throw new Error(data.error);
+    if (!res.ok) throw new Error(data.error);
 
     setTimeout(() => {
       pointer.classList.add('spinning');
@@ -1874,7 +1882,7 @@ $('btnDoUpgrade').onclick = async () => {
         enterGame();
         loadLiveDrops();
 
-        if(data.win) {
+        if (data.win) {
           playSfx('coin');
           toast('УСПЕХ! Вы получили ' + data.item.name, 'success');
         } else {
@@ -1882,7 +1890,7 @@ $('btnDoUpgrade').onclick = async () => {
         }
       }, 4600);
     }, 50);
-  } catch(e) {
+  } catch (e) {
     toast(e.message, 'error');
     $('btnDoUpgrade').disabled = false;
   }
@@ -1890,7 +1898,7 @@ $('btnDoUpgrade').onclick = async () => {
 
 function renderInventory() {
   const inv = $('inventory'); inv.innerHTML = '';
-  if(!playerData.inventory || playerData.inventory.length === 0) { inv.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:20px;">Пусто</div>'; return; }
+  if (!playerData.inventory || playerData.inventory.length === 0) { inv.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:20px;">Пусто</div>'; return; }
   playerData.inventory.forEach(item => {
     const nftFlag = isNftItem(item);
     const d = document.createElement('div'); d.className = `item ${nftFlag ? 'nft-item' : ''}`;
@@ -1899,27 +1907,27 @@ function renderInventory() {
   });
 }
 async function sellItem(uid) {
-  if(!confirm('Продать предмет?')) return;
+  if (!confirm('Продать предмет?')) return;
   try {
     await apiPost('/api/inventory/sell', { uid });
     playSfx('coin');
     await enterGame();
-  } catch(e) {}
+  } catch (e) {}
 }
 
 $('btnWalletDeposit').onclick = async () => {
   const amount = $('depositAmount').value;
-  if(!amount || amount <= 0) return toast('Введите сумму', 'error');
+  if (!amount || amount <= 0) return toast('Введите сумму', 'error');
   const res = await apiPost('/api/wallet/deposit', { amount });
-  if(res.ok) toast('Заявка создана! Ожидайте.', 'success');
+  if (res.ok) toast('Заявка создана! Ожидайте.', 'success');
   else toast('Ошибка', 'error');
 };
 
 $('btnWalletWithdraw').onclick = async () => {
   const amount = $('withdrawAmount').value;
-  if(!amount || amount <= 0) return toast('Введите сумму', 'error');
+  if (!amount || amount <= 0) return toast('Введите сумму', 'error');
   const res = await apiPost('/api/wallet/withdraw', { amount });
-  if(res.ok) {
+  if (res.ok) {
     toast('Заявка на вывод создана!', 'success');
     enterGame();
   } else { const d = await res.json(); toast(d.error, 'error'); }
@@ -1956,7 +1964,7 @@ function renderAdminUI() {
     <div class="admin-box"><h3>Права</h3><input type="text" id="adminLoginTarget" placeholder="Логин"><button onclick="makeAdmin()">Сделать админом</button><button style="background:var(--bad); color:#fff;" onclick="removeAdmin()">Снять права</button></div>
     <div class="admin-box"><h3>Логи</h3><div id="adminLogs"></div></div>` : ''}
   `;
-  loadAdminTable(); if(playerData.is_super_admin) { loadWithdraws(); loadDeposits(); loadLogs(); }
+  loadAdminTable(); if (playerData.is_super_admin) { loadWithdraws(); loadDeposits(); loadLogs(); }
 }
 
 window.applyNftPreset = function () {
@@ -1973,7 +1981,7 @@ window.applyNftPreset = function () {
 window.loadAdminTable = async function () {
   try {
     var res = await apiGet('/api/admin/players'); if (!res.ok) return; var players = await res.json();
-    $('adminTable').innerHTML = players.map(p => `<tr><td style="color:${p.is_super_admin?'#f87171':(p.is_admin?'var(--accent-bright)':'var(--text)')};font-weight:700;border-bottom:1px solid var(--border);padding:8px 0;">${p.login}</td><td style="border-bottom:1px solid var(--border);">${p.balance}★</td><td style="border-bottom:1px solid var(--border);">${p.nft_count} шт</td></tr>`).join('');
+    $('adminTable').innerHTML = players.map(p => `<tr><td style="color:${p.is_super_admin ? '#f87171' : (p.is_admin ? 'var(--accent-bright)' : 'var(--text)')};font-weight:700;border-bottom:1px solid var(--border);padding:8px 0;">${p.login}</td><td style="border-bottom:1px solid var(--border);">${p.balance}★</td><td style="border-bottom:1px solid var(--border);">${p.nft_count} шт</td></tr>`).join('');
   } catch (e) {}
 };
 window.loadWithdraws = async function () {
@@ -2031,6 +2039,7 @@ window.adminGiveNft = async function () {
       toast('NFT выдан', 'success');
       loadAdminTable();
       if (t === currentUser) enterGame();
+      loadLiveDrops();
     } else toast('Ошибка', 'error');
   } catch (e) { toast('Ошибка сети', 'error'); }
 };

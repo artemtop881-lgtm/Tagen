@@ -8,7 +8,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 /* ================== АВТОПОИСК КАРТИНОК ================== */
 let FOUND_IMAGES = {};
-// ИСПРАВЛЕНО: Путь к папке items (как и было изначально)
 const ITEMS_DIR = path.join(__dirname, 'public', 'items');
 
 function scanImages() {
@@ -88,7 +87,7 @@ function addBalance(login, amount) {
   return { balance: u.balance };
 }
 
-/* ================== ПРЕДМЕТЫ ================== */
+/* ================== ПРЕДМЕТЫ (ИСПРАВЛЕННЫЕ КЕЙСЫ) ================== */
 const GAME_CASES = [
   { id:'starter', name:'Стартовый', icon:'📦', price:100, items:[
     {id:'heart',name:'Сердечко',icon:'💖',rarity:'common',price:15,chance:50},
@@ -101,8 +100,7 @@ const GAME_CASES = [
     {id:'gift',name:'Подарок',icon:'🎁',rarity:'common',price:25,chance:50},
     {id:'cake',name:'Торт',icon:'🎂',rarity:'common',price:50,chance:25},
     {id:'bouquet',name:'Букет',icon:'💐',rarity:'common',price:50,chance:15},
-    {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:9.9},
-    {id:'crown',name:'Корона',icon:'👑',rarity:'legendary',price:500000,chance:0.1}
+    {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:0.1}
   ]},
   { id:'legend', name:'Легенда', icon:'⚡', price:5000, items:[
     {id:'ring',name:'Кольцо',icon:'💍',rarity:'rare',price:100,chance:60},
@@ -111,13 +109,11 @@ const GAME_CASES = [
     {id:'crown',name:'Корона',icon:'👑',rarity:'legendary',price:500000,chance:2.9},
     {id:'galaxy',name:'Галактика',icon:'🌌',rarity:'legendary',price:2000000,chance:0.1}
   ]},
-  // --- НОВЫЕ КЕЙСЫ ---
   { id:'magic', name:'Магический', icon:'🔮', price:2500, items:[
     {id:'heart',name:'Сердечко',icon:'💖',rarity:'common',price:15,chance:40},
     {id:'skull',name:'Череп',icon:'💀',rarity:'rare',price:50,chance:30},
     {id:'ring',name:'Кольцо',icon:'💍',rarity:'rare',price:100,chance:20},
-    {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:9.5},
-    {id:'galaxy',name:'Галактика',icon:'🌌',rarity:'legendary',price:2000000,chance:0.5}
+    {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:0.5}
   ]},
   { id:'winter', name:'Зимний', icon:'❄️', price:3000, items:[
     {id:'bear',name:'Мишка',icon:'🧸',rarity:'common',price:15,chance:40},
@@ -195,8 +191,6 @@ app.get('/api/user/:login', (req, res) => {
 });
 
 app.get('/api/items', (req, res) => res.json(ITEM_CATALOG));
-
-/* ================== КЕЙСЫ ================== */
 app.get('/api/cases', (req, res) => res.json(GAME_CASES));
 
 app.post('/api/cases/open', (req, res) => {
@@ -222,18 +216,20 @@ app.post('/api/cases/open', (req, res) => {
   res.json({ success: true, balance: user.balance, item: { ...dropped, uid: itemUid }, pool: box.items });
 });
 
-/* ================== ИГРА "МИНЫ" ================== */
+/* ================== ИГРА "МИНЫ" (УСЛОЖНЕННЫЕ) ================== */
 app.post('/api/games/mines', (req, res) => {
   const { login, action, bet, opened, minesCount, totalCells } = req.body;
   db = loadDB();
   const user = db.users.find(u => u.login === login);
   if (!user) return res.status(404).json({ error: 'Юзер не найден' });
+  
   if (action === 'start') {
     if (Number(user.balance) < Number(bet)) return res.status(400).json({ error: 'Мало звезд!' });
     user.balance = Number(user.balance) - Number(bet);
     saveDB(db);
     return res.json({ success: true, balance: user.balance });
   }
+  
   if (action === 'cashout') {
     const mult = 1 + (opened * (minesCount / totalCells) * 2);
     const winAmount = Math.floor(bet * mult);
@@ -241,6 +237,19 @@ app.post('/api/games/mines', (req, res) => {
     saveDB(db);
     return res.json({ success: true, balance: user.balance, win: winAmount });
   }
+});
+
+// Эндпоинт для генерации поля (логика на клиенте для анимации, но бомбы ставим рядом)
+app.post('/api/games/mines/generate', (req, res) => {
+    const { size, mines } = req.body;
+    const total = size * size;
+    let bombs = Array(total).fill(false);
+    let placed = 0;
+    while(placed < mines) {
+        let idx = Math.floor(Math.random() * total);
+        if (!bombs[idx]) { bombs[idx] = true; placed++; }
+    }
+    res.json({ bombs });
 });
 
 /* ================== ИНВЕНТАРЬ / АПГРЕЙД ================== */
@@ -285,14 +294,14 @@ app.post('/api/upgrade', (req, res) => {
   res.json({ success: true, win, chance, item: win ? { ...target, uid: newItem.uid } : target, myItem });
 });
 
-/* ================== КОШЕЛЕК (ДЕПОЗИТ / ВЫВОД) ================== */
+/* ================== КОШЕЛЕК (ЗАЯВКИ) ================== */
 app.post('/api/wallet/deposit', (req, res) => {
   const { login, amount } = req.body;
   if (!login || !amount || Number(amount) <= 0) return res.status(400).json({ error: 'Введите сумму' });
   db = loadDB();
   db.deposit_requests.push({ id: uid(), user_login: login, amount_stars: Number(amount), status: 'pending', created_at: now() });
   saveDB(db);
-  res.json({ success: true });
+  res.json({ success: true, message: 'Заявка на пополнение создана. Ожидайте подтверждения админом.' });
 });
 
 app.post('/api/wallet/withdraw', (req, res) => {
@@ -306,7 +315,7 @@ app.post('/api/wallet/withdraw', (req, res) => {
   user.balance = Number(user.balance) - Number(amount);
   db.withdraw_requests.push({ id: uid(), user_login: login, amount_stars: Number(amount), status: 'pending', created_at: now() });
   saveDB(db);
-  res.json({ success: true, balance: user.balance });
+  res.json({ success: true, message: 'Заявка на вывод создана. Ожидайте.' });
 });
 
 /* ================== АДМИНКА ================== */

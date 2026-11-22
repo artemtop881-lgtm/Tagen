@@ -87,48 +87,48 @@ function addBalance(login, amount) {
   return { balance: u.balance };
 }
 
-/* ================== ПРЕДМЕТЫ (ИСПРАВЛЕННЫЕ КЕЙСЫ) ================== */
+/* ================== ПРЕДМЕТЫ (ПОФИКШЕННЫЕ ШАНСЫ) ================== */
 const GAME_CASES = [
   { id:'starter', name:'Стартовый', icon:'📦', price:100, items:[
-    {id:'heart',name:'Сердечко',icon:'💖',rarity:'common',price:15,chance:50},
+    {id:'heart',name:'Сердечко',icon:'💖',rarity:'common',price:15,chance:54},
     {id:'rose',name:'Роза',icon:'🌹',rarity:'common',price:25,chance:30},
     {id:'bear',name:'Мишка',icon:'🧸',rarity:'common',price:15,chance:10},
-    {id:'skull',name:'Череп',icon:'💀',rarity:'rare',price:50,chance:8},
-    {id:'ring',name:'Кольцо',icon:'💍',rarity:'rare',price:100,chance:2}
+    {id:'skull',name:'Череп',icon:'💀',rarity:'rare',price:50,chance:5},
+    {id:'ring',name:'Кольцо',icon:'💍',rarity:'rare',price:100,chance:1}
   ]},
   { id:'pro', name:'Про', icon:'🎁', price:1000, items:[
     {id:'gift',name:'Подарок',icon:'🎁',rarity:'common',price:25,chance:50},
-    {id:'cake',name:'Торт',icon:'🎂',rarity:'common',price:50,chance:25},
-    {id:'bouquet',name:'Букет',icon:'💐',rarity:'common',price:50,chance:15},
-    {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:0.1}
+    {id:'cake',name:'Торт',icon:'🎂',rarity:'common',price:50,chance:30},
+    {id:'bouquet',name:'Букет',icon:'💐',rarity:'common',price:50,chance:19.99},
+    {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:0.01}
   ]},
   { id:'legend', name:'Легенда', icon:'⚡', price:5000, items:[
     {id:'ring',name:'Кольцо',icon:'💍',rarity:'rare',price:100,chance:60},
-    {id:'golden_cup',name:'Золотой Кубок',icon:'🏆',rarity:'legendary',price:100000,chance:30},
-    {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:7},
-    {id:'crown',name:'Корона',icon:'👑',rarity:'legendary',price:500000,chance:2.9},
-    {id:'galaxy',name:'Галактика',icon:'🌌',rarity:'legendary',price:2000000,chance:0.1}
+    {id:'golden_cup',name:'Золотой Кубок',icon:'🏆',rarity:'legendary',price:100000,chance:5},
+    {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:1},
+    {id:'crown',name:'Корона',icon:'👑',rarity:'legendary',price:500000,chance:0.1},
+    {id:'galaxy',name:'Галактика',icon:'🌌',rarity:'legendary',price:2000000,chance:0.001}
   ]},
   { id:'magic', name:'Магический', icon:'🔮', price:2500, items:[
     {id:'heart',name:'Сердечко',icon:'💖',rarity:'common',price:15,chance:40},
     {id:'skull',name:'Череп',icon:'💀',rarity:'rare',price:50,chance:30},
     {id:'ring',name:'Кольцо',icon:'💍',rarity:'rare',price:100,chance:20},
-    {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:0.5}
+    {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:0.05}
   ]},
   { id:'winter', name:'Зимний', icon:'❄️', price:3000, items:[
     {id:'bear',name:'Мишка',icon:'🧸',rarity:'common',price:15,chance:40},
     {id:'cake',name:'Торт',icon:'🎂',rarity:'common',price:50,chance:35},
-    {id:'golden_cup',name:'Золотой Кубок',icon:'🏆',rarity:'legendary',price:100000,chance:20},
-    {id:'crown',name:'Корона',icon:'👑',rarity:'legendary',price:500000,chance:4.5},
-    {id:'galaxy',name:'Галактика',icon:'🌌',rarity:'legendary',price:2000000,chance:0.5}
+    {id:'golden_cup',name:'Золотой Кубок',icon:'🏆',rarity:'legendary',price:100000,chance:3},
+    {id:'crown',name:'Корона',icon:'👑',rarity:'legendary',price:500000,chance:0.1},
+    {id:'galaxy',name:'Галактика',icon:'🌌',rarity:'legendary',price:2000000,chance:0.01}
   ]},
   { id:'inferno', name:'Адский', icon:'🔥', price:7500, items:[
     {id:'skull',name:'Череп',icon:'💀',rarity:'rare',price:50,chance:50},
     {id:'ring',name:'Кольцо',icon:'💍',rarity:'rare',price:100,chance:25},
-    {id:'golden_cup',name:'Золотой Кубок',icon:'🏆',rarity:'legendary',price:100000,chance:15},
-    {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:9},
-    {id:'crown',name:'Корона',icon:'👑',rarity:'legendary',price:500000,chance:0.9},
-    {id:'galaxy',name:'Галактика',icon:'🌌',rarity:'legendary',price:2000000,chance:0.1}
+    {id:'golden_cup',name:'Золотой Кубок',icon:'🏆',rarity:'legendary',price:100000,chance:8},
+    {id:'dragon',name:'Дракон',icon:'🐉',rarity:'legendary',price:250000,chance:2},
+    {id:'crown',name:'Корона',icon:'👑',rarity:'legendary',price:500000,chance:0.1},
+    {id:'galaxy',name:'Галактика',icon:'🌌',rarity:'legendary',price:2000000,chance:0.001}
   ]}
 ];
 
@@ -216,7 +216,7 @@ app.post('/api/cases/open', (req, res) => {
   res.json({ success: true, balance: user.balance, item: { ...dropped, uid: itemUid }, pool: box.items });
 });
 
-/* ================== ИГРА "МИНЫ" (УСЛОЖНЕННЫЕ) ================== */
+/* ================== ИГРА "МИНЫ" ================== */
 app.post('/api/games/mines', (req, res) => {
   const { login, action, bet, opened, minesCount, totalCells } = req.body;
   db = loadDB();
@@ -237,19 +237,6 @@ app.post('/api/games/mines', (req, res) => {
     saveDB(db);
     return res.json({ success: true, balance: user.balance, win: winAmount });
   }
-});
-
-// Эндпоинт для генерации поля (логика на клиенте для анимации, но бомбы ставим рядом)
-app.post('/api/games/mines/generate', (req, res) => {
-    const { size, mines } = req.body;
-    const total = size * size;
-    let bombs = Array(total).fill(false);
-    let placed = 0;
-    while(placed < mines) {
-        let idx = Math.floor(Math.random() * total);
-        if (!bombs[idx]) { bombs[idx] = true; placed++; }
-    }
-    res.json({ bombs });
 });
 
 /* ================== ИНВЕНТАРЬ / АПГРЕЙД ================== */
@@ -301,7 +288,7 @@ app.post('/api/wallet/deposit', (req, res) => {
   db = loadDB();
   db.deposit_requests.push({ id: uid(), user_login: login, amount_stars: Number(amount), status: 'pending', created_at: now() });
   saveDB(db);
-  res.json({ success: true, message: 'Заявка на пополнение создана. Ожидайте подтверждения админом.' });
+  res.json({ success: true, message: 'Заявка на пополнение создана. Ожидайте подтверждения.' });
 });
 
 app.post('/api/wallet/withdraw', (req, res) => {

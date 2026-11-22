@@ -639,7 +639,6 @@ $('btnStartMines').onclick = async () => {
     $('minesGrid').style.display = 'grid'; $('minesGrid').style.gridTemplateColumns = `repeat(${currentGridSize}, 1fr)`; $('minesGrid').innerHTML = '';
     $('btnCashout').style.display = 'none'; $('btnStartMines').style.display = 'none';
     
-    // ГЕНЕРАЦИЯ С УСЛОЖНЕНИЕМ (Бомбы рядом с нажатием)
     minesBombs = Array(totalCells).fill(false); 
     let placed = 0;
     while(placed < minesCount) { 
@@ -661,7 +660,6 @@ function clickMine(cell, idx, total) {
   if(!minesActive || cell.classList.contains('opened')) return;
   cell.classList.add('opened');
   
-  // Если попали на бомбу
   if(minesBombs[idx]) {
     cell.textContent = '💣'; cell.classList.add('bomb'); playSound($('soundWin')); 
     minesActive = false;
@@ -671,11 +669,9 @@ function clickMine(cell, idx, total) {
     toast('Вы подорвались!', 'error'); 
     setTimeout(() => { resetMines(); enterGame(); }, 2000);
   } else {
-    // Если безопасно
     cell.textContent = '💎'; playSound($('soundCoin')); minesOpened++; updateMultiplier(total);
     $('btnCashout').style.display = 'block'; $('cashoutVal').textContent = Math.floor(minesBet * getMult(total));
     
-    // УСЛОЖНЕНИЕ: При клике на безопасную клетку, ставим бомбу рядом (если есть куда)
     if (minesOpened > 0) {
         const size = Math.sqrt(total);
         const row = Math.floor(idx / size);
@@ -689,7 +685,6 @@ function clickMine(cell, idx, total) {
                 const nc = col + dc;
                 if (nr >= 0 && nr < size && nc >= 0 && nc < size) {
                     const nIdx = nr * size + nc;
-                    // Если соседняя клетка не открыта и там еще нет бомбы
                     const neighborCell = document.querySelectorAll('.mine-cell')[nIdx];
                     if (neighborCell && !neighborCell.classList.contains('opened') && !minesBombs[nIdx]) {
                         neighbors.push(nIdx);
@@ -1022,4 +1017,4 @@ async function updateOnline() {
 }
 </script>
 </body>
-                                  </html>
+            </html>

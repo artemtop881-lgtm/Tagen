@@ -156,10 +156,14 @@ app.post('/api/register', (req, res) => {
   if (!login || !password || password.length < 6) return res.status(400).json({ error: 'Логин и пароль (мин. 6 символов)' });
   db = loadDB();
   if (db.users.find(u => u.login === login)) return res.status(400).json({ error: 'Логин уже занят' });
-  db.users.push({ login, password, balance: 1000, is_admin: false, is_super_admin: false, last_seen: now(), last_bonus: null });
+  
+  // ИЗМЕНЕНО: Стартовый баланс 100 звёзд
+  db.users.push({ login, password, balance: 100, is_admin: false, is_super_admin: false, last_seen: now(), last_bonus: null });
   db.user_customization.push({ user_login: login, avatar: '👤', frame: 'none' });
   saveDB(db);
-  res.json({ success: true, user: { login, balance: 1000 } });
+  
+  // ИЗМЕНЕНО: Возвращаем 100 звёзд
+  res.json({ success: true, user: { login, balance: 100 } });
 });
 
 app.post('/api/login', (req, res) => {

@@ -42,7 +42,7 @@ function getIconPath(id, fallbackEmoji) {
 /* ================== ХРАНИЛИЩЕ ================== */
 const DB_FILE = process.env.DB_PATH || path.join(__dirname, 'database.json');
 const EMPTY_DB = () => ({
-  users: [], inventory: [], user_customization: [], drop_history: [], // <-- ДОБАВИЛ drop_history
+  users: [], inventory: [], user_customization: [], drop_history: [],
   withdraw_requests: [], deposit_requests: [], promocodes: [], promo_history: [],
   admin_logs: [], admin_notes: [], broadcasts: []
 });
@@ -215,7 +215,6 @@ app.post('/api/cases/open', (req, res) => {
   const itemUid = uid();
   db.inventory.push({ uid: itemUid, user_login: login, item_id: dropped.id, name: dropped.name, icon: dropped.icon, rarity: dropped.rarity, price: dropped.price, status: 'inventory', created_at: now() });
   
-  // ДОБАВЛЯЕМ В ИСТОРИЮ ДРОПОВ
   db.drop_history.push({ user_login: login, item_name: dropped.name, item_icon: dropped.icon, item_price: dropped.price, rarity: dropped.rarity, created_at: now() });
   saveDB(db);
   
@@ -259,41 +258,64 @@ app.post('/api/inventory/sell', (req, res) => {
   res.json({ success: true, balance: user.balance });
 });
 
+// НОВЫЙ ЭНДПОИНТ АПГРЕЙДА (С ПОДДЕРЖКОЙ ЗВЕЗД)
 app.post('/api/upgrade', (req, res) => {
-  const { login, myUid, targetItemId } = req.body;
+  const { login, myUid, targetItemId, betStars } = req.body;
   db = loadDB();
-  const myIdx = db.inventory.findIndex(i => i.user_login === login && i.uid === myUid);
-  if (myIdx === -1) return res.status(404).json({ error: 'Предмет не найден' });
+  const user = db.users.find(u => u.login === login);
+  if (!user) return res.status(404).json({ error: 'Юзер не найден' });
+  
+  let myValue = 0;
+  let myItem = null;
+
+  if (betStars) {
+    // Игра на звезды
+    if (Number(betStars) < 10) return res.status(400).json({ error: 'Мин. ставка 10 звезд' });
+    if (Number(user.balance) < Number(betStars)) return res.status(400).json({ error: 'Мало звезд на балансе' });
+    myValue = Number(betStars);
+  } else {
+    // Игра на предмет
+    const myIdx = db.inventory.findIndex(i => i.user_login === login && i.uid === myUid);
+    if (myIdx === -1) return res.status(404).json({ error: 'Предмет не найден' });
+    myItem = db.inventory[myIdx];
+    myValue = Number(myItem.price);
+  }
+
   const target = ITEM_BY_ID.get(targetItemId);
   if (!target) return res.status(400).json({ error: 'Цель не найдена' });
-  const myItem = db.inventory[myIdx];
-  if (Number(myItem.price) >= Number(target.price)) return res.status(400).json({ error: 'Целевой предмет должен быть дороже' });
   
-  let chance = (Number(myItem.price) / Number(target.price)) * 50;
+  if (myValue >= Number(target.price)) return res.status(400).json({ error: 'Целевой предмет должен быть дороже' });
+  
+  let chance = (myValue / Number(target.price)) * 50;
   if (!isFinite(chance)) chance = 1;
   if (chance > 50) chance = 50;
   if (chance < 1) chance = 1;
   chance = Math.round(chance * 100) / 100;
   
-  db.inventory.splice(myIdx, 1);
+  // Списываем ставку
+  if (betStars) {
+    user.balance = Number(user.balance) - Number(betStars);
+  } else {
+    db.inventory.splice(db.inventory.findIndex(i => i.uid === myUid), 1);
+  }
+
   const win = Math.random() * 100 < chance;
   let newItem = null;
+  
   if (win) {
     const itemUid = uid();
     newItem = { uid: itemUid, user_login: login, item_id: target.id, name: target.name, icon: target.icon, rarity: target.rarity, price: target.price, status: 'inventory', created_at: now() };
     db.inventory.push(newItem);
     
-    // ДОБАВЛЯЕМ В ИСТОРИЮ ДРОПОВ (ЕСЛИ ВЫИГРАЛ)
     db.drop_history.push({ user_login: login, item_name: target.name, item_icon: target.icon, item_price: target.price, rarity: target.rarity, created_at: now() });
   }
+  
   saveDB(db);
-  res.json({ success: true, win, chance, item: win ? { ...target, uid: newItem.uid } : target, myItem });
+  res.json({ success: true, win, chance, item: win ? { ...target, uid: newItem.uid } : target, myItem, newBalance: user.balance });
 });
 
-// НОВЫЙ ЭНДПОИНТ ДЛЯ ПОЛУЧЕНИЯ ПОСЛЕДНИХ ДРОПОВ
 app.get('/api/drops', (req, res) => {
   db = loadDB();
-  // Берем последние 20 дропов, сортируем по времени (новые сверху)
   const recent = db.drop_history.slice(-20).reverse();
   res.json(recent);
 });

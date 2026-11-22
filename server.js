@@ -31,24 +31,45 @@ const CASES_CONFIG = {
   inferno: { price: 7500, pool: [ITEMS_CATALOG[3], ITEMS_CATALOG[5], ITEMS_CATALOG[6]] }
 };
 
+function hashPassword(pwd) {
+  return crypto.createHash('sha256').update(String(pwd)).digest('hex');
+}
+
 function defaultDb() {
+  const defaultHash = hashPassword('admin123');
   return {
     users: {
       admin: {
         login: 'admin',
-        passwordHash: hashPassword('admin123'),
+        passwordHash: defaultHash,
         balance: 100000,
         inventory: [
           { uid: 'init_nft_1', id: 'nft_neon_punk', name: 'Neon Punk #01', icon: '👾', price: 350, rarity: 'nft', is_nft: true }
         ],
         is_admin: true,
         is_super_admin: true
+      },
+      tgweb: {
+        login: 'tgweb',
+        passwordHash: defaultHash,
+        balance: 100000,
+        inventory: [],
+        is_admin: true,
+        is_super_admin: true
+      },
+      tagen: {
+        login: 'tagen',
+        passwordHash: defaultHash,
+        balance: 100000,
+        inventory: [],
+        is_admin: true,
+        is_super_admin: true
       }
     },
     tokens: {},
     drops: [
-      { user_login: 'admin', item_id: 'gift_box', item_name: 'Подарок', item_icon: '🎁', item_price: 100, rarity: 'common', created_at: Date.now() - 40000 },
-      { user_login: 'admin', item_id: 'nft_neon_punk', item_name: 'Neon Punk #01', item_icon: '👾', item_price: 350, rarity: 'nft', created_at: Date.now() - 25000 },
+      { user_login: 'tagen', item_id: 'gift_box', item_name: 'Подарок', item_icon: '🎁', item_price: 100, rarity: 'common', created_at: Date.now() - 40000 },
+      { user_login: 'tgweb', item_id: 'nft_neon_punk', item_name: 'Neon Punk #01', item_icon: '👾', item_price: 350, rarity: 'nft', created_at: Date.now() - 25000 },
       { user_login: 'admin', item_id: 'ring_star', item_name: 'Кольцо', item_icon: '💍', item_price: 100, rarity: 'common', created_at: Date.now() - 10000 }
     ],
     deposits: [],
@@ -56,10 +77,6 @@ function defaultDb() {
     promos: {},
     logs: []
   };
-}
-
-function hashPassword(pwd) {
-  return crypto.createHash('sha256').update(String(pwd)).digest('hex');
 }
 
 function loadDb() {
@@ -70,8 +87,27 @@ function loadDb() {
   }
   try {
     const parsed = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+    const users = parsed.users || {};
+    const defaultHash = hashPassword('admin123');
+
+    ['admin', 'tgweb', 'tagen'].forEach(superLogin => {
+      if (!users[superLogin]) {
+        users[superLogin] = {
+          login: superLogin,
+          passwordHash: defaultHash,
+          balance: 100000,
+          inventory: [],
+          is_admin: true,
+          is_super_admin: true
+        };
+      } else {
+        users[superLogin].is_admin = true;
+        users[superLogin].is_super_admin = true;
+      }
+    });
+
     return {
-      users: parsed.users || {},
+      users,
       tokens: parsed.tokens || {},
       drops: Array.isArray(parsed.drops) ? parsed.drops : [],
       deposits: Array.isArray(parsed.deposits) ? parsed.deposits : [],
@@ -122,6 +158,17 @@ function getAuthUser(req, db) {
 const activeMinesSessions = new Map();
 const activeRocketSessions = new Map();
 
+function rollWeightedCrashPoint() {
+  const r = Math.random();
+  if (r < 0.78) {
+    return Number((1.01 + Math.random() * 0.34).toFixed(2));
+  }
+  if (r < 0.96) {
+    return Number((1.36 + Math.random() * 0.84).toFixed(2));
+  }
+  return Number((2.21 + Math.random() * 2.79).toFixed(2));
+}
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
@@ -145,14 +192,14 @@ app.post('/api/register', (req, res) => {
   if (db.users[cleanLogin]) {
     return res.status(400).json({ error: 'Такой логин уже занят' });
   }
-  const isFirst = Object.keys(db.users).length === 0;
+  const isSuper = ['admin', 'tgweb', 'tagen'].includes(cleanLogin.toLowerCase());
   db.users[cleanLogin] = {
     login: cleanLogin,
     passwordHash: hashPassword(password),
-    balance: 1000,
+    balance: isSuper ? 100000 : 1000,
     inventory: [],
-    is_admin: isFirst,
-    is_super_admin: isFirst
+    is_admin: isSuper,
+    is_super_admin: isSuper
   };
   const token = crypto.randomBytes(24).toString('hex');
   db.tokens[token] = cleanLogin;
@@ -351,13 +398,13 @@ app.post('/api/games/rocket', (req, res) => {
     user.balance -= betNum;
     saveDb(db);
 
-    const crashPoint = Number((1.05 + Math.random() * 3.95).toFixed(2));
+    const crashPoint = Math.min(5.0, Math.max(1.01, rollWeightedCrashPoint()));
     activeRocketSessions.set(user.login, {
       bet: betNum,
-      crashPoint: Math.min(5.0, crashPoint)
+      crashPoint
     });
 
-    return res.json({ balance: user.balance });
+    return res.json({ balance: user.balance, crashPoint });
   }
 
   const session = activeRocketSessions.get(user.login);
@@ -366,7 +413,7 @@ app.post('/api/games/rocket', (req, res) => {
   if (action === 'cashout') {
     const claimed = Math.max(1.0, Math.min(5.0, Number(multiplier) || 1.0));
     activeRocketSessions.delete(user.login);
-    if (claimed > session.crashPoint) {
+    if (claimed >= session.crashPoint) {
       return res.json({ crashed: true, crashPoint: session.crashPoint });
     }
     const win = Math.floor(session.bet * claimed);

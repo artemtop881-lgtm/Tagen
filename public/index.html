@@ -356,7 +356,6 @@ input[type="text"], input[type="number"], input[type="password"] { width:100%; p
         <div class="upg-circle-wrap">
           <svg class="upg-svg" viewBox="0 0 200 200">
             <circle class="upg-svg-bg" cx="100" cy="100" r="85" />
-            <!-- ВАЖНО: dashoffset=0 => белая дуга идёт ОТ ВЕРХА ПО ЧАСОВОЙ -->
             <circle id="upgProgressCircle" class="upg-svg-win" cx="100" cy="100" r="85" stroke-dasharray="0 534" stroke-dashoffset="0" />
           </svg>
           <div id="upgCenterItem"><span style="opacity:0.2;">❓</span></div>
@@ -479,6 +478,33 @@ let authMode = 'login';
 let playerData = { balance: 0, inventory: [], is_admin: false };
 let SERVER_ITEMS = [];
 let activeCaseData = { price: 0, caseId: '' };
+
+/* ================= ЗВУКИ ================= */
+const sfx = {
+  click: new Audio('/sounds/click.mp3'),
+  coin: new Audio('/sounds/coin.mp3'),
+  spin: new Audio('/sounds/spin.mp3')
+};
+
+const bgm = new Audio('/sounds/bgm.mp3');
+bgm.loop = true; // Зацикливаем фоновую музыку
+bgm.volume = 0.3; // Фоновая музыка играет тише, чтобы не перебивать эффекты
+
+function playSfx(name) {
+  if (sfx[name]) {
+    sfx[name].currentTime = 0; // Сбрасываем на начало (чтобы можно было спамить клики)
+    sfx[name].play().catch(() => {}); // Игнорируем ошибки автовоспроизведения
+  }
+}
+
+function playBGM() {
+  if (bgm.paused) {
+    bgm.play().catch(() => {});
+  }
+}
+
+// Браузеры разрешают звук только после первого клика пользователя
+document.body.addEventListener('click', playBGM, { once: true });
 
 /* ====== АВТОРИЗАЦИЯ / ТОКЕН ====== */
 let AUTH_TOKEN = localStorage.getItem('auth_token') || '';
@@ -662,9 +688,12 @@ async function startCase(caseId, price) {
       const itemW = 80; const container = document.querySelector('.roulette-container'); const containerW = container.offsetWidth;
       const offset = (45 * itemW) - (containerW / 2) + (itemW / 2);
       strip.style.transition = 'transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)'; strip.style.transform = `translateX(-${offset}px)`;
+      
+      playSfx('spin'); // Звук кручения рулетки
 
       setTimeout(() => {
         toast(`Вы выбили: ${currentWinItem.name}`, 'success');
+        playSfx('coin'); // Звук победы
         $('caseActions').style.display = 'flex';
         isCaseOpening = false;
         enterGame();
@@ -756,6 +785,7 @@ async function clickMine(cell, idx) {
       setTimeout(() => { enterGame(); resetMines(); }, 2000);
     } else {
       cell.textContent = '💎';
+      playSfx('click'); // Звук клика по безопасной клетке
       $('minesMultLbl').textContent = Number(data.multiplier).toFixed(2) + 'x';
       $('btnCashout').style.display = 'block';
       $('cashoutVal').textContent = data.potentialWin;
@@ -785,6 +815,7 @@ $('btnCashout').onclick = async () => {
       if(data.bombs && data.bombs.includes(i) && !c.classList.contains('opened')) c.textContent = '💣';
     });
 
+    playSfx('coin'); // Звук получения монет
     toast(`Вы забрали ${data.win} ★`, 'success');
     setTimeout(() => resetMines(), 1500);
   } catch(e) { toast(e.message, 'error'); }
@@ -895,7 +926,7 @@ function renderUpgradeGrid() {
 
 function updateUpgradeUI() {
   const circle = $('upgProgressCircle');
-  circle.style.strokeDashoffset = '0'; // дуга всегда от верха по часовой
+  circle.style.strokeDashoffset = '0';
   if (!myUpgradeItem || !targetUpgradeItem) {
     $('upgradeChanceText').textContent = '0%';
     $('upgCenterItem').innerHTML = '<span style="opacity:0.2;">❓</span>';
@@ -937,14 +968,14 @@ $('btnDoUpgrade').onclick = async () => {
 
     setTimeout(() => {
       pointer.classList.add('spinning');
+      playSfx('spin'); // Звук вращения указателя
+
       const chanceDeg = (data.chance / 100) * 360;
       const gap = 360 - chanceDeg;
       let targetAngle;
       if (data.win) {
-        // ВНУТРИ белой дуги [0 .. chanceDeg]
         targetAngle = chanceDeg * 0.15 + Math.random() * chanceDeg * 0.7;
       } else {
-        // СНАРУЖИ белой дуги (chanceDeg .. 360)
         targetAngle = chanceDeg + gap * 0.1 + Math.random() * gap * 0.8;
       }
       const totalSpins = 360 * 5;
@@ -964,8 +995,13 @@ $('btnDoUpgrade').onclick = async () => {
         updateUpgradeUI();
         renderUpgradeGrid();
         enterGame();
-        if(data.win) toast('УСПЕХ! Вы получили ' + data.item.name, 'success');
-        else toast('НЕУДАЧА', 'error');
+        
+        if(data.win) {
+          playSfx('coin'); // Звук победы
+          toast('УСПЕХ! Вы получили ' + data.item.name, 'success');
+        } else {
+          toast('НЕУДАЧА', 'error');
+        }
       }, 4600);
     }, 50);
   } catch(e) {
@@ -988,6 +1024,7 @@ async function sellItem(uid) {
   if(!confirm('Продать предмет?')) return;
   try {
     await apiPost('/api/inventory/sell', { uid });
+    playSfx('coin'); // Звук получения звезд
     await enterGame();
   } catch(e) {}
 }
@@ -1108,4 +1145,4 @@ window.removeAdmin = async function () {
 $('adminFromSettings').onclick = () => switchTab('admin');
 </script>
 </body>
-            </html>
+      </html>

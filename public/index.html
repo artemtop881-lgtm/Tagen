@@ -86,13 +86,81 @@ header{ display:flex; align-items:center; justify-content:space-between; gap:10p
 .roulette-item .r-name { font-size:9px; color:var(--dim); margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%; text-align:center; }
 .roulette-pointer{ position:absolute; left:50%; top:0; bottom:0; width:4px; background:var(--gold); transform:translateX(-50%); z-index:10; box-shadow:0 0 15px var(--gold); }
 
-/* ========== АПГРЕЙД ========== */
-.upg-circle-wrap{position:relative; width:220px; height:220px; margin:0 auto 20px;}
-.upg-svg{width:100%; height:100%; transform:rotate(-90deg);}
-#upgCenterItem{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:60px; z-index:2;}
-#upgCenterItem img { max-width: 60px; max-height: 60px; }
-#upgPointer { position: absolute; top: 50%; left: 50%; width: 4px; height: 94px; background: linear-gradient(to top, transparent, #fff); transform-origin: bottom center; transform: translate(-50%, -100%) rotate(0deg); z-index: 5; border-radius: 4px; pointer-events: none; opacity: 1; transition: transform 3s cubic-bezier(0.1, 0.8, 0.2, 1), opacity 0.2s; }
-#upgPointer::after { content: ''; position: absolute; top: -6px; left: -4px; width: 12px; height: 12px; background: #fff; border-radius: 50%; box-shadow: 0 0 15px #fff; }
+/* ========== АПГРЕЙД (3D) ========== */
+.upgrade-container {
+    perspective: 1000px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+}
+.upg-circle-wrap {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+    margin-bottom: 20px;
+}
+.upg-circle-wrap:hover {
+    transform: rotateX(10deg) rotateY(10deg);
+}
+.upg-svg {
+    width: 100%; height: 100%;
+    transform: rotate(-90deg);
+    filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));
+}
+.upg-svg-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 12; }
+.upg-svg-progress { fill: none; stroke: url(#gradient); stroke-width: 12; stroke-linecap: round; filter: drop-shadow(0 0 10px rgba(255,215,0,0.8)); transition: stroke-dashoffset 0.1s linear; }
+#upgCenterItem { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2; transform: translateZ(50px); }
+#upgCenterItem img { max-width: 70px; max-height: 70px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.5)); }
+
+/* Указатель */
+#upgPointer {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 6px; height: 100px;
+    background: linear-gradient(to top, transparent, #fff, #ffd700);
+    transform-origin: bottom center;
+    transform: translate(-50%, -100%) rotate(0deg);
+    z-index: 5;
+    border-radius: 6px;
+    pointer-events: none;
+    box-shadow: 0 0 20px #ffd700;
+}
+#upgPointer::after {
+    content: ''; position: absolute; top: -8px; left: -6px;
+    width: 18px; height: 18px;
+    background: #fff; border-radius: 50%;
+    box-shadow: 0 0 20px #fff, 0 0 40px #ffd700;
+}
+
+/* Блок выбора */
+.upgrade-slots { display: flex; gap: 15px; width: 100%; margin-bottom: 15px; }
+.slot-card {
+    flex: 1; background: linear-gradient(145deg, var(--card-2), var(--card));
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 15px 10px; text-align: center; cursor: pointer;
+    transition: 0.2s; box-shadow: 0 6px 0 var(--hard);
+}
+.slot-card:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--hard); }
+.slot-card.active { border-color: var(--gold); box-shadow: 0 0 15px rgba(255,215,0,0.3), 0 6px 0 var(--hard); }
+.slot-card .s-label { font-size: 11px; color: var(--dim); margin-bottom: 5px; font-weight: 700; text-transform: uppercase; }
+.slot-card .s-content { font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 5px; }
+
+/* Сетка предметов */
+.items-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; margin-bottom: 20px; max-height: 200px; overflow-y: auto; padding-right: 5px; }
+.item-card { background: var(--card-2); border: 2px solid transparent; border-radius: 12px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+.item-card:hover { background: var(--card-3); }
+.item-card.selected { border-color: var(--gold); background: rgba(255,215,0,0.1); }
+.item-card .ic-icon { margin-bottom: 5px; height: 30px; }
+.item-card .ic-name { font-size: 11px; font-weight: 700; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item-card .ic-price { font-size: 10px; color: var(--gold); font-weight: 800; }
+.item-card .ic-mult { font-size: 9px; color: var(--ok); font-weight: 800; margin-top: 2px; }
+
+/* Чанс */
+.upg-chance-text { text-align: center; margin-bottom: 15px; font-size: 18px; font-weight: 900; }
+.upg-chance-text span { color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.5); }
 
 /* ========== МИНЫ ========== */
 .mines-wrapper { max-width:100%; margin:0 auto; padding-bottom: 80px; }
@@ -176,7 +244,7 @@ input:checked + .slider:before { transform: translateX(22px); }
   font-size: 12px;
   font-weight: 700;
   position: absolute;
-  right: -300px; /* Начало за экраном */
+  right: -300px; 
   animation: slideInOut 15s linear forwards;
 }
 .drop-feed-item .f-icon img { width: 20px; height: 20px; object-fit: contain; vertical-align: middle; }
@@ -186,7 +254,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 @keyframes slideInOut {
   0% { right: -300px; }
-  10% { right: 100%; } /* Выезд слева */
+  10% { right: 100%; }
   90% { right: 100%; }
   100% { right: -300px; }
 }
@@ -311,31 +379,44 @@ input:checked + .slider:before { transform: translateX(22px); }
 
     <!-- Апгрейд -->
     <div id="gameUpgrade" style="display:none;">
-      <div id="dropFeedContainer"></div> <!-- КОНТЕЙНЕР ДЛЯ ЛЕНТЫ ДРОПОВ -->
+      <div id="dropFeedContainer"></div>
       <button class="btn-grey" onclick="openGame('menu')" style="margin-bottom:15px; padding:10px; border-radius:12px; font-weight:800; width:100%; cursor:pointer;">← Назад</button>
-      <div class="upg-circle-wrap">
-        <svg class="upg-svg" viewBox="0 0 200 200">
-          <circle cx="100" cy="100" r="85" fill="none" stroke="#222" stroke-width="10" />
-          <circle id="upgProgressCircle" cx="100" cy="100" r="85" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-dasharray="534" stroke-dashoffset="534" style="transition: stroke-dashoffset 3s ease-in-out;"/>
-        </svg>
-        <div id="upgCenterItem"><span style="opacity:0.2;">❓</span></div>
-        <div id="upgPointer"></div>
-      </div>
-      <div style="text-align:center; margin-bottom:15px;">Шанс <span id="upgradeChanceText" style="font-size:22px; font-weight:900; color:var(--gold);">0%</span></div>
       
-      <div style="display:flex; gap:10px; margin-bottom:15px;">
-        <div id="upgradeMySlot" class="card3d" style="padding:10px; flex:1; cursor:pointer;">
-          <div style="font-size:10px; color:var(--dim);">Ставка</div>
-          <div style="display:flex; align-items:center; gap:5px;"><span id="upgMyIcon">⭐</span><span id="upgMyName" style="font-size:12px;">Выбрать</span></div>
-        </div>
-        <div style="display:flex; align-items:center;">➔</div>
-        <div id="upgradeTargetSlot" class="card3d" style="padding:10px; flex:1; cursor:pointer;">
-          <div style="font-size:10px; color:var(--dim);">Получить</div>
-          <div style="display:flex; align-items:center; gap:5px;"><span id="upgTargetIcon">🎁</span><span id="upgTargetName" style="font-size:12px;">Выбрать</span></div>
-        </div>
+      <div class="upgrade-container">
+          <div class="upg-circle-wrap">
+            <svg class="upg-svg" viewBox="0 0 200 200">
+              <defs>
+                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ffd700" />
+                  <stop offset="100%" stop-color="#ff8c00" />
+                </linearGradient>
+              </defs>
+              <circle class="upg-svg-bg" cx="100" cy="100" r="85" />
+              <circle id="upgProgressCircle" class="upg-svg-progress" cx="100" cy="100" r="85" stroke-dasharray="534" stroke-dashoffset="534" />
+            </svg>
+            <div id="upgCenterItem"><span style="opacity:0.2;">❓</span></div>
+            <div id="upgPointer"></div>
+          </div>
+          
+          <div class="upg-chance-text">Шанс <span id="upgradeChanceText">0%</span></div>
+
+          <div class="upgrade-slots">
+            <div id="upgradeMySlot" class="slot-card active" onclick="openMyUpgradeSelect()">
+              <div class="s-label">Ставка</div>
+              <div class="s-content" id="upgMyContent">Выбрать</div>
+            </div>
+            <div style="display:flex; align-items:center; font-size:20px;">➔</div>
+            <div id="upgradeTargetSlot" class="slot-card" onclick="openTargetUpgradeSelect()">
+              <div class="s-label">Получить</div>
+              <div class="s-content" id="upgTargetContent">Выбрать</div>
+            </div>
+          </div>
+
+          <!-- Сетка целей -->
+          <div class="items-grid" id="upgradeItemsGrid"></div>
+          
+          <button class="btn-main btn-blue" id="btnDoUpgrade" style="font-size: 18px; padding: 18px; letter-spacing: 1px;">Улучшить</button>
       </div>
-      <div id="upgradeItemsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(60px, 1fr)); gap:8px; max-height:150px; overflow-y:auto; margin-bottom:15px;"></div>
-      <button class="btn-main btn-blue" id="btnDoUpgrade">Улучшить</button>
     </div>
   </div>
 
@@ -428,8 +509,16 @@ input:checked + .slider:before { transform: translateX(22px); }
 <!-- МОДАЛКА ВЫБОРА ПРЕДМЕТА -->
 <div class="modal" id="selectItemModal">
   <div class="box">
-    <h3 style="margin-bottom:15px; text-align:center;">Выберите предмет</h3>
-    <div id="selectItemList" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:10px; max-height:50vh; overflow-y:auto; padding:5px;"></div>
+    <h3 style="margin-bottom:15px; text-align:center;" id="selectItemTitle">Выберите предмет</h3>
+    
+    <div id="mySelectOptions" style="display:flex; flex-direction:column; gap:10px; margin-bottom:15px;">
+        <button class="btn-main btn-green" onclick="selectMyBet('stars')" style="padding:12px; font-size:14px;">⭐ Поставить Звёзды</button>
+        <button class="btn-main btn-blue" onclick="selectMyBet('items')" style="padding:12px; font-size:14px;">🎁 Выбрать Предмет</button>
+    </div>
+
+    <div id="myItemsList" style="display:none; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:10px; max-height:50vh; overflow-y:auto; padding:5px;"></div>
+    <div id="targetItemsList" style="display:none; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:10px; max-height:50vh; overflow-y:auto; padding:5px;"></div>
+    
     <button class="btn-grey" onclick="closeModal('selectItemModal')" style="margin-top:15px; padding:12px;">Отмена</button>
   </div>
 </div>
@@ -449,7 +538,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if(localStorage.getItem('snow') === 'true') { document.getElementById('toggleSnow').checked = true; initSnow(); }
   if(localStorage.getItem('neon') === 'true') { document.getElementById('toggleNeon').checked = true; document.documentElement.classList.add('neon'); }
   
-  // Запускаем ленту дропов
   setInterval(loadDropFeed, 5000); 
   loadDropFeed();
 });
@@ -464,53 +552,34 @@ function renderIcon(icon, size = 40) {
   return `<span style="font-size:${size}px;line-height:1">${icon}</span>`;
 }
 
-// ==== ЛЕНТА ДРОПОВ ====
 async function loadDropFeed() {
   const container = $('dropFeedContainer');
   if(!container) return;
-  
   try {
     const res = await fetch('/api/drops');
     if(!res.ok) return;
     const drops = await res.json();
-    
-    // Очищаем старые элементы, чтобы они не забивали экран
-    if(container.children.length > 5) {
-        container.innerHTML = ''; 
-    }
+    if(container.children.length > 5) container.innerHTML = ''; 
 
     drops.forEach(drop => {
-      // Создаем элемент только если его еще нет (проверка по времени, чтобы не дублировать)
       const dropId = drop.created_at;
       if (document.querySelector(`.drop-feed-item[data-id="${dropId}"]`)) return;
-
       const div = document.createElement('div');
       div.className = 'drop-feed-item';
       div.dataset.id = dropId;
-      
-      // Рандомное смещение, чтобы они не наезжали друг на друга
       div.style.top = `${Math.random() * 20}px`;
-      // Случайная задержка анимации
       div.style.animationDelay = `${Math.random() * 2}s`;
-
       div.innerHTML = `
         <span class="f-user">${drop.user_login}</span> выбил
         <span class="f-icon">${renderIcon(drop.item_icon, 20)}</span>
         <span class="f-name">${drop.item_name}</span>
         <span class="f-price">${drop.item_price} 🌟</span>
       `;
-      
       container.appendChild(div);
-
-      // Удаляем элемент из DOM после завершения анимации (15 сек)
-      setTimeout(() => {
-        if (div.parentNode) div.remove();
-      }, 15000);
+      setTimeout(() => { if (div.parentNode) div.remove(); }, 15000);
     });
-
-  } catch(e) { console.error('Ошибка загрузки дропов', e); }
+  } catch(e) {}
 }
-// ===================
 
 function toast(msg, type = 'info') {
   const c = $('toastContainer');
@@ -614,7 +683,7 @@ function openGame(game) {
   $('gameCases').style.display = game === 'cases' ? 'block' : 'none';
   $('gameMines').style.display = game === 'mines' ? 'block' : 'none';
   $('gameUpgrade').style.display = game === 'upgrade' ? 'block' : 'none';
-  if(game === 'upgrade') renderUpgradeGrid();
+  if(game === 'upgrade') { renderUpgradeGrid(); updateUpgradeUI(); }
   window.scrollTo(0,0);
 }
 
@@ -825,55 +894,92 @@ $('btnCashout').onclick = async () => {
 
 /* ================= АПГРЕЙД ================= */
 let myUpgradeItem = null, targetUpgradeItem = null;
+let myBetType = null; // 'stars' или 'item'
 
-function openSelectModal(items, callback) {
-  const list = $('selectItemList');
-  list.innerHTML = '';
-  if(items.length === 0) {
-    list.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--dim);">Пусто</div>';
-  } else {
-    items.sort((a,b) => a.price - b.price).forEach(item => {
-      const d = document.createElement('div');
-      d.style.cssText = `background:var(--card-2); border:1px solid var(--border); border-radius:10px; padding:10px; text-align:center; cursor:pointer;`;
-      d.innerHTML = `${renderIcon(item.icon, 30)}<div style="font-size:10px; font-weight:700; margin-top:5px;">${item.name}</div><div style="color:var(--gold); font-size:10px; font-weight:800;">${item.price} 🌟</div>`;
-      d.onclick = () => { callback(item); closeModal('selectItemModal'); };
-      list.appendChild(d);
-    });
-  }
+function openMyUpgradeSelect() {
+  $('selectItemTitle').textContent = 'Что ставим?';
+  $('mySelectOptions').style.display = 'flex';
+  $('myItemsList').style.display = 'none';
+  $('targetItemsList').style.display = 'none';
   $('selectItemModal').classList.add('show');
 }
 
-$('upgradeMySlot').onclick = () => {
-  if(!playerData.inventory || playerData.inventory.length === 0) return toast('Инвентарь пуст', 'error');
-  openSelectModal(playerData.inventory, (item) => {
-    myUpgradeItem = item;
-    $('upgMyIcon').innerHTML = renderIcon(item.icon, 20);
-    $('upgMyName').textContent = item.name;
-    updateUpgradeUI();
-  });
-};
+function selectMyBet(type) {
+  $('mySelectOptions').style.display = 'none';
+  if (type === 'stars') {
+    const amount = prompt('Введите сумму звезд для ставки (мин. 10):', '100');
+    if (amount && Number(amount) >= 10) {
+      if (Number(amount) > playerData.balance) return toast('Мало звезд на балансе!', 'error');
+      myBetType = 'stars';
+      myUpgradeItem = { price: Number(amount), name: 'Звёзды', icon: '⭐', uid: 'stars' };
+      $('upgMyContent').innerHTML = `<span style="color:var(--gold);font-size:16px;">⭐</span> ${amount}`;
+      closeModal('selectItemModal');
+      updateUpgradeUI();
+    }
+  } else if (type === 'items') {
+    myBetType = 'item';
+    $('myItemsList').style.display = 'grid';
+    const list = $('myItemsList');
+    list.innerHTML = '';
+    if(!playerData.inventory || playerData.inventory.length === 0) {
+      list.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--dim);">Пусто</div>';
+      return;
+    }
+    playerData.inventory.sort((a,b) => a.price - b.price).forEach(item => {
+      const d = document.createElement('div');
+      d.style.cssText = `background:var(--card-2); border:1px solid var(--border); border-radius:10px; padding:10px; text-align:center; cursor:pointer;`;
+      d.innerHTML = `${renderIcon(item.icon, 30)}<div style="font-size:10px; font-weight:700; margin-top:5px;">${item.name}</div><div style="color:var(--gold); font-size:10px; font-weight:800;">${item.price} 🌟</div>`;
+      d.onclick = () => { 
+        myUpgradeItem = item; 
+        myBetType = 'item';
+        $('upgMyContent').innerHTML = `${renderIcon(item.icon, 16)} ${item.name}`;
+        closeModal('selectItemModal'); 
+        updateUpgradeUI();
+      };
+      list.appendChild(d);
+    });
+  }
+}
 
-$('upgradeTargetSlot').onclick = () => {
-  openSelectModal(SERVER_ITEMS, (item) => {
-    targetUpgradeItem = item;
-    $('upgTargetIcon').innerHTML = renderIcon(item.icon, 20);
-    $('upgTargetName').textContent = item.name;
-    updateUpgradeUI();
-    renderUpgradeGrid();
+function openTargetUpgradeSelect() {
+  $('selectItemTitle').textContent = 'Что хотим получить?';
+  $('mySelectOptions').style.display = 'none';
+  $('myItemsList').style.display = 'none';
+  $('targetItemsList').style.display = 'grid';
+  const list = $('targetItemsList');
+  list.innerHTML = '';
+  SERVER_ITEMS.sort((a,b) => a.price - b.price).forEach(item => {
+    const d = document.createElement('div');
+    d.style.cssText = `background:var(--card-2); border:1px solid var(--border); border-radius:10px; padding:10px; text-align:center; cursor:pointer;`;
+    d.innerHTML = `${renderIcon(item.icon, 30)}<div style="font-size:10px; font-weight:700; margin-top:5px;">${item.name}</div><div style="color:var(--gold); font-size:10px; font-weight:800;">${item.price} 🌟</div>`;
+    d.onclick = () => { 
+      targetUpgradeItem = item; 
+      $('upgTargetContent').innerHTML = `${renderIcon(item.icon, 16)} ${item.name}`;
+      closeModal('selectItemModal'); 
+      updateUpgradeUI();
+      renderUpgradeGrid(); 
+    };
+    list.appendChild(d);
   });
-};
+  $('selectItemModal').classList.add('show');
+}
 
 function renderUpgradeGrid() {
   const grid = $('upgradeItemsGrid'); grid.innerHTML = '';
   const pool = SERVER_ITEMS.length > 0 ? SERVER_ITEMS : [];
   pool.forEach(item => {
     const d = document.createElement('div');
-    d.style.cssText = `background:var(--card-2); padding:8px; border-radius:10px; text-align:center; cursor:pointer; border:1px solid ${targetUpgradeItem && targetUpgradeItem.id === item.id ? '#fff' : 'transparent'}; transition:0.1s;`;
-    d.innerHTML = `${renderIcon(item.icon, 24)}<div style="font-size:9px;margin-top:3px;">${item.name}</div>`;
+    d.className = `item-card ${targetUpgradeItem && targetUpgradeItem.id === item.id ? 'selected' : ''}`;
+    const mult = (myUpgradeItem ? (item.price / myUpgradeItem.price) : 0).toFixed(1);
+    d.innerHTML = `
+      <div class="ic-icon">${renderIcon(item.icon, 30)}</div>
+      <div class="ic-name">${item.name}</div>
+      <div class="ic-price">${item.price} 🌟</div>
+      ${myUpgradeItem && item.price > myUpgradeItem.price ? `<div class="ic-mult">x${mult}</div>` : ''}
+    `;
     d.onclick = () => { 
       targetUpgradeItem = item; 
-      $('upgTargetIcon').innerHTML = renderIcon(item.icon, 20); 
-      $('upgTargetName').textContent = item.name;
+      $('upgTargetContent').innerHTML = `${renderIcon(item.icon, 16)} ${item.name}`;
       updateUpgradeUI();
       renderUpgradeGrid(); 
       playSound($('soundClick')); 
@@ -918,15 +1024,18 @@ $('btnDoUpgrade').onclick = async () => {
   
   pointer.style.transition = 'none';
   pointer.style.transform = 'translate(-50%, -100%) rotate(0deg)';
-  pointer.style.opacity = '1';
   circle.style.transition = 'none';
   circle.style.strokeDashoffset = 534;
   void pointer.offsetWidth;
   
   try {
+    const bodyData = { login: currentUser, targetItemId: targetUpgradeItem.id };
+    if (myBetType === 'stars') bodyData.betStars = myUpgradeItem.price;
+    else bodyData.myUid = myUpgradeItem.uid;
+
     const res = await fetch('/api/upgrade', {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({login: currentUser, myUid: myUpgradeItem.uid, targetItemId: targetUpgradeItem.id})
+      body: JSON.stringify(bodyData)
     });
     const data = await res.json();
     if(!res.ok) throw new Error(data.error);
@@ -935,19 +1044,19 @@ $('btnDoUpgrade').onclick = async () => {
       const finalAngle = (data.chance / 100) * 360;
       const spins = 360 * 5;
       
-      pointer.style.transition = 'transform 3s cubic-bezier(0.1, 0.8, 0.2, 1)';
+      pointer.style.transition = 'transform 4s cubic-bezier(0.1, 0.8, 0.2, 1)';
       pointer.style.transform = `translate(-50%, -100%) rotate(${spins + finalAngle}deg)`;
       
-      circle.style.transition = 'stroke-dashoffset 3s cubic-bezier(0.1, 0.8, 0.2, 1)';
+      circle.style.transition = 'stroke-dashoffset 4s cubic-bezier(0.1, 0.8, 0.2, 1)';
       circle.style.strokeDashoffset = 534 - (data.chance / 100) * 534;
       
       setTimeout(() => {
-        pointer.style.opacity = '1';
         $('btnDoUpgrade').disabled = false;
         myUpgradeItem = null;
         targetUpgradeItem = null;
-        $('upgMyIcon').textContent = '⭐'; $('upgMyName').textContent = 'Выбрать';
-        $('upgTargetIcon').textContent = '🎁'; $('upgTargetName').textContent = 'Выбрать';
+        myBetType = null;
+        $('upgMyContent').textContent = 'Выбрать';
+        $('upgTargetContent').textContent = 'Выбрать';
         updateUpgradeUI();
         renderUpgradeGrid();
         enterGame();
@@ -957,7 +1066,7 @@ $('btnDoUpgrade').onclick = async () => {
         } else {
           toast('НЕУДАЧА', 'error');
         }
-      }, 3100);
+      }, 4100);
     }, 50);
     
   } catch(e) {
@@ -1111,4 +1220,4 @@ async function updateOnline() {
 }
 </script>
 </body>
-                                                                                                                                                                                             </html>
+                </html>

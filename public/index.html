@@ -93,6 +93,7 @@ header{ display:flex; align-items:center; justify-content:space-between; gap:10p
     flex-direction: column;
     align-items: center;
     padding: 20px 0;
+    padding-bottom: 90px; /* Отступ для фиксированной кнопки */
 }
 .upg-circle-wrap {
     position: relative;
@@ -101,38 +102,51 @@ header{ display:flex; align-items:center; justify-content:space-between; gap:10p
     transform-style: preserve-3d;
     transition: transform 0.3s ease;
     margin-bottom: 20px;
-}
-.upg-circle-wrap:hover {
-    transform: rotateX(10deg) rotateY(10deg);
+    border-radius: 50%;
+    box-shadow: 0 0 50px rgba(255,255,255,0.05);
 }
 .upg-svg {
     width: 100%; height: 100%;
     transform: rotate(-90deg);
-    filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));
+    overflow: visible;
 }
-.upg-svg-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 12; }
-.upg-svg-progress { fill: none; stroke: url(#gradient); stroke-width: 12; stroke-linecap: round; filter: drop-shadow(0 0 10px rgba(255,215,0,0.8)); transition: stroke-dashoffset 0.1s linear; }
+/* Фон круга (серый) */
+.upg-svg-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 15; }
+/* Белая зона выигрыша */
+.upg-svg-win { 
+    fill: none; 
+    stroke: #ffffff; 
+    stroke-width: 15; 
+    stroke-linecap: butt; 
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+    transition: stroke-dashoffset 0.3s ease, stroke-dasharray 0.3s ease;
+}
 #upgCenterItem { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2; transform: translateZ(50px); }
 #upgCenterItem img { max-width: 70px; max-height: 70px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.5)); }
 
-/* Указатель */
+/* Указатель (Стрелка) */
 #upgPointer {
     position: absolute;
     top: 50%; left: 50%;
-    width: 6px; height: 100px;
-    background: linear-gradient(to top, transparent, #fff, #ffd700);
+    width: 8px; height: 100px;
+    background: linear-gradient(to top, rgba(255,255,255,0.1), #fff, #ffd700);
     transform-origin: bottom center;
     transform: translate(-50%, -100%) rotate(0deg);
     z-index: 5;
-    border-radius: 6px;
+    border-radius: 8px;
     pointer-events: none;
-    box-shadow: 0 0 20px #ffd700;
+    box-shadow: 0 0 15px #ffd700, 0 0 30px rgba(255, 215, 0, 0.5);
+    will-change: transform;
 }
 #upgPointer::after {
-    content: ''; position: absolute; top: -8px; left: -6px;
-    width: 18px; height: 18px;
+    content: ''; position: absolute; top: -10px; left: -6px;
+    width: 20px; height: 20px;
     background: #fff; border-radius: 50%;
     box-shadow: 0 0 20px #fff, 0 0 40px #ffd700;
+}
+/* Вращение стрелки */
+.spinning {
+    transition: transform 4.5s cubic-bezier(0.15, 0.85, 0.3, 1);
 }
 
 /* Блок выбора */
@@ -149,7 +163,7 @@ header{ display:flex; align-items:center; justify-content:space-between; gap:10p
 .slot-card .s-content { font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
 /* Сетка предметов */
-.items-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; margin-bottom: 20px; max-height: 200px; overflow-y: auto; padding-right: 5px; }
+.items-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; margin-bottom: 20px; max-height: 180px; overflow-y: auto; padding-right: 5px; }
 .item-card { background: var(--card-2); border: 2px solid transparent; border-radius: 12px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
 .item-card:hover { background: var(--card-3); }
 .item-card.selected { border-color: var(--gold); background: rgba(255,215,0,0.1); }
@@ -161,6 +175,30 @@ header{ display:flex; align-items:center; justify-content:space-between; gap:10p
 /* Чанс */
 .upg-chance-text { text-align: center; margin-bottom: 15px; font-size: 18px; font-weight: 900; }
 .upg-chance-text span { color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+
+/* ФИКСИРОВАННАЯ КНОПКА УЛУЧШИТЬ */
+#btnDoUpgrade {
+    position: fixed;
+    bottom: 80px; /* Над нижней навигацией */
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 24px);
+    max-width: 576px;
+    z-index: 100;
+    padding: 16px;
+    font-size: 18px;
+    letter-spacing: 1px;
+    background: linear-gradient(180deg,#6b7cff,#4f46e5);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-weight: 900;
+    box-shadow: 0 5px 0 #312e81, 0 10px 20px rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: 0.1s;
+}
+#btnDoUpgrade:active { transform: translate(-50%, 4px); box-shadow: 0 1px 0 #312e81; }
+#btnDoUpgrade:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ========== МИНЫ ========== */
 .mines-wrapper { max-width:100%; margin:0 auto; padding-bottom: 80px; }
@@ -385,14 +423,9 @@ input:checked + .slider:before { transform: translateX(22px); }
       <div class="upgrade-container">
           <div class="upg-circle-wrap">
             <svg class="upg-svg" viewBox="0 0 200 200">
-              <defs>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#ffd700" />
-                  <stop offset="100%" stop-color="#ff8c00" />
-                </linearGradient>
-              </defs>
               <circle class="upg-svg-bg" cx="100" cy="100" r="85" />
-              <circle id="upgProgressCircle" class="upg-svg-progress" cx="100" cy="100" r="85" stroke-dasharray="534" stroke-dashoffset="534" />
+              <!-- Белая полоса (шанс выигрыша) -->
+              <circle id="upgProgressCircle" class="upg-svg-win" cx="100" cy="100" r="85" stroke-dasharray="534" stroke-dashoffset="534" />
             </svg>
             <div id="upgCenterItem"><span style="opacity:0.2;">❓</span></div>
             <div id="upgPointer"></div>
@@ -415,7 +448,8 @@ input:checked + .slider:before { transform: translateX(22px); }
           <!-- Сетка целей -->
           <div class="items-grid" id="upgradeItemsGrid"></div>
           
-          <button class="btn-main btn-blue" id="btnDoUpgrade" style="font-size: 18px; padding: 18px; letter-spacing: 1px;">Улучшить</button>
+          <!-- Кнопка улучшить (фиксированная) -->
+          <button class="btn-main btn-blue" id="btnDoUpgrade">Улучшить</button>
       </div>
     </div>
   </div>
@@ -989,17 +1023,18 @@ function renderUpgradeGrid() {
 }
 
 function updateUpgradeUI() {
+  const circle = $('upgProgressCircle');
   if (!myUpgradeItem || !targetUpgradeItem) {
     $('upgradeChanceText').textContent = '0%';
     $('upgCenterItem').innerHTML = '<span style="opacity:0.2;">❓</span>';
-    $('upgProgressCircle').style.strokeDashoffset = 534;
+    circle.style.strokeDasharray = `0 534`;
     return;
   }
   
   if (myUpgradeItem.price >= targetUpgradeItem.price) {
     $('upgradeChanceText').textContent = '0%';
     $('upgCenterItem').innerHTML = '<span style="opacity:0.2;">❌</span>';
-    $('upgProgressCircle').style.strokeDashoffset = 534;
+    circle.style.strokeDasharray = `0 534`;
     return;
   }
   
@@ -1010,8 +1045,9 @@ function updateUpgradeUI() {
   $('upgradeChanceText').textContent = chance.toFixed(1) + '%';
   $('upgCenterItem').innerHTML = renderIcon(targetUpgradeItem.icon, 60);
   
-  const offset = 534 - (chance / 100) * 534;
-  $('upgProgressCircle').style.strokeDashoffset = offset;
+  // Рисуем белую полосу
+  const arcLength = (chance / 100) * 534;
+  circle.style.strokeDasharray = `${arcLength} 534`;
 }
 
 $('btnDoUpgrade').onclick = async () => {
@@ -1022,11 +1058,9 @@ $('btnDoUpgrade').onclick = async () => {
   const pointer = $('upgPointer');
   const circle = $('upgProgressCircle');
   
-  pointer.style.transition = 'none';
+  // Сброс стрелки
+  pointer.classList.remove('spinning');
   pointer.style.transform = 'translate(-50%, -100%) rotate(0deg)';
-  circle.style.transition = 'none';
-  circle.style.strokeDashoffset = 534;
-  void pointer.offsetWidth;
   
   try {
     const bodyData = { login: currentUser, targetItemId: targetUpgradeItem.id };
@@ -1041,14 +1075,25 @@ $('btnDoUpgrade').onclick = async () => {
     if(!res.ok) throw new Error(data.error);
     
     setTimeout(() => {
-      const finalAngle = (data.chance / 100) * 360;
-      const spins = 360 * 5;
+      const pointer = $('upgPointer');
+      pointer.classList.add('spinning');
       
-      pointer.style.transition = 'transform 4s cubic-bezier(0.1, 0.8, 0.2, 1)';
-      pointer.style.transform = `translate(-50%, -100%) rotate(${spins + finalAngle}deg)`;
+      // Расчет угла: если выигрыш, останавливаемся в белой зоне. Если проигрыш - в серой.
+      let targetAngle = 0;
+      const chanceDeg = (data.chance / 100) * 360;
       
-      circle.style.transition = 'stroke-dashoffset 4s cubic-bezier(0.1, 0.8, 0.2, 1)';
-      circle.style.strokeDashoffset = 534 - (data.chance / 100) * 534;
+      if (data.win) {
+        // Выигрыш: останавливаемся где-то внутри белой зоны (от 0 до chanceDeg)
+        targetAngle = Math.random() * chanceDeg; 
+      } else {
+        // Проигрыш: останавливаемся где-то в серой зоне (от chanceDeg до 360)
+        targetAngle = chanceDeg + Math.random() * (360 - chanceDeg);
+      }
+      
+      const totalSpins = 360 * 5; // 5 оборотов
+      const finalAngle = totalSpins + targetAngle;
+      
+      pointer.style.transform = `translate(-50%, -100%) rotate(${finalAngle}deg)`;
       
       setTimeout(() => {
         $('btnDoUpgrade').disabled = false;
@@ -1057,6 +1102,10 @@ $('btnDoUpgrade').onclick = async () => {
         myBetType = null;
         $('upgMyContent').textContent = 'Выбрать';
         $('upgTargetContent').textContent = 'Выбрать';
+        
+        pointer.classList.remove('spinning');
+        pointer.style.transform = 'translate(-50%, -100%) rotate(0deg)';
+        
         updateUpgradeUI();
         renderUpgradeGrid();
         enterGame();
@@ -1066,7 +1115,7 @@ $('btnDoUpgrade').onclick = async () => {
         } else {
           toast('НЕУДАЧА', 'error');
         }
-      }, 4100);
+      }, 4600); // 4.5s анимация + запас
     }, 50);
     
   } catch(e) {
@@ -1220,4 +1269,4 @@ async function updateOnline() {
 }
 </script>
 </body>
-                </html>
+            </html>

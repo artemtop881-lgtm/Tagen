@@ -9,7 +9,8 @@ const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const DB_PATH = path.join(__dirname, 'database.json');
 
-app.use(express.json());
+// Лимит увеличен для чата (файлы)
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(PUBLIC_DIR));
 
 const ITEMS_CATALOG = [
@@ -49,39 +50,12 @@ function defaultDb() {
   const defaultHash = hashPassword('admin123');
   return {
     users: {
-      admin: {
-        login: 'admin',
-        passwordHash: defaultHash,
-        balance: 100,
-        inventory: [
-          { uid: 'init_nft_1', id: 'nft_neon_punk', name: 'Neon Punk #01', icon: '👾', price: 350, rarity: 'nft', is_nft: true }
-        ],
-        is_admin: true,
-        is_super_admin: true
-      },
-      tgweb: {
-        login: 'tgweb',
-        passwordHash: defaultHash,
-        balance: 100,
-        inventory: [],
-        is_admin: true,
-        is_super_admin: true
-      },
-      tagen: {
-        login: 'tagen',
-        passwordHash: defaultHash,
-        balance: 100,
-        inventory: [],
-        is_admin: true,
-        is_super_admin: true
-      }
+      admin: { login: 'admin', passwordHash: defaultHash, balance: 100, inventory: [{ uid: 'init_nft_1', id: 'nft_neon_punk', name: 'Neon Punk #01', icon: '👾', price: 350, rarity: 'nft', is_nft: true }], is_admin: true, is_super_admin: true },
+      tgweb: { login: 'tgweb', passwordHash: defaultHash, balance: 100, inventory: [], is_admin: true, is_super_admin: true },
+      tagen: { login: 'tagen', passwordHash: defaultHash, balance: 100, inventory: [], is_admin: true, is_super_admin: true }
     },
-    tokens: {},
-    drops: initialFeedEvents(),
-    deposits: [],
-    withdraws: [],
-    promos: {},
-    logs: []
+    tokens: {}, drops: initialFeedEvents(), deposits: [], withdraws: [], promos: {}, logs: [],
+    chat: [], muted: {}
   };
 }
 
@@ -98,32 +72,23 @@ function loadDb() {
 
     ['admin', 'tgweb', 'tagen'].forEach(superLogin => {
       if (!users[superLogin]) {
-        users[superLogin] = {
-          login: superLogin,
-          passwordHash: defaultHash,
-          balance: 100,
-          inventory: [],
-          is_admin: true,
-          is_super_admin: true
-        };
+        users[superLogin] = { login: superLogin, passwordHash: defaultHash, balance: 100, inventory: [], is_admin: true, is_super_admin: true };
       } else {
         users[superLogin].is_admin = true;
         users[superLogin].is_super_admin = true;
       }
     });
 
-    const drops = Array.isArray(parsed.drops) && parsed.drops.length > 0
-      ? parsed.drops
-      : initialFeedEvents();
-
     return {
       users,
       tokens: parsed.tokens || {},
-      drops,
+      drops: Array.isArray(parsed.drops) && parsed.drops.length > 0 ? parsed.drops : initialFeedEvents(),
       deposits: Array.isArray(parsed.deposits) ? parsed.deposits : [],
       withdraws: Array.isArray(parsed.withdraws) ? parsed.withdraws : [],
       promos: parsed.promos || {},
-      logs: Array.isArray(parsed.logs) ? parsed.logs : []
+      logs: Array.isArray(parsed.logs) ? parsed.logs : [],
+      chat: Array.isArray(parsed.chat) ? parsed.chat : [],
+      muted: parsed.muted || {}
     };
   } catch (e) {
     return defaultDb();
@@ -135,33 +100,19 @@ function saveDb(db) {
 }
 
 function addLog(db, adminLogin, action, details) {
-  db.logs.unshift({
-    id: crypto.randomUUID(),
-    admin_login: adminLogin,
-    action,
-    details,
-    created_at: Date.now()
-  });
+  db.logs.unshift({ id: crypto.randomUUID(), admin_login: adminLogin, action, details, created_at: Date.now() });
   db.logs = db.logs.slice(0, 200);
 }
 
 function pushFeed(db, userLogin, text, icon, isWin) {
-  db.drops.unshift({
-    user_login: userLogin || 'Игрок',
-    item_id: isWin ? 'win_event' : 'loss_event',
-    item_name: text,
-    item_icon: icon || (isWin ? '🎁' : '💥'),
-    is_win: Boolean(isWin),
-    created_at: Date.now()
-  });
+  db.drops.unshift({ user_login: userLogin || 'Игрок', item_id: isWin ? 'win_event' : 'loss_event', item_name: text, item_icon: icon || (isWin ? '🎁' : '💥'), is_win: Boolean(isWin), created_at: Date.now() });
   db.drops = db.drops.slice(0, 30);
 }
 
 function getAuthUser(req, db) {
   const token = req.headers['x-auth-token'];
   if (!token || !db.tokens[token]) return null;
-  const login = db.tokens[token];
-  return db.users[login] || null;
+  return db.users[db.tokens[token]] || null;
 }
 
 const activeMinesSessions = new Map();
@@ -169,561 +120,281 @@ const activeRocketSessions = new Map();
 
 function rollWeightedCrashPoint() {
   const r = Math.random();
-  if (r < 0.78) {
-    return Number((1.01 + Math.random() * 0.34).toFixed(2));
-  }
-  if (r < 0.96) {
-    return Number((1.36 + Math.random() * 0.84).toFixed(2));
-  }
+  if (r < 0.78) return Number((1.01 + Math.random() * 0.34).toFixed(2));
+  if (r < 0.96) return Number((1.36 + Math.random() * 0.84).toFixed(2));
   return Number((2.21 + Math.random() * 2.79).toFixed(2));
 }
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
-});
-
-app.get('/api/items', (req, res) => {
-  res.json(ITEMS_CATALOG);
-});
-
-app.get('/api/drops', (req, res) => {
+// ---------------- ЧАТ API ----------------
+app.get('/api/chat', (req, res) => {
   const db = loadDb();
-  res.json(db.drops || []);
+  res.json(db.chat.slice(-60));
 });
 
-app.post('/api/register', (req, res) => {
-  const { login, password } = req.body || {};
-  const cleanLogin = String(login || '').trim();
-  if (!cleanLogin || String(password || '').length < 6) {
-    return res.status(400).json({ error: 'Укажите логин и пароль (от 6 символов)' });
-  }
-  const db = loadDb();
-  if (db.users[cleanLogin]) {
-    return res.status(400).json({ error: 'Такой логин уже занят' });
-  }
-  const isSuper = ['admin', 'tgweb', 'tagen'].includes(cleanLogin.toLowerCase());
-  db.users[cleanLogin] = {
-    login: cleanLogin,
-    passwordHash: hashPassword(password),
-    balance: 100,
-    inventory: [],
-    is_admin: isSuper,
-    is_super_admin: isSuper
-  };
-  const token = crypto.randomBytes(24).toString('hex');
-  db.tokens[token] = cleanLogin;
-  saveDb(db);
-
-  const u = db.users[cleanLogin];
-  res.json({
-    token,
-    user: {
-      login: u.login,
-      balance: u.balance,
-      inventory: u.inventory,
-      is_admin: u.is_admin,
-      is_super_admin: u.is_super_admin
-    }
-  });
-});
-
-app.post('/api/login', (req, res) => {
-  const { login, password } = req.body || {};
-  const cleanLogin = String(login || '').trim();
-  const db = loadDb();
-  const u = db.users[cleanLogin];
-  if (!u || u.passwordHash !== hashPassword(password)) {
-    return res.status(401).json({ error: 'Неверный логин или пароль' });
-  }
-  const token = crypto.randomBytes(24).toString('hex');
-  db.tokens[token] = cleanLogin;
-  saveDb(db);
-
-  res.json({
-    token,
-    user: {
-      login: u.login,
-      balance: u.balance,
-      inventory: u.inventory,
-      is_admin: Boolean(u.is_admin),
-      is_super_admin: Boolean(u.is_super_admin)
-    }
-  });
-});
-
-app.get('/api/user/:login', (req, res) => {
-  const db = loadDb();
-  const authUser = getAuthUser(req, db);
-  if (!authUser) return res.status(401).json({ error: 'Требуется авторизация' });
-
-  const targetLogin = decodeURIComponent(req.params.login);
-  if (authUser.login !== targetLogin && !authUser.is_admin && !authUser.is_super_admin) {
-    return res.status(403).json({ error: 'Доступ запрещён' });
-  }
-  const u = db.users[targetLogin];
-  if (!u) return res.status(404).json({ error: 'Пользователь не найден' });
-
-  res.json({
-    login: u.login,
-    balance: u.balance,
-    inventory: u.inventory || [],
-    is_admin: Boolean(u.is_admin),
-    is_super_admin: Boolean(u.is_super_admin)
-  });
-});
-
-app.get('/api/export/my-data', (req, res) => {
-  const db = loadDb();
-  const authUser = getAuthUser(req, db);
-  if (!authUser) return res.status(401).json({ error: 'Требуется авторизация' });
-  res.json({
-    exported_at: new Date().toISOString(),
-    login: authUser.login,
-    balance: authUser.balance,
-    inventory: authUser.inventory || []
-  });
-});
-
-app.post('/api/cases/open', (req, res) => {
-  const { caseId } = req.body || {};
-  const cfg = CASES_CONFIG[caseId];
-  if (!cfg) return res.status(400).json({ error: 'Кейс не найден' });
-
+app.post('/api/chat/send', (req, res) => {
   const db = loadDb();
   const user = getAuthUser(req, db);
   if (!user) return res.status(401).json({ error: 'Требуется авторизация' });
-  if (user.balance < cfg.price) return res.status(400).json({ error: 'Недостаточно звёзд' });
+  if (db.muted[user.login] && db.muted[user.login] > Date.now()) {
+    const left = Math.ceil((db.muted[user.login] - Date.now()) / 60000);
+    return res.status(403).json({ error: `Вы заглушены ещё на ${left} мин.` });
+  }
+  const { text, file, fileType } = req.body || {};
+  if (!text && !file) return res.status(400).json({ error: 'Пустое сообщение' });
+  if (file && file.length > 7 * 1024 * 1024) return res.status(400).json({ error: 'Файл слишком большой' });
 
-  user.balance -= cfg.price;
-  const template = cfg.pool[Math.floor(Math.random() * cfg.pool.length)];
-  const wonItem = {
-    uid: crypto.randomUUID(),
-    id: template.id,
-    name: template.name,
-    icon: template.icon,
-    price: template.price,
-    rarity: template.rarity,
-    is_nft: Boolean(template.is_nft)
-  };
-  user.inventory.push(wonItem);
-  pushFeed(db, user.login, `выиграл ${wonItem.name}`, wonItem.icon, true);
+  const msg = { id: crypto.randomUUID(), login: user.login, is_admin: Boolean(user.is_admin || user.is_super_admin), text: text || '', file: file || null, fileType: fileType || null, created_at: Date.now() };
+  db.chat.push(msg);
+  if (db.chat.length > 200) db.chat = db.chat.slice(-200);
   saveDb(db);
-
-  res.json({
-    balance: user.balance,
-    item: wonItem,
-    pool: cfg.pool
-  });
+  res.json({ success: true, message: msg });
 });
 
-app.post('/api/games/mines', (req, res) => {
-  const { action, bet, minesCount, cell } = req.body || {};
-  const db = loadDb();
-  const user = getAuthUser(req, db);
-  if (!user) return res.status(401).json({ error: 'Требуется авторизация' });
-
-  if (action === 'start') {
-    const betNum = Number(bet) || 0;
-    const mCount = [1, 3, 5, 10].includes(Number(minesCount)) ? Number(minesCount) : 3;
-    const gridSize = 3;
-    const totalCells = gridSize * gridSize;
-    if (betNum < 10) return res.status(400).json({ error: 'Мин. ставка 10 ★' });
-    if (mCount >= totalCells) return res.status(400).json({ error: 'Слишком много мин' });
-    if (user.balance < betNum) return res.status(400).json({ error: 'Недостаточно средств' });
-
-    user.balance -= betNum;
-    saveDb(db);
-
-    const bombs = new Set();
-    while (bombs.size < mCount) {
-      bombs.add(Math.floor(Math.random() * totalCells));
-    }
-
-    activeMinesSessions.set(user.login, {
-      bet: betNum,
-      minesCount: mCount,
-      gridSize,
-      totalCells,
-      bombs: Array.from(bombs),
-      opened: []
-    });
-
-    return res.json({
-      balance: user.balance,
-      gridSize,
-      totalCells,
-      minesCount: mCount
-    });
-  }
-
-  const session = activeMinesSessions.get(user.login);
-  if (!session) return res.status(400).json({ error: 'Активная игра не найдена' });
-
-  if (action === 'click') {
-    const idx = Number(cell);
-    if (session.bombs.includes(idx)) {
-      activeMinesSessions.delete(user.login);
-      pushFeed(db, user.login, 'подорвался на мине', '💣', false);
-      saveDb(db);
-      return res.json({ bomb: true, bombs: session.bombs });
-    }
-    if (!session.opened.includes(idx)) {
-      session.opened.push(idx);
-    }
-    const mult = Number((1 + session.opened.length * (0.22 + session.minesCount * 0.08)).toFixed(2));
-    const potentialWin = Math.floor(session.bet * mult);
-    return res.json({
-      bomb: false,
-      openedCount: session.opened.length,
-      multiplier: mult,
-      potentialWin
-    });
-  }
-
-  if (action === 'cashout') {
-    if (session.opened.length === 0) {
-      return res.status(400).json({ error: 'Откройте хотя бы одну ячейку' });
-    }
-    const mult = Number((1 + session.opened.length * (0.22 + session.minesCount * 0.08)).toFixed(2));
-    const win = Math.floor(session.bet * mult);
-    user.balance += win;
-    pushFeed(db, user.login, `выиграл ${win} ★ (${mult.toFixed(2)}x)`, '💎', true);
-    saveDb(db);
-    activeMinesSessions.delete(user.login);
-    return res.json({ balance: user.balance, win, bombs: session.bombs });
-  }
-
-  res.status(400).json({ error: 'Неизвестное действие' });
-});
-
-app.post('/api/games/rocket', (req, res) => {
-  const { action, bet, multiplier } = req.body || {};
-  const db = loadDb();
-  const user = getAuthUser(req, db);
-  if (!user) return res.status(401).json({ error: 'Требуется авторизация' });
-
-  if (action === 'start') {
-    const betNum = Number(bet) || 0;
-    if (betNum < 10) return res.status(400).json({ error: 'Мин. ставка 10 ★' });
-    if (user.balance < betNum) return res.status(400).json({ error: 'Недостаточно средств' });
-
-    user.balance -= betNum;
-    saveDb(db);
-
-    const crashPoint = Math.min(5.0, Math.max(1.01, rollWeightedCrashPoint()));
-    activeRocketSessions.set(user.login, {
-      bet: betNum,
-      crashPoint
-    });
-
-    return res.json({ balance: user.balance, crashPoint });
-  }
-
-  const session = activeRocketSessions.get(user.login);
-  if (!session) return res.status(400).json({ error: 'Раунд ракетки не найден' });
-
-  if (action === 'cashout') {
-    const claimed = Math.max(1.0, Math.min(5.0, Number(multiplier) || 1.0));
-    activeRocketSessions.delete(user.login);
-    if (claimed >= session.crashPoint) {
-      pushFeed(db, user.login, `проиграл на ${session.crashPoint.toFixed(2)}x`, '🚀', false);
-      saveDb(db);
-      return res.json({ crashed: true, crashPoint: session.crashPoint });
-    }
-    const win = Math.floor(session.bet * claimed);
-    user.balance += win;
-    pushFeed(db, user.login, `выиграл ${win} ★ на ${claimed.toFixed(2)}x`, '🚀', true);
-    saveDb(db);
-    return res.json({
-      crashed: false,
-      multiplier: claimed,
-      crashPoint: session.crashPoint,
-      win,
-      balance: user.balance
-    });
-  }
-
-  if (action === 'crash') {
-    const cp = session.crashPoint;
-    activeRocketSessions.delete(user.login);
-    pushFeed(db, user.login, `проиграл на ${cp.toFixed(2)}x`, '🚀', false);
-    saveDb(db);
-    return res.json({ crashPoint: cp });
-  }
-
-  res.status(400).json({ error: 'Неизвестное действие' });
-});
-
-app.post('/api/upgrade', (req, res) => {
-  const { targetItemId, targetItem, betStars, myUid } = req.body || {};
-  const db = loadDb();
-  const user = getAuthUser(req, db);
-  if (!user) return res.status(401).json({ error: 'Требуется авторизация' });
-
-  let betPrice = 0;
-  let removedItemIndex = -1;
-
-  if (betStars !== undefined) {
-    betPrice = Number(betStars) || 0;
-    if (betPrice < 10) return res.status(400).json({ error: 'Мин. ставка 10 ★' });
-    if (user.balance < betPrice) return res.status(400).json({ error: 'Недостаточно звёзд' });
-  } else {
-    removedItemIndex = (user.inventory || []).findIndex(i => i.uid === myUid);
-    if (removedItemIndex === -1) return res.status(400).json({ error: 'Предмет не найден в инвентаре' });
-    betPrice = Number(user.inventory[removedItemIndex].price) || 0;
-  }
-
-  const catalogTarget = ITEMS_CATALOG.find(i => i.id === targetItemId);
-  const invTarget = (user.inventory || []).find(i => i.id === targetItemId || i.uid === targetItemId);
-  const finalTarget = catalogTarget || invTarget || targetItem;
-  if (!finalTarget) return res.status(400).json({ error: 'Цель апгрейда не найдена' });
-
-  const targetPrice = Number(finalTarget.price) || 0;
-  if (betPrice <= 0 || targetPrice <= betPrice) {
-    return res.status(400).json({ error: 'Цель должна быть дороже ставки' });
-  }
-
-  if (betStars !== undefined) {
-    user.balance -= betPrice;
-  } else {
-    user.inventory.splice(removedItemIndex, 1);
-  }
-
-  let chance = (betPrice / targetPrice) * 50;
-  if (chance > 50) chance = 50;
-  if (chance < 1) chance = 1;
-
-  const win = Math.random() * 100 < chance;
-  let wonItem = null;
-
-  if (win) {
-    wonItem = {
-      uid: crypto.randomUUID(),
-      id: finalTarget.id || crypto.randomUUID(),
-      name: finalTarget.name,
-      icon: finalTarget.icon || '🎁',
-      price: targetPrice,
-      rarity: finalTarget.rarity || (finalTarget.is_nft ? 'nft' : 'rare'),
-      is_nft: Boolean(finalTarget.is_nft || String(finalTarget.rarity).toLowerCase() === 'nft')
-    };
-    user.inventory.push(wonItem);
-    pushFeed(db, user.login, `выиграл ${wonItem.name}`, wonItem.icon, true);
-  } else {
-    pushFeed(db, user.login, 'проиграл в апгрейде', '⚡', false);
-  }
-
-  saveDb(db);
-  res.json({ win, chance, item: wonItem, balance: user.balance });
-});
-
-app.post('/api/inventory/sell', (req, res) => {
-  const { uid } = req.body || {};
-  const db = loadDb();
-  const user = getAuthUser(req, db);
-  if (!user) return res.status(401).json({ error: 'Требуется авторизация' });
-
-  const idx = (user.inventory || []).findIndex(i => i.uid === uid);
-  if (idx === -1) return res.status(404).json({ error: 'Предмет не найден' });
-
-  const [sold] = user.inventory.splice(idx, 1);
-  const price = Number(sold.price) || 0;
-  user.balance += price;
-  saveDb(db);
-  res.json({ balance: user.balance, soldPrice: price });
-});
-
-app.post('/api/wallet/deposit', (req, res) => {
-  const amount = Number((req.body || {}).amount) || 0;
-  if (amount <= 0) return res.status(400).json({ error: 'Некорректная сумма' });
-  const db = loadDb();
-  const user = getAuthUser(req, db);
-  if (!user) return res.status(401).json({ error: 'Требуется авторизация' });
-
-  db.deposits.push({ id: crypto.randomUUID(), user_login: user.login, amount_stars: amount, created_at: Date.now() });
-  saveDb(db);
-  res.json({ ok: true });
-});
-
-app.post('/api/wallet/withdraw', (req, res) => {
-  const amount = Number((req.body || {}).amount) || 0;
-  if (amount <= 0) return res.status(400).json({ error: 'Некорректная сумма' });
-  const db = loadDb();
-  const user = getAuthUser(req, db);
-  if (!user) return res.status(401).json({ error: 'Требуется авторизация' });
-  if (user.balance < amount) return res.status(400).json({ error: 'Недостаточно средств' });
-
-  user.balance -= amount;
-  db.withdraws.push({ id: crypto.randomUUID(), user_login: user.login, amount_stars: amount, created_at: Date.now() });
-  saveDb(db);
-  res.json({ ok: true, balance: user.balance });
-});
-
-app.get('/api/admin/players', (req, res) => {
+app.post('/api/chat/admin', (req, res) => {
   const db = loadDb();
   const user = getAuthUser(req, db);
   if (!user || (!user.is_admin && !user.is_super_admin)) return res.status(403).json({ error: 'Нет прав' });
+  const { action, msgId, targetLogin } = req.body || {};
 
-  const list = Object.values(db.users).map(u => ({
-    login: u.login,
-    balance: u.balance,
-    nft_count: (u.inventory || []).filter(i => i.is_nft || String(i.rarity).toLowerCase() === 'nft').length,
-    is_admin: Boolean(u.is_admin),
-    is_super_admin: Boolean(u.is_super_admin)
-  }));
-  res.json(list);
-});
-
-app.post('/api/admin/give-stars', (req, res) => {
-  const { targetLogin, amount } = req.body || {};
-  const db = loadDb();
-  const admin = getAuthUser(req, db);
-  if (!admin || (!admin.is_admin && !admin.is_super_admin)) return res.status(403).json({ error: 'Нет прав' });
-
-  const target = db.users[String(targetLogin || '').trim()];
-  const num = Number(amount) || 0;
-  if (!target || num <= 0) return res.status(400).json({ error: 'Проверьте логин и сумму' });
-
-  target.balance += num;
-  addLog(db, admin.login, 'give-stars', `${target.login}: +${num}★`);
-  saveDb(db);
-  res.json({ ok: true });
-});
-
-app.post('/api/admin/take-stars', (req, res) => {
-  const { targetLogin, amount } = req.body || {};
-  const db = loadDb();
-  const admin = getAuthUser(req, db);
-  if (!admin || !admin.is_super_admin) return res.status(403).json({ error: 'Только для главного админа' });
-
-  const target = db.users[String(targetLogin || '').trim()];
-  const num = Number(amount) || 0;
-  if (!target || num <= 0) return res.status(400).json({ error: 'Проверьте логин и сумму' });
-
-  target.balance = Math.max(0, target.balance - num);
-  addLog(db, admin.login, 'take-stars', `${target.login}: -${num}★`);
-  saveDb(db);
-  res.json({ ok: true });
-});
-
-app.post('/api/admin/give-nft', (req, res) => {
-  const { targetLogin, item } = req.body || {};
-  const db = loadDb();
-  const admin = getAuthUser(req, db);
-  if (!admin || (!admin.is_admin && !admin.is_super_admin)) return res.status(403).json({ error: 'Нет прав' });
-
-  const target = db.users[String(targetLogin || '').trim()];
-  if (!target || !item || !item.name) return res.status(400).json({ error: 'Неверные данные NFT' });
-
-  const nftObj = {
-    uid: crypto.randomUUID(),
-    id: item.id || `nft_${Date.now()}`,
-    name: item.name,
-    icon: item.icon || '💎',
-    price: Number(item.price) || 100,
-    rarity: 'nft',
-    is_nft: true
-  };
-  target.inventory.push(nftObj);
-  pushFeed(db, target.login, `выиграл ${nftObj.name}`, nftObj.icon, true);
-  addLog(db, admin.login, 'give-nft', `${target.login}: ${nftObj.name}`);
-  saveDb(db);
-  res.json({ ok: true });
-});
-
-app.get('/api/admin/withdraws', (req, res) => {
-  const db = loadDb();
-  const admin = getAuthUser(req, db);
-  if (!admin || !admin.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
-  res.json(db.withdraws);
-});
-
-app.post('/api/admin/withdraws/accept', (req, res) => {
-  const { id } = req.body || {};
-  const db = loadDb();
-  const admin = getAuthUser(req, db);
-  if (!admin || !admin.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
-  db.withdraws = db.withdraws.filter(w => w.id !== id);
-  addLog(db, admin.login, 'withdraw-accept', id);
-  saveDb(db);
-  res.json({ ok: true });
-});
-
-app.get('/api/admin/deposits', (req, res) => {
-  const db = loadDb();
-  const admin = getAuthUser(req, db);
-  if (!admin || !admin.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
-  res.json(db.deposits);
-});
-
-app.post('/api/admin/deposit/accept', (req, res) => {
-  const { id } = req.body || {};
-  const db = loadDb();
-  const admin = getAuthUser(req, db);
-  if (!admin || !admin.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
-
-  const idx = db.deposits.findIndex(d => d.id === id);
-  if (idx === -1) return res.status(404).json({ error: 'Заявка не найдена' });
-  const [dep] = db.deposits.splice(idx, 1);
-  if (db.users[dep.user_login]) {
-    db.users[dep.user_login].balance += Number(dep.amount_stars) || 0;
+  if (action === 'delete') { db.chat = db.chat.filter(m => m.id !== msgId); addLog(db, user.login, 'chat_delete', `Удалил сообщение ${msgId}`); }
+  else if (action === 'clear') { db.chat = []; addLog(db, user.login, 'chat_clear', 'Очистил чат'); }
+  else if (action === 'mute') {
+    if (!db.users[targetLogin]) return res.status(404).json({ error: 'Юзер не найден' });
+    db.muted[targetLogin] = Date.now() + 5 * 60 * 1000;
+    addLog(db, user.login, 'chat_mute', `Замутил ${targetLogin}`);
   }
-  addLog(db, admin.login, 'deposit-accept', `${dep.user_login}: +${dep.amount_stars}★`);
   saveDb(db);
-  res.json({ ok: true });
+  res.json({ success: true });
 });
 
-app.post('/api/admin/create-promo', (req, res) => {
-  const { code, stars, limit } = req.body || {};
-  const db = loadDb();
-  const admin = getAuthUser(req, db);
-  if (!admin || !admin.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
-  if (!code) return res.status(400).json({ error: 'Укажите код' });
-  db.promos[String(code).trim()] = { stars: Number(stars) || 100, limit: Number(limit) || 10 };
-  addLog(db, admin.login, 'create-promo', String(code).trim());
-  saveDb(db);
-  res.json({ ok: true });
+// ---------------- БАЗОВЫЕ API ----------------
+app.get('/api/items', (req, res) => res.json(ITEMS_CATALOG));
+app.get('/api/drops', (req, res) => { const db = loadDb(); res.json(db.drops || []); });
+app.get('/api/user/:login', (req, res) => {
+  const db = loadDb(); const authUser = getAuthUser(req, db);
+  if (!authUser) return res.status(401).json({ error: 'Требуется авторизация' });
+  const u = db.users[decodeURIComponent(req.params.login)];
+  if (!u || (authUser.login !== u.login && !authUser.is_admin && !authUser.is_super_admin)) return res.status(403).json({ error: 'Доступ запрещён' });
+  res.json({ login: u.login, balance: u.balance, inventory: u.inventory || [], is_admin: Boolean(u.is_admin), is_super_admin: Boolean(u.is_super_admin) });
 });
 
-app.post('/api/admin/make-admin', (req, res) => {
-  const { targetLogin } = req.body || {};
-  const db = loadDb();
-  const admin = getAuthUser(req, db);
-  if (!admin || !admin.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
-  const target = db.users[String(targetLogin || '').trim()];
-  if (!target) return res.status(404).json({ error: 'Игрок не найден' });
-  target.is_admin = true;
-  addLog(db, admin.login, 'make-admin', target.login);
-  saveDb(db);
-  res.json({ ok: true });
+app.post('/api/register', (req, res) => {
+  const { login, password } = req.body || {}; const cleanLogin = String(login || '').trim();
+  if (!cleanLogin || String(password || '').length < 6) return res.status(400).json({ error: 'Логин и пароль (мин. 6 символов)' });
+  const db = loadDb(); if (db.users[cleanLogin]) return res.status(400).json({ error: 'Логин занят' });
+  const isSuper = ['admin', 'tgweb', 'tagen'].includes(cleanLogin.toLowerCase());
+  db.users[cleanLogin] = { login: cleanLogin, passwordHash: hashPassword(password), balance: 100, inventory: [], is_admin: isSuper, is_super_admin: isSuper };
+  const token = crypto.randomBytes(24).toString('hex'); db.tokens[token] = cleanLogin; saveDb(db);
+  const u = db.users[cleanLogin];
+  res.json({ token, user: { login: u.login, balance: u.balance, inventory: u.inventory, is_admin: u.is_admin, is_super_admin: u.is_super_admin } });
 });
 
-app.post('/api/admin/remove-admin', (req, res) => {
-  const { targetLogin } = req.body || {};
-  const db = loadDb();
-  const admin = getAuthUser(req, db);
-  if (!admin || !admin.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
-  const target = db.users[String(targetLogin || '').trim()];
-  if (!target) return res.status(404).json({ error: 'Игрок не найден' });
-  target.is_admin = false;
-  addLog(db, admin.login, 'remove-admin', target.login);
-  saveDb(db);
-  res.json({ ok: true });
+app.post('/api/login', (req, res) => {
+  const { login, password } = req.body || {}; const db = loadDb();
+  const u = db.users[String(login || '').trim()];
+  if (!u || u.passwordHash !== hashPassword(password)) return res.status(401).json({ error: 'Неверный логин или пароль' });
+  const token = crypto.randomBytes(24).toString('hex'); db.tokens[token] = u.login; saveDb(db);
+  res.json({ token, user: { login: u.login, balance: u.balance, inventory: u.inventory, is_admin: Boolean(u.is_admin), is_super_admin: Boolean(u.is_super_admin) } });
 });
 
-app.get('/api/admin/logs', (req, res) => {
-  const db = loadDb();
-  const admin = getAuthUser(req, db);
-  if (!admin || !admin.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
-  res.json(db.logs);
+// ---------------- ИГРЫ ----------------
+app.post('/api/cases/open', (req, res) => {
+  const { caseId } = req.body || {}; const cfg = CASES_CONFIG[caseId];
+  const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || !cfg || user.balance < cfg.price) return res.status(400).json({ error: 'Ошибка' });
+  user.balance -= cfg.price;
+  const template = cfg.pool[Math.floor(Math.random() * cfg.pool.length)];
+  const wonItem = { uid: crypto.randomUUID(), id: template.id, name: template.name, icon: template.icon, price: template.price, rarity: template.rarity, is_nft: Boolean(template.is_nft) };
+  user.inventory.push(wonItem); pushFeed(db, user.login, `выиграл ${wonItem.name}`, wonItem.icon, true); saveDb(db);
+  res.json({ balance: user.balance, item: wonItem, pool: cfg.pool });
+});
+
+app.post('/api/games/mines', (req, res) => {
+  const { action, bet, minesCount, cell } = req.body || {}; const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user) return res.status(401).json({ error: 'Требуется авторизация' });
+
+  if (action === 'start') {
+    const betNum = Number(bet) || 0; const mCount = [1, 3, 5, 10].includes(Number(minesCount)) ? Number(minesCount) : 3;
+    if (betNum < 10 || user.balance < betNum) return res.status(400).json({ error: 'Ставка от 10★, недостаточно средств' });
+    user.balance -= betNum; saveDb(db);
+    const bombs = new Set(); while (bombs.size < mCount) bombs.add(Math.floor(Math.random() * 9));
+    activeMinesSessions.set(user.login, { bet: betNum, minesCount: mCount, bombs: Array.from(bombs), opened: [] });
+    return res.json({ balance: user.balance, gridSize: 3, totalCells: 9, minesCount: mCount });
+  }
+  const session = activeMinesSessions.get(user.login); if (!session) return res.status(400).json({ error: 'Игра не найдена' });
+  if (action === 'click') {
+    const idx = Number(cell);
+    if (session.bombs.includes(idx)) { activeMinesSessions.delete(user.login); pushFeed(db, user.login, 'подорвался на мине', '💣', false); saveDb(db); return res.json({ bomb: true, bombs: session.bombs }); }
+    if (!session.opened.includes(idx)) session.opened.push(idx);
+    const mult = Number((1 + session.opened.length * (0.22 + session.minesCount * 0.08)).toFixed(2));
+    return res.json({ bomb: false, openedCount: session.opened.length, multiplier: mult, potentialWin: Math.floor(session.bet * mult) });
+  }
+  if (action === 'cashout') {
+    if (!session.opened.length) return res.status(400).json({ error: 'Откройте ячейку' });
+    const mult = Number((1 + session.opened.length * (0.22 + session.minesCount * 0.08)).toFixed(2));
+    const win = Math.floor(session.bet * mult); user.balance += win;
+    pushFeed(db, user.login, `выиграл ${win} ★`, '💎', true); saveDb(db); activeMinesSessions.delete(user.login);
+    return res.json({ balance: user.balance, win, bombs: session.bombs });
+  }
+});
+
+app.post('/api/games/rocket', (req, res) => {
+  const { action, bet, multiplier } = req.body || {}; const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user) return res.status(401).json({ error: 'Требуется авторизация' });
+  if (action === 'start') {
+    const betNum = Number(bet) || 0; if (betNum < 10 || user.balance < betNum) return res.status(400).json({ error: 'Ошибка ставки' });
+    user.balance -= betNum; saveDb(db);
+    const crashPoint = Math.min(5.0, Math.max(1.01, rollWeightedCrashPoint()));
+    activeRocketSessions.set(user.login, { bet: betNum, crashPoint });
+    return res.json({ balance: user.balance, crashPoint });
+  }
+  const session = activeRocketSessions.get(user.login); if (!session) return res.status(400).json({ error: 'Ракета не запущена' });
+  if (action === 'cashout') {
+    const claimMult = Number(multiplier);
+    if (claimMult >= session.crashPoint) { activeRocketSessions.delete(user.login); return res.json({ crashed: true, crashPoint: session.crashPoint }); }
+    const win = Math.floor(session.bet * claimMult); user.balance += win;
+    pushFeed(db, user.login, `забрал на ${claimMult}x (+${win} ★)`, '🚀', true); saveDb(db); activeRocketSessions.delete(user.login);
+    return res.json({ balance: user.balance, win, multiplier: claimMult, crashPoint: session.crashPoint });
+  }
+  if (action === 'crash') { activeRocketSessions.delete(user.login); pushFeed(db, user.login, `проиграл на ${session.crashPoint}x`, '💥', false); saveDb(db); return res.json({ crashPoint: session.crashPoint }); }
+});
+
+app.post('/api/upgrade', (req, res) => {
+  const { targetItemId, betStars, myUid } = req.body || {}; const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user) return res.status(401).json({ error: 'Требуется авторизация' });
+  const target = ITEMS_CATALOG.find(i => i.id === targetItemId) || (user.inventory || []).find(i => i.uid === targetItemId);
+  if (!target) return res.status(400).json({ error: 'Цель не найдена' });
+  let myPrice = 0; let itemToRemove = null;
+  if (betStars) { myPrice = Number(betStars); if (user.balance < myPrice) return res.status(400).json({ error: 'Мало звезд' }); }
+  else if (myUid) { const idx = (user.inventory || []).findIndex(i => i.uid === myUid); if (idx === -1) return res.status(400).json({ error: 'Нет предмета' }); itemToRemove = user.inventory[idx]; myPrice = Number(itemToRemove.price); }
+  if (myPrice >= target.price) return res.status(400).json({ error: 'Цель должна быть дороже' });
+  let chance = (myPrice / target.price) * 50; if (chance > 50) chance = 50; if (chance < 1) chance = 1;
+  const win = Math.random() * 100 <= chance;
+  if (betStars) user.balance -= myPrice; else if (itemToRemove) user.inventory = user.inventory.filter(i => i.uid !== itemToRemove.uid);
+  if (win) { user.inventory.push({ uid: crypto.randomUUID(), ...target }); pushFeed(db, user.login, `апгрейд в ${target.name}`, target.icon, true); }
+  else { pushFeed(db, user.login, `сгорел на апгрейде`, '💥', false); }
+  saveDb(db);
+  res.json({ win, chance, item: target });
+});
+
+// ---------------- КОШЕЛЕК ----------------
+app.post('/api/wallet/deposit', (req, res) => {
+  const { amount } = req.body || {}; const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || !amount) return res.status(400).json({ error: 'Ошибка' });
+  db.deposits.push({ id: crypto.randomUUID(), user_login: user.login, amount_stars: Number(amount), created_at: Date.now() });
+  saveDb(db); res.json({ success: true });
+});
+
+app.post('/api/wallet/withdraw', (req, res) => {
+  const { amount } = req.body || {}; const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || !amount || user.balance < Number(amount)) return res.status(400).json({ error: 'Недостаточно средств' });
+  user.balance -= Number(amount);
+  db.withdraws.push({ id: crypto.randomUUID(), user_login: user.login, amount_stars: Number(amount), created_at: Date.now() });
+  saveDb(db); res.json({ success: true });
+});
+
+// ---------------- СКАЧИВАНИЕ ----------------
+app.get('/api/export/my-data', (req, res) => {
+  const db = loadDb(); const authUser = getAuthUser(req, db);
+  if (!authUser) return res.status(401).json({ error: 'Требуется авторизация' });
+  res.json({ exported_at: new Date().toISOString(), login: authUser.login, balance: authUser.balance, inventory: authUser.inventory || [] });
 });
 
 app.get('/api/admin/download-db', (req, res) => {
-  const db = loadDb();
-  const admin = getAuthUser(req, db);
-  if (!admin || !admin.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
+  const db = loadDb(); const authUser = getAuthUser(req, db);
+  if (!authUser || (!authUser.is_admin && !authUser.is_super_admin)) return res.status(403).json({ error: 'Нет прав' });
   res.json(db);
 });
 
-app.listen(PORT, () => {
-  console.log(`TagenGame server running on port ${PORT}`);
+// ---------------- АДМИНКА ----------------
+app.get('/api/admin/players', (req, res) => {
+  const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || (!user.is_admin && !user.is_super_admin)) return res.status(403).json({ error: 'Нет прав' });
+  res.json(Object.values(db.users).map(u => ({ login: u.login, balance: u.balance, is_admin: u.is_admin, is_super_admin: u.is_super_admin, nft_count: (u.inventory || []).filter(i => i.is_nft).length })));
 });
+
+app.post('/api/admin/give-stars', (req, res) => {
+  const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || (!user.is_admin && !user.is_super_admin)) return res.status(403).json({ error: 'Нет прав' });
+  const { targetLogin, amount } = req.body;
+  if (db.users[targetLogin]) { db.users[targetLogin].balance += Number(amount); addLog(db, user.login, 'give_stars', `${amount}★ для ${targetLogin}`); saveDb(db); res.json({ success: true }); } else res.status(404).json({ error: 'Не найден' });
+});
+
+app.post('/api/admin/take-stars', (req, res) => {
+  const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || !user.is_super_admin) return res.status(403).json({ error: 'Только супер-админ' });
+  const { targetLogin, amount } = req.body;
+  if (db.users[targetLogin]) { db.users[targetLogin].balance -= Number(amount); addLog(db, user.login, 'take_stars', `${amount}★ у ${targetLogin}`); saveDb(db); res.json({ success: true }); } else res.status(404).json({ error: 'Не найден' });
+});
+
+app.post('/api/admin/give-nft', (req, res) => {
+  const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || (!user.is_admin && !user.is_super_admin)) return res.status(403).json({ error: 'Нет прав' });
+  const { targetLogin, item } = req.body;
+  if (db.users[targetLogin]) { db.users[targetLogin].inventory.push({ uid: crypto.randomUUID(), ...item }); addLog(db, user.login, 'give_nft', `NFT ${item.name} для ${targetLogin}`); saveDb(db); res.json({ success: true }); } else res.status(404).json({ error: 'Не найден' });
+});
+
+app.get('/api/admin/withdraws', (req, res) => {
+  const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || !user.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
+  res.json(db.withdraws || []);
+});
+
+app.get('/api/admin/deposits', (req, res) => {
+  const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || !user.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
+  res.json(db.deposits || []);
+});
+
+app.post('/api/admin/withdraws/accept', (req, res) => {
+  const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || !user.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
+  const { id } = req.body;
+  db.withdraws = db.withdraws.filter(w => w.id !== id);
+  addLog(db, user.login, 'accept_withdraw', `Выплата ${id}`);
+  saveDb(db); res.json({ success: true });
+});
+
+app.post('/api/admin/deposit/accept', (req, res) => {
+  const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || !user.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
+  const { id } = req.body;
+  const dep = db.deposits.find(d => d.id === id);
+  if (dep && db.users[dep.user_login]) {
+    db.users[dep.user_login].balance += dep.amount_stars;
+    db.deposits = db.deposits.filter(d => d.id !== id);
+    addLog(db, user.login, 'accept_deposit', `Пополнение ${dep.amount_stars}★ для ${dep.user_login}`);
+    saveDb(db);
+  }
+  res.json({ success: true });
+});
+
+app.post('/api/admin/create-promo', (req, res) => {
+  const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || !user.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
+  const { code, stars, limit } = req.body;
+  db.promos[code.toUpperCase()] = { stars: Number(stars), limit: Number(limit), used: 0 };
+  addLog(db, user.login, 'create_promo', `Промокод ${code} на ${stars}★`);
+  saveDb(db); res.json({ success: true });
+});
+
+app.get('/api/admin/logs', (req, res) => {
+  const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || !user.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
+  res.json(db.logs || []);
+});
+
+app.post('/api/admin/make-admin', (req, res) => {
+  const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || !user.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
+  const { targetLogin } = req.body;
+  if (db.users[targetLogin]) { db.users[targetLogin].is_admin = true; addLog(db, user.login, 'make_admin', `Выдал права ${targetLogin}`); saveDb(db); res.json({ success: true }); }
+});
+app.post('/api/admin/remove-admin', (req, res) => {
+  const db = loadDb(); const user = getAuthUser(req, db);
+  if (!user || !user.is_super_admin) return res.status(403).json({ error: 'Нет прав' });
+  const { targetLogin } = req.body;
+  if (db.users[targetLogin] && !['admin', 'tgweb', 'tagen'].includes(targetLogin)) { db.users[targetLogin].is_admin = false; addLog(db, user.login, 'remove_admin', `Снял права ${targetLogin}`); saveDb(db); res.json({ success: true }); }
+});
+
+app.listen(PORT, () => console.log(`Server started on port ${PORT}`));

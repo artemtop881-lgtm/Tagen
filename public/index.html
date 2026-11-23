@@ -110,7 +110,6 @@ header{
   box-shadow:0 0 8px var(--cyan), 0 0 14px var(--cyan);
 }
 
-/* РАБОЧАЯ ЛАЙВ-ЛЕНТА СЛЕВА НАПРАВО */
 .live-table-card {
   background: linear-gradient(155deg, #2b1846 0%, #190e2b 58%, #120920 100%);
   border-radius:24px; padding:16px;
@@ -136,51 +135,38 @@ header{
   padding:4px 9px; border-radius:999px;
 }
 
-.drop-ticker {
-  background:#0d0618; border-radius:18px; padding:10px 0;
-  overflow:hidden; border:1.5px solid rgba(224,170,255,0.55);
-  position:relative; display:block; width:100%; min-height:66px;
-  box-shadow: inset 0 2px 12px rgba(0,0,0,0.75), 0 0 16px rgba(199,125,255,0.28);
-}
-.drop-ticker::before, .drop-ticker::after {
-  content:''; position:absolute; top:0; bottom:0; width:22px; z-index:3; pointer-events:none;
-}
-.drop-ticker::before {
-  left:0; background:linear-gradient(90deg, #0d0618 0%, rgba(13,6,24,0) 100%);
-}
-.drop-ticker::after {
-  right:0; background:linear-gradient(270deg, #0d0618 0%, rgba(13,6,24,0) 100%);
-}
-.drop-ticker-track {
-  display:flex; flex-direction:row; flex-wrap:nowrap; flex-shrink:0;
-  width:max-content; gap:10px;
-  animation: liveSlideLeftToRight 16s linear infinite;
-  padding-left:10px; will-change: transform;
-}
-.drop-ticker:hover .drop-ticker-track { animation-play-state: paused; }
-
-.drop-card {
-  display:inline-flex; align-items:center; gap:8px; flex-shrink:0;
-  background: linear-gradient(160deg, rgba(48,27,78,0.96), rgba(22,12,38,0.98));
-  border:1px solid rgba(224,170,255,0.45);
-  border-radius:14px; padding:8px 12px;
-  box-shadow: 0 3px 0 #090411, 0 0 10px rgba(157,78,221,0.25);
+.live-feed-line {
+  background:#0d0618;
+  border:1.5px solid rgba(224,170,255,0.55);
+  border-radius:16px;
+  padding:10px 12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  overflow-x:auto;
   white-space:nowrap;
+  scrollbar-width:none;
+  min-height:48px;
 }
-.drop-card-nick {
-  color:var(--accent-bright); font-size:12.5px; font-weight:900;
+.live-feed-line::-webkit-scrollbar { display:none; }
+.feed-pill {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:11px;
+  font-size:12px;
+  font-weight:800;
+  color:#fff;
+  flex-shrink:0;
 }
-.drop-card-text {
-  color:#ffffff; font-size:12.5px; font-weight:700;
+.feed-pill.win {
+  background:rgba(16,185,129,0.14);
+  border:1px solid rgba(16,185,129,0.5);
 }
-.drop-card-icon {
-  width:26px; height:26px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
-}
-.drop-card-icon img { width:24px; height:24px; object-fit:contain; }
-
-@keyframes liveSlideLeftToRight {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(0%); }
+.feed-pill.loss {
+  background:rgba(239,68,68,0.14);
+  border:1px solid rgba(239,68,68,0.5);
 }
 
 .section-title {
@@ -677,9 +663,7 @@ input:focus, select.admin-select:focus {
       <div class="live-tag">ДРОП ЛАЙВ</div>
       <div class="live-status-pill" id="liveDropsCount">● Лента активна</div>
     </div>
-    <div class="drop-ticker">
-      <div class="drop-ticker-track" id="liveDropTrack"></div>
-    </div>
+    <div class="live-feed-line" id="liveFeedBar"></div>
   </div>
 
   <div class="section-title">Арсенал</div>
@@ -1052,62 +1036,53 @@ function renderIcon(icon, size = 24) {
   return `<span style="font-size:${size}px;line-height:1">${icon}</span>`;
 }
 
-function buildDropCardHtml(d) {
-  const nick = (d && d.user_login) ? String(d.user_login) : 'tagen';
-  const icon = (d && d.item_icon) ? d.item_icon : '🎁';
-  return `
-    <div class="drop-card">
-      <span class="drop-card-nick">${nick}</span>
-      <span class="drop-card-text">выиграл</span>
-      <span class="drop-card-icon">${renderIcon(icon, 24)}</span>
-    </div>
-  `;
-}
-
-const DEFAULT_LIVE_DROPS = [
-  { user_login: 'tagen', item_icon: '🎁' },
-  { user_login: 'tgweb', item_icon: '👾' },
-  { user_login: 'admin', item_icon: '💍' },
-  { user_login: 'player', item_icon: '💎' },
-  { user_login: 'nova', item_icon: '👑' },
-  { user_login: 'zen', item_icon: '⚔️' }
+const DEMO_FEED = [
+  { user_login: 'tagen', item_name: 'выиграл Подарок', item_icon: '🎁', is_win: true },
+  { user_login: 'tgweb', item_name: 'выиграл Neon Punk #01', item_icon: '👾', is_win: true },
+  { user_login: 'admin', item_name: 'проиграл на 1.16x', item_icon: '🚀', is_win: false },
+  { user_login: 'player', item_name: 'подорвался на мине', item_icon: '💣', is_win: false }
 ];
 
-function renderTickerTrack(list) {
-  const track = $('liveDropTrack');
-  if (!track) return;
+function renderFeedItems(list) {
+  const bar = $('liveFeedBar');
+  const badge = $('liveDropsCount');
+  if (!bar) return;
 
-  let base = Array.isArray(list) && list.length > 0 ? [...list] : [...DEFAULT_LIVE_DROPS];
-  let idx = 0;
-  while (base.length < 6) {
-    base.push(DEFAULT_LIVE_DROPS[idx % DEFAULT_LIVE_DROPS.length]);
-    idx++;
-  }
+  const items = Array.isArray(list) && list.length > 0 ? list : DEMO_FEED;
+  if (badge) badge.textContent = `● ${items.length} событий`;
 
-  const slice = base.slice(0, 8);
-  const segmentHtml = slice.map(buildDropCardHtml).join('');
-  track.style.animation = 'none';
-  track.innerHTML = segmentHtml + segmentHtml;
-  void track.offsetWidth;
-  track.style.animation = 'liveSlideLeftToRight 16s linear infinite';
+  bar.innerHTML = items.slice(0, 15).map(d => {
+    const nick = (d && d.user_login) ? String(d.user_login) : 'Игрок';
+    const icon = (d && d.item_icon) ? d.item_icon : '🎁';
+    const rawLabel = (d && d.item_name) ? String(d.item_name) : 'выиграл Подарок';
+    const isWin = d && typeof d.is_win === 'boolean'
+      ? d.is_win
+      : (!rawLabel.toLowerCase().includes('проигр') && !rawLabel.toLowerCase().includes('подорв'));
+    const textColor = isWin ? '#6ee7b7' : '#fca5a5';
+
+    return `
+      <span class="feed-pill ${isWin ? 'win' : 'loss'}">
+        <span>${renderIcon(icon, 18)}</span>
+        <span style="color:var(--accent-bright);">${nick}</span>
+        <span style="color:${textColor};">${rawLabel}</span>
+      </span>
+    `;
+  }).join('');
 }
 
 async function loadLiveDrops() {
-  const badge = $('liveDropsCount');
-  if (badge) badge.textContent = '● Лента активна';
-
   try {
-    const res = await fetch('/api/drops', { cache: 'no-store' });
-    const drops = res.ok ? await res.json() : [];
-    renderTickerTrack(Array.isArray(drops) && drops.length > 0 ? drops : DEFAULT_LIVE_DROPS);
+    const r = await fetch('/api/drops', { cache: 'no-store' });
+    const data = r.ok ? await r.json() : [];
+    renderFeedItems(Array.isArray(data) && data.length > 0 ? data : DEMO_FEED);
   } catch (e) {
-    renderTickerTrack(DEFAULT_LIVE_DROPS);
+    renderFeedItems(DEMO_FEED);
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   applyAudioVolumes();
-  renderTickerTrack(DEFAULT_LIVE_DROPS);
+  renderFeedItems(DEMO_FEED);
 
   const bgmSlider = $('bgmVolumeSlider');
   const sfxSlider = $('sfxVolumeSlider');
@@ -1403,6 +1378,7 @@ async function clickMine(cell, idx) {
         }
       });
       toast('Вы подорвались!', 'error');
+      loadLiveDrops();
       setTimeout(() => { enterGame(); resetMines(); }, 1800);
     } else {
       cell.textContent = '💎';
@@ -1441,6 +1417,7 @@ $('btnCashout').onclick = async () => {
 
     playSfx('coin');
     toast(`Вы забрали ${data.win} ★`, 'success');
+    loadLiveDrops();
     setTimeout(() => resetMines(), 1400);
   } catch (e) { toast(e.message, 'error'); }
 };
@@ -1577,6 +1554,7 @@ $('btnRocketAction').onclick = async () => {
       renderRocketHistory();
       playSfx('coin');
       toast(`Забрано ${actualMult.toFixed(2)}x (+${data.win} ★) • Краш: ${actualCrash.toFixed(2)}x`, 'success');
+      loadLiveDrops();
       setTimeout(() => {
         if (!rocketRunning) updateRocketVisual(1.0, 'idle');
       }, 1800);
@@ -1663,6 +1641,7 @@ function triggerRocketCrash(crashPoint) {
   rocketHistory.unshift({ crashPoint: finalCrash, mult: finalCrash, won: false });
   renderRocketHistory();
   toast(`Ракета взорвалась на ${finalCrash.toFixed(2)}x!`, 'error');
+  loadLiveDrops();
   setTimeout(() => {
     if (!rocketRunning) updateRocketVisual(1.0, 'idle');
   }, 1600);

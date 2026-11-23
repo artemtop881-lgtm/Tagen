@@ -42,7 +42,7 @@ function defaultDb() {
       admin: {
         login: 'admin',
         passwordHash: defaultHash,
-        balance: 100000,
+        balance: 100,
         inventory: [
           { uid: 'init_nft_1', id: 'nft_neon_punk', name: 'Neon Punk #01', icon: '👾', price: 350, rarity: 'nft', is_nft: true }
         ],
@@ -52,7 +52,7 @@ function defaultDb() {
       tgweb: {
         login: 'tgweb',
         passwordHash: defaultHash,
-        balance: 100000,
+        balance: 100,
         inventory: [],
         is_admin: true,
         is_super_admin: true
@@ -60,7 +60,7 @@ function defaultDb() {
       tagen: {
         login: 'tagen',
         passwordHash: defaultHash,
-        balance: 100000,
+        balance: 100,
         inventory: [],
         is_admin: true,
         is_super_admin: true
@@ -95,7 +95,7 @@ function loadDb() {
         users[superLogin] = {
           login: superLogin,
           passwordHash: defaultHash,
-          balance: 100000,
+          balance: 100,
           inventory: [],
           is_admin: true,
           is_super_admin: true
@@ -196,7 +196,7 @@ app.post('/api/register', (req, res) => {
   db.users[cleanLogin] = {
     login: cleanLogin,
     passwordHash: hashPassword(password),
-    balance: isSuper ? 100000 : 1000,
+    balance: 100,
     inventory: [],
     is_admin: isSuper,
     is_super_admin: isSuper

@@ -12,12 +12,12 @@ app.use(express.json({ limit: '8mb' }));
 app.use(express.static(PUBLIC_DIR));
 
 const CASES = {
-  starter: { id: 'starter', name: 'Стартовый', price: 100 },
-  pro:     { id: 'pro',     name: 'Про',        price: 1000 },
-  magic:   { id: 'magic',   name: 'Магический', price: 2500 },
-  winter:  { id: 'winter',  name: 'Зимний',     price: 3000 },
-  legend:  { id: 'legend',  name: 'Легенда',    price: 5000 },
-  inferno: { id: 'inferno', name: 'Адский',     price: 7500 }
+  starter: { id: 'starter', name: 'Стартовый', price: 100,  icon: '/items/case_starter.png', fallbackEmoji: '📦' },
+  pro:     { id: 'pro',     name: 'Про',        price: 1000, icon: '/items/case_pro.png',     fallbackEmoji: '💼' },
+  magic:   { id: 'magic',   name: 'Магический', price: 2500, icon: '/items/case_magic.png',   fallbackEmoji: '🔮' },
+  winter:  { id: 'winter',  name: 'Зимний',     price: 3000, icon: '/items/case_winter.png',  fallbackEmoji: '❄️' },
+  legend:  { id: 'legend',  name: 'Легенда',    price: 5000, icon: '/items/case_legend.png',  fallbackEmoji: '👑' },
+  inferno: { id: 'inferno', name: 'Адский',     price: 7500, icon: '/items/case_infern.png',  fallbackEmoji: '🔥' }
 };
 
 const DEFAULT_ITEMS = [
@@ -30,6 +30,8 @@ const DEFAULT_ITEMS = [
   { id: 'dragon_myth', name: 'Дракон NFT',  icon: '/items/bear/2.png',      fallbackEmoji: '🐉', price: 9500, rarity: 'nft',    is_nft: true }
 ];
 
+const DEFAULT_ITEM_BY_ID = Object.fromEntries(DEFAULT_ITEMS.map((it) => [it.id, it]));
+
 const activeMines = new Map();
 const activeRockets = new Map();
 
@@ -37,20 +39,54 @@ function hashPassword(password, salt) {
   return crypto.scryptSync(String(password), salt, 64).toString('hex');
 }
 
-function createInitialDB() {
-  const superSalt = crypto.randomBytes(16).toString('hex');
+function buildUserRecord(login, password, balance = 5000, isSuperAdmin = false) {
+  const salt = crypto.randomBytes(16).toString('hex');
   return {
+    login,
+    salt,
+    passwordHash: hashPassword(password, salt),
+    balance,
+    inventory: [],
+    is_admin: Boolean(isSuperAdmin),
+    is_super_admin: Boolean(isSuperAdmin),
+    created_at: Date.now()
+  };
+}
+
+function ensureStaffAccounts(db) {
+  if (!db.users || typeof db.users !== 'object') {
+    db.users = {};
+  }
+  const staff = ['admin', 'tagen', 'tgweb'];
+  let changed = false;
+  for (const login of staff) {
+    if (!db.users[login]) {
+      db.users[login] = buildUserRecord(login, 'admin123', 5000, true);
+      changed = true;
+    }
+  }
+  return changed;
+}
+
+function normalizeItemsCatalog(items) {
+  const source = Array.isArray(items) && items.length > 0 ? items : DEFAULT_ITEMS;
+  return source.map((it) => {
+    const base = DEFAULT_ITEM_BY_ID[it.id] || {};
+    return {
+      ...base,
+      ...it,
+      icon: it.icon || base.icon || '/items/bear/1.png',
+      fallbackEmoji: it.fallbackEmoji || base.fallbackEmoji || '🎁'
+    };
+  });
+}
+
+function createInitialDB() {
+  const db = {
     users: {
-      admin: {
-        login: 'admin',
-        salt: superSalt,
-        passwordHash: hashPassword('admin123', superSalt),
-        balance: 5000,
-        inventory: [],
-        is_admin: true,
-        is_super_admin: true,
-        created_at: Date.now()
-      }
+      admin: buildUserRecord('admin', 'admin123', 5000, true),
+      tagen: buildUserRecord('tagen', 'admin123', 5000, true),
+      tgweb: buildUserRecord('tgweb', 'admin123', 5000, true)
     },
     sessions: {},
     items: DEFAULT_ITEMS.slice(),
@@ -61,6 +97,7 @@ function createInitialDB() {
     promos: {},
     logs: []
   };
+  return db;
 }
 
 function readDB() {
@@ -72,10 +109,10 @@ function readDB() {
     }
     const raw = fs.readFileSync(DB_PATH, 'utf8');
     const parsed = JSON.parse(raw || '{}');
-    return {
+    const db = {
       users: parsed.users || {},
       sessions: parsed.sessions || {},
-      items: Array.isArray(parsed.items) && parsed.items.length > 0 ? parsed.items : DEFAULT_ITEMS.slice(),
+      items: normalizeItemsCatalog(parsed.items),
       drops: Array.isArray(parsed.drops) ? parsed.drops : [],
       chat: Array.isArray(parsed.chat) ? parsed.chat : [],
       deposits: Array.isArray(parsed.deposits) ? parsed.deposits : [],
@@ -83,6 +120,10 @@ function readDB() {
       promos: parsed.promos || {},
       logs: Array.isArray(parsed.logs) ? parsed.logs : []
     };
+    if (ensureStaffAccounts(db)) {
+      writeDB(db);
+    }
+    return db;
   } catch (err) {
     console.error('readDB error:', err);
     return createInitialDB();
@@ -109,7 +150,7 @@ function pushDrop(db, userLogin, itemName, itemIcon, isWin = true) {
     id: `drop_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     user_login: userLogin,
     item_name: itemName,
-    item_icon: itemIcon || '🎁',
+    item_icon: itemIcon || '/items/bear/1.png',
     is_win: Boolean(isWin),
     created_at: Date.now()
   });
@@ -165,17 +206,7 @@ app.post('/api/register', (req, res) => {
     if (db.users[login]) {
       return res.status(400).json({ error: 'Такой логин уже занят' });
     }
-    const salt = crypto.randomBytes(16).toString('hex');
-    db.users[login] = {
-      login,
-      salt,
-      passwordHash: hashPassword(password, salt),
-      balance: 500,
-      inventory: [],
-      is_admin: false,
-      is_super_admin: false,
-      created_at: Date.now()
-    };
+    db.users[login] = buildUserRecord(login, password, 500, false);
     const token = crypto.randomBytes(24).toString('hex');
     db.sessions[token] = { login, created_at: Date.now() };
     writeDB(db);
@@ -231,6 +262,10 @@ app.get('/api/user/:login', requireAuth, (req, res) => {
     is_admin: Boolean(target.is_admin),
     is_super_admin: Boolean(target.is_super_admin)
   });
+});
+
+app.get('/api/cases', (req, res) => {
+  return res.json(Object.values(CASES));
 });
 
 app.get('/api/items', (req, res) => {
@@ -293,7 +328,7 @@ app.post('/api/cases/open', requireAuth, (req, res) => {
       return res.status(400).json({ error: 'Недостаточно звёзд' });
     }
 
-    const catalog = Array.isArray(db.items) && db.items.length > 0 ? db.items : DEFAULT_ITEMS;
+    const catalog = normalizeItemsCatalog(db.items);
     const cheapPool = catalog.filter((it) => Number(it.price) > 0 && Number(it.price) < price);
     const profitPool = catalog.filter((it) => Number(it.price) >= price);
 
@@ -335,7 +370,7 @@ app.post('/api/cases/open', requireAuth, (req, res) => {
       uid: `item_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       id: template.id,
       name: template.name,
-      icon: template.icon,
+      icon: template.icon || '/items/bear/1.png',
       fallbackEmoji: template.fallbackEmoji || '🎁',
       price: Number(template.price) || 0,
       rarity: template.rarity || 'common',
@@ -548,16 +583,16 @@ app.post('/api/upgrade', requireAuth, (req, res) => {
     const user = req.user;
     const targetItemId = String(req.body?.targetItemId || '');
     const customTarget = req.body?.targetItem;
+    const catalog = normalizeItemsCatalog(db.items);
     const target = (customTarget && customTarget.price)
-      ? customTarget
-      : (db.items.find((it) => String(it.id) === targetItemId) || DEFAULT_ITEMS.find((it) => String(it.id) === targetItemId));
+      ? { ...customTarget, icon: customTarget.icon || '/items/rose/1.png' }
+      : catalog.find((it) => String(it.id) === targetItemId);
 
     if (!target || !Number(target.price)) {
       return res.status(400).json({ error: 'Не выбран целевой предмет' });
     }
 
     let betPrice = 0;
-    let invIndex = -1;
 
     if (req.body?.betStars) {
       betPrice = Math.floor(Number(req.body.betStars) || 0);
@@ -567,7 +602,7 @@ app.post('/api/upgrade', requireAuth, (req, res) => {
       user.balance = (Number(user.balance) || 0) - betPrice;
     } else if (req.body?.myUid) {
       if (!Array.isArray(user.inventory)) user.inventory = [];
-      invIndex = user.inventory.findIndex((it) => String(it.uid) === String(req.body.myUid));
+      const invIndex = user.inventory.findIndex((it) => String(it.uid) === String(req.body.myUid));
       if (invIndex === -1) {
         return res.status(404).json({ error: 'Предмет ставки не найден' });
       }
@@ -591,7 +626,7 @@ app.post('/api/upgrade', requireAuth, (req, res) => {
         uid: `upg_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
         id: target.id || `target_${Date.now()}`,
         name: target.name,
-        icon: target.icon,
+        icon: target.icon || '/items/rose/1.png',
         fallbackEmoji: target.fallbackEmoji || '⚡',
         price: targetPrice,
         rarity: target.rarity || 'epic',
@@ -737,7 +772,7 @@ app.post('/api/admin/give-nft', requireAuth, requireAdmin, (req, res) => {
     uid: `nft_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     id: item.id || `nft_${Date.now()}`,
     name: item.name,
-    icon: item.icon || '💎',
+    icon: item.icon || '/items/skull/1.png',
     price: Number(item.price) || 100,
     rarity: 'nft',
     is_nft: true

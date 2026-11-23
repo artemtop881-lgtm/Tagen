@@ -110,7 +110,7 @@ header{
   box-shadow:0 0 8px var(--cyan), 0 0 14px var(--cyan);
 }
 
-/* ЛАЙВ-ЛЕНТА ДРОПОВ: НИК + ВЫИГРАЛ + ПОДАРОК (СЛЕВА НАПРАВО) */
+/* РАБОЧАЯ ЛАЙВ-ЛЕНТА СЛЕВА НАПРАВО */
 .live-table-card {
   background: linear-gradient(155deg, #2b1846 0%, #190e2b 58%, #120920 100%);
   border-radius:24px; padding:16px;
@@ -139,7 +139,7 @@ header{
 .drop-ticker {
   background:#0d0618; border-radius:18px; padding:10px 0;
   overflow:hidden; border:1.5px solid rgba(224,170,255,0.55);
-  position:relative; display:flex; align-items:center; min-height:66px;
+  position:relative; display:block; width:100%; min-height:66px;
   box-shadow: inset 0 2px 12px rgba(0,0,0,0.75), 0 0 16px rgba(199,125,255,0.28);
 }
 .drop-ticker::before, .drop-ticker::after {
@@ -678,28 +678,7 @@ input:focus, select.admin-select:focus {
       <div class="live-status-pill" id="liveDropsCount">● Лента активна</div>
     </div>
     <div class="drop-ticker">
-      <div class="drop-ticker-track" id="liveDropTrack">
-        <div class="drop-card">
-          <span class="drop-card-nick">tagen</span>
-          <span class="drop-card-text">выиграл</span>
-          <span class="drop-card-icon">🎁</span>
-        </div>
-        <div class="drop-card">
-          <span class="drop-card-nick">tgweb</span>
-          <span class="drop-card-text">выиграл</span>
-          <span class="drop-card-icon">👾</span>
-        </div>
-        <div class="drop-card">
-          <span class="drop-card-nick">tagen</span>
-          <span class="drop-card-text">выиграл</span>
-          <span class="drop-card-icon">🎁</span>
-        </div>
-        <div class="drop-card">
-          <span class="drop-card-nick">tgweb</span>
-          <span class="drop-card-text">выиграл</span>
-          <span class="drop-card-icon">👾</span>
-        </div>
-      </div>
+      <div class="drop-ticker-track" id="liveDropTrack"></div>
     </div>
   </div>
 
@@ -1065,8 +1044,71 @@ function isNftItem(item) {
   return item.is_nft === true || String(item.rarity || '').toLowerCase() === 'nft' || String(item.item_id || item.id || '').toLowerCase().startsWith('nft');
 }
 
+function renderIcon(icon, size = 24) {
+  if (!icon) return `<span style="font-size:${size}px;line-height:1">🎁</span>`;
+  if (typeof icon === 'string' && (icon.startsWith('/') || icon.startsWith('http'))) {
+    return `<img src="${icon}" style="width:${size}px;height:${size}px;object-fit:contain;vertical-align:middle;" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=\\'font-size:${size}px;line-height:1\\'>🎁</span>')">`;
+  }
+  return `<span style="font-size:${size}px;line-height:1">${icon}</span>`;
+}
+
+function buildDropCardHtml(d) {
+  const nick = (d && d.user_login) ? String(d.user_login) : 'tagen';
+  const icon = (d && d.item_icon) ? d.item_icon : '🎁';
+  return `
+    <div class="drop-card">
+      <span class="drop-card-nick">${nick}</span>
+      <span class="drop-card-text">выиграл</span>
+      <span class="drop-card-icon">${renderIcon(icon, 24)}</span>
+    </div>
+  `;
+}
+
+const DEFAULT_LIVE_DROPS = [
+  { user_login: 'tagen', item_icon: '🎁' },
+  { user_login: 'tgweb', item_icon: '👾' },
+  { user_login: 'admin', item_icon: '💍' },
+  { user_login: 'player', item_icon: '💎' },
+  { user_login: 'nova', item_icon: '👑' },
+  { user_login: 'zen', item_icon: '⚔️' }
+];
+
+function renderTickerTrack(list) {
+  const track = $('liveDropTrack');
+  if (!track) return;
+
+  let base = Array.isArray(list) && list.length > 0 ? [...list] : [...DEFAULT_LIVE_DROPS];
+  let idx = 0;
+  while (base.length < 6) {
+    base.push(DEFAULT_LIVE_DROPS[idx % DEFAULT_LIVE_DROPS.length]);
+    idx++;
+  }
+
+  const slice = base.slice(0, 8);
+  const segmentHtml = slice.map(buildDropCardHtml).join('');
+  track.style.animation = 'none';
+  track.innerHTML = segmentHtml + segmentHtml;
+  void track.offsetWidth;
+  track.style.animation = 'liveSlideLeftToRight 16s linear infinite';
+}
+
+async function loadLiveDrops() {
+  const badge = $('liveDropsCount');
+  if (badge) badge.textContent = '● Лента активна';
+
+  try {
+    const res = await fetch('/api/drops', { cache: 'no-store' });
+    const drops = res.ok ? await res.json() : [];
+    renderTickerTrack(Array.isArray(drops) && drops.length > 0 ? drops : DEFAULT_LIVE_DROPS);
+  } catch (e) {
+    renderTickerTrack(DEFAULT_LIVE_DROPS);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   applyAudioVolumes();
+  renderTickerTrack(DEFAULT_LIVE_DROPS);
+
   const bgmSlider = $('bgmVolumeSlider');
   const sfxSlider = $('sfxVolumeSlider');
   if (bgmSlider) {
@@ -1089,60 +1131,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadLiveDrops();
   setInterval(loadLiveDrops, 8000);
 });
-
-function renderIcon(icon, size = 24) {
-  if (!icon) return `<span style="font-size:${size}px;line-height:1">🎁</span>`;
-  if (typeof icon === 'string' && (icon.startsWith('/') || icon.startsWith('http'))) {
-    return `<img src="${icon}" style="width:${size}px;height:${size}px;object-fit:contain;vertical-align:middle;" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=\\'font-size:${size}px;line-height:1\\'>🎁</span>')">`;
-  }
-  return `<span style="font-size:${size}px;line-height:1">${icon}</span>`;
-}
-
-function buildDropCardHtml(d) {
-  const nick = (d && d.user_login) ? String(d.user_login) : 'Игрок';
-  const icon = (d && d.item_icon) ? d.item_icon : '🎁';
-  return `
-    <div class="drop-card">
-      <span class="drop-card-nick">${nick}</span>
-      <span class="drop-card-text">выиграл</span>
-      <span class="drop-card-icon">${renderIcon(icon, 24)}</span>
-    </div>
-  `;
-}
-
-async function loadLiveDrops() {
-  const track = $('liveDropTrack');
-  const badge = $('liveDropsCount');
-  if (!track) return;
-
-  const fallbackList = [
-    { user_login: 'tagen', item_icon: '🎁' },
-    { user_login: 'tgweb', item_icon: '👾' },
-    { user_login: 'admin', item_icon: '💍' },
-    { user_login: 'player', item_icon: '💎' }
-  ];
-
-  try {
-    const res = await fetch('/api/drops');
-    const drops = res.ok ? await res.json() : [];
-    const hasReal = Array.isArray(drops) && drops.length > 0;
-    const rawList = hasReal ? drops : fallbackList;
-
-    if (badge) {
-      badge.textContent = hasReal ? `● ${drops.length} недавних` : '● Лента активна';
-    }
-
-    let items = [...rawList];
-    while (items.length < 6) {
-      items = items.concat(rawList);
-    }
-    const segment = items.slice(0, 8).map(buildDropCardHtml).join('');
-    track.innerHTML = segment + segment;
-  } catch (e) {
-    const segment = fallbackList.map(buildDropCardHtml).join('');
-    track.innerHTML = segment + segment;
-  }
-}
 
 function toast(msg, type = 'info') {
   const c = $('toastContainer');
@@ -1942,7 +1930,7 @@ function renderAdminUI() {
 
   c.innerHTML = `
     <div class="admin-box"><h3>Игроки</h3><table id="adminTable" style="width:100%; border-collapse:collapse; font-size:12px;"></table></div>
-    <div class="admin-box"><h3>Выдача звёзд</h3><input type="text" id="aTarget" placeholder="Логин"><input type="number" id="aAmount" value="1000"><button onclick="quickAdmin('give')">Выдать</button></div>
+    <div class="admin-box"><h3>Выдача звёзд</h3><input type="text" id="aTarget" placeholder="Логин"><input type="number" id="aAmount" value="100"><button onclick="quickAdmin('give')">Выдать</button></div>
     <div class="admin-box">
       <h3>Выдача NFT</h3>
       <input type="text" id="nftTarget" placeholder="Логин">
@@ -1957,7 +1945,7 @@ function renderAdminUI() {
       <button onclick="adminGiveNft()">Выдать NFT</button>
     </div>
     ${playerData.is_super_admin ? `
-    <div class="admin-box"><h3 style="color:var(--bad);">Для Главного Админа</h3><input type="text" id="aTargetTake" placeholder="Логин"><input type="number" id="aAmountTake" value="1000"><button style="background:var(--bad); color:#fff;" onclick="quickAdmin('take')">Забрать звёзды</button></div>
+    <div class="admin-box"><h3 style="color:var(--bad);">Для Главного Админа</h3><input type="text" id="aTargetTake" placeholder="Логин"><input type="number" id="aAmountTake" value="100"><button style="background:var(--bad); color:#fff;" onclick="quickAdmin('take')">Забрать звёзды</button></div>
     <div class="admin-box"><h3>Выводы</h3><div id="aWithdraws"></div></div>
     <div class="admin-box"><h3>Пополнения</h3><div id="aDeposits"></div></div>
     <div class="admin-box"><h3>Промокод</h3><input type="text" id="pCode" placeholder="Код"><input type="number" id="pStars" value="100"><input type="number" id="pLimit" value="10"><button onclick="createPromo()">Создать</button></div>

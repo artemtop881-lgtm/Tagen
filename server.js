@@ -35,6 +35,16 @@ function hashPassword(pwd) {
   return crypto.createHash('sha256').update(String(pwd)).digest('hex');
 }
 
+function initialFeedEvents() {
+  const now = Date.now();
+  return [
+    { user_login: 'tagen', item_id: 'gift_box', item_name: 'выиграл Подарок', item_icon: '🎁', is_win: true, created_at: now - 40000 },
+    { user_login: 'tgweb', item_id: 'nft_neon_punk', item_name: 'выиграл Neon Punk #01', item_icon: '👾', is_win: true, created_at: now - 30000 },
+    { user_login: 'admin', item_id: 'rocket_loss', item_name: 'проиграл на 1.16x', item_icon: '🚀', is_win: false, created_at: now - 20000 },
+    { user_login: 'player', item_id: 'mines_loss', item_name: 'подорвался на мине', item_icon: '💣', is_win: false, created_at: now - 10000 }
+  ];
+}
+
 function defaultDb() {
   const defaultHash = hashPassword('admin123');
   return {
@@ -67,11 +77,7 @@ function defaultDb() {
       }
     },
     tokens: {},
-    drops: [
-      { user_login: 'tagen', item_id: 'gift_box', item_name: 'Подарок', item_icon: '🎁', item_price: 100, rarity: 'common', created_at: Date.now() - 40000 },
-      { user_login: 'tgweb', item_id: 'nft_neon_punk', item_name: 'Neon Punk #01', item_icon: '👾', item_price: 350, rarity: 'nft', created_at: Date.now() - 25000 },
-      { user_login: 'admin', item_id: 'ring_star', item_name: 'Кольцо', item_icon: '💍', item_price: 100, rarity: 'common', created_at: Date.now() - 10000 }
-    ],
+    drops: initialFeedEvents(),
     deposits: [],
     withdraws: [],
     promos: {},
@@ -106,10 +112,14 @@ function loadDb() {
       }
     });
 
+    const drops = Array.isArray(parsed.drops) && parsed.drops.length > 0
+      ? parsed.drops
+      : initialFeedEvents();
+
     return {
       users,
       tokens: parsed.tokens || {},
-      drops: Array.isArray(parsed.drops) ? parsed.drops : [],
+      drops,
       deposits: Array.isArray(parsed.deposits) ? parsed.deposits : [],
       withdraws: Array.isArray(parsed.withdraws) ? parsed.withdraws : [],
       promos: parsed.promos || {},
@@ -135,14 +145,13 @@ function addLog(db, adminLogin, action, details) {
   db.logs = db.logs.slice(0, 200);
 }
 
-function pushDrop(db, userLogin, item) {
+function pushFeed(db, userLogin, text, icon, isWin) {
   db.drops.unshift({
-    user_login: userLogin,
-    item_id: item.id || item.item_id || 'gift_box',
-    item_name: item.name || 'Подарок',
-    item_icon: item.icon || '🎁',
-    item_price: Number(item.price) || 0,
-    rarity: item.rarity || (item.is_nft ? 'nft' : 'common'),
+    user_login: userLogin || 'Игрок',
+    item_id: isWin ? 'win_event' : 'loss_event',
+    item_name: text,
+    item_icon: icon || (isWin ? '🎁' : '💥'),
+    is_win: Boolean(isWin),
     created_at: Date.now()
   });
   db.drops = db.drops.slice(0, 30);
@@ -297,7 +306,7 @@ app.post('/api/cases/open', (req, res) => {
     is_nft: Boolean(template.is_nft)
   };
   user.inventory.push(wonItem);
-  pushDrop(db, user.login, wonItem);
+  pushFeed(db, user.login, `выиграл ${wonItem.name}`, wonItem.icon, true);
   saveDb(db);
 
   res.json({
@@ -354,6 +363,8 @@ app.post('/api/games/mines', (req, res) => {
     const idx = Number(cell);
     if (session.bombs.includes(idx)) {
       activeMinesSessions.delete(user.login);
+      pushFeed(db, user.login, 'подорвался на мине', '💣', false);
+      saveDb(db);
       return res.json({ bomb: true, bombs: session.bombs });
     }
     if (!session.opened.includes(idx)) {
@@ -376,6 +387,7 @@ app.post('/api/games/mines', (req, res) => {
     const mult = Number((1 + session.opened.length * (0.22 + session.minesCount * 0.08)).toFixed(2));
     const win = Math.floor(session.bet * mult);
     user.balance += win;
+    pushFeed(db, user.login, `выиграл ${win} ★ (${mult.toFixed(2)}x)`, '💎', true);
     saveDb(db);
     activeMinesSessions.delete(user.login);
     return res.json({ balance: user.balance, win, bombs: session.bombs });
@@ -414,10 +426,13 @@ app.post('/api/games/rocket', (req, res) => {
     const claimed = Math.max(1.0, Math.min(5.0, Number(multiplier) || 1.0));
     activeRocketSessions.delete(user.login);
     if (claimed >= session.crashPoint) {
+      pushFeed(db, user.login, `проиграл на ${session.crashPoint.toFixed(2)}x`, '🚀', false);
+      saveDb(db);
       return res.json({ crashed: true, crashPoint: session.crashPoint });
     }
     const win = Math.floor(session.bet * claimed);
     user.balance += win;
+    pushFeed(db, user.login, `выиграл ${win} ★ на ${claimed.toFixed(2)}x`, '🚀', true);
     saveDb(db);
     return res.json({
       crashed: false,
@@ -431,6 +446,8 @@ app.post('/api/games/rocket', (req, res) => {
   if (action === 'crash') {
     const cp = session.crashPoint;
     activeRocketSessions.delete(user.login);
+    pushFeed(db, user.login, `проиграл на ${cp.toFixed(2)}x`, '🚀', false);
+    saveDb(db);
     return res.json({ crashPoint: cp });
   }
 
@@ -490,7 +507,9 @@ app.post('/api/upgrade', (req, res) => {
       is_nft: Boolean(finalTarget.is_nft || String(finalTarget.rarity).toLowerCase() === 'nft')
     };
     user.inventory.push(wonItem);
-    pushDrop(db, user.login, wonItem);
+    pushFeed(db, user.login, `выиграл ${wonItem.name}`, wonItem.icon, true);
+  } else {
+    pushFeed(db, user.login, 'проиграл в апгрейде', '⚡', false);
   }
 
   saveDb(db);
@@ -605,7 +624,7 @@ app.post('/api/admin/give-nft', (req, res) => {
     is_nft: true
   };
   target.inventory.push(nftObj);
-  pushDrop(db, target.login, nftObj);
+  pushFeed(db, target.login, `выиграл ${nftObj.name}`, nftObj.icon, true);
   addLog(db, admin.login, 'give-nft', `${target.login}: ${nftObj.name}`);
   saveDb(db);
   res.json({ ok: true });

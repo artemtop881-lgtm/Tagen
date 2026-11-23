@@ -548,7 +548,7 @@ input:focus,select.admin-select:focus,textarea:focus{border-color:var(--gold-bri
     </div>
     <div class="chat-scroll" id="chatScroll"><div class="chat-empty">Загрузка...</div></div>
     <div class="chat-input-bar">
-      <button class="chat-file-btn" id="chatFileBtn" title="Прикрепить файл">📎</button>
+      <button class="chat-file-btn" id="chatFileBtn" title="Прикрепить картинку">📎</button>
       <input type="file" id="chatFileInput" accept="image/*" style="display:none;">
       <input type="text" class="chat-input chat-page-input" id="chatPageInput" placeholder="Сообщение..." maxlength="500">
       <button class="chat-send-btn" id="chatPageSend">➤</button>
@@ -612,10 +612,6 @@ input:focus,select.admin-select:focus,textarea:focus{border-color:var(--gold-bri
 </div>
 
 <script>
-/* ============================================================
-   АДАПТАЦИЯ: ITEMS_CATALOG (сервер не отдаёт /api/items)
-   Хардкод идентичен ITEMS_CATALOG в server.js
-   ============================================================ */
 const ITEMS_CATALOG_FALLBACK = [
   { id: 'gift_box', name: 'Подарок', icon: '🎁', price: 100, rarity: 'common', is_nft: false },
   { id: 'ring_star', name: 'Кольцо', icon: '💍', price: 100, rarity: 'common', is_nft: false },
@@ -648,8 +644,8 @@ function applyAudioVolumes() {
   const bS = $('bgmVolumeSlider'), sS = $('sfxVolumeSlider');
   if (bS) bS.value = Math.round(bgmVolume * 100);
   if (sS) sS.value = Math.round(sfxVolume * 100);
-  $('bgmVolLabel').textContent = Math.round(bgmVolume * 100) + '%';
-  $('sfxVolLabel').textContent = Math.round(sfxVolume * 100) + '%';
+  if ($('bgmVolLabel')) $('bgmVolLabel').textContent = Math.round(bgmVolume * 100) + '%';
+  if ($('sfxVolLabel')) $('sfxVolLabel').textContent = Math.round(sfxVolume * 100) + '%';
 }
 function playSfx(name) {
   if (sfx[name] && sfxVolume > 0) {
@@ -673,8 +669,8 @@ function isNftItem(item) {
 }
 function renderIcon(icon, size = 24) {
   if (!icon) return `<span style="font-size:${size}px;line-height:1">🎁</span>`;
-  if (typeof icon === 'string' && (icon.startsWith('/') || icon.startsWith('http'))) {
-    return `<img src="${icon}" style="width:${size}px;height:${size}px;object-fit:contain;vertical-align:middle;">`;
+  if (typeof icon === 'string' && (icon.startsWith('/') || icon.startsWith('http') || icon.startsWith('data:image/'))) {
+    return `<img src="${icon}" style="width:${size}px;height:${size}px;object-fit:contain;vertical-align:middle;" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=\\'font-size:${size}px;line-height:1\\'>🎁</span>')">`;
   }
   return `<span style="font-size:${size}px;line-height:1">${icon}</span>`;
 }
@@ -697,7 +693,7 @@ function renderFeedItems(list) {
     const rawLabel = (d && d.item_name) ? String(d.item_name) : 'выиграл Подарок';
     const isWin = d && typeof d.is_win === 'boolean' ? d.is_win : (!rawLabel.toLowerCase().includes('проигр') && !rawLabel.toLowerCase().includes('подорв'));
     const textColor = isWin ? '#6ee7b7' : '#fca5a5';
-    return `<span class="feed-pill ${isWin ? 'win' : 'loss'}"><span>${renderIcon(icon, 18)}</span><span style="color:var(--accent-bright);">${nick}</span><span style="color:${textColor};">${rawLabel}</span></span>`;
+    return `<span class="feed-pill ${isWin ? 'win' : 'loss'}"><span>${renderIcon(icon, 18)}</span><span style="color:var(--accent-bright);">${escapeHtml(nick)}</span><span style="color:${textColor};">${escapeHtml(rawLabel)}</span></span>`;
   }).join('');
 }
 
@@ -709,9 +705,6 @@ async function loadLiveDrops() {
   } catch (e) { renderFeedItems(DEMO_FEED); }
 }
 
-/* ============================================================
-   АДАПТАЦИЯ: загрузка каталога /api/items с fallback
-   ============================================================ */
 async function loadServerItems() {
   try {
     const r = await fetch('/api/items');
@@ -750,7 +743,7 @@ function initSnow() {
     }
   }
   function draw() {
-    if (!snowEnabled) { requestAnimationFrame(draw); return; }
+    if (!snowEnabled) { ctx.clearRect(0, 0, w, h); requestAnimationFrame(draw); return; }
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = '#f0f7ff';
     flakes.forEach(f => {
@@ -779,17 +772,16 @@ function initCountdown() {
     let target = new Date(year + 1, 0, 1, 0, 0, 0);
     if (now.getMonth() === 11 && now.getDate() === 31 && now.getHours() >= 23) target = new Date(year + 1, 0, 1);
     const diff = target - now;
+    const cells = document.querySelectorAll('#nyCountdown [data-cd]');
     if (diff <= 0) {
-      // Сегодня НГ или прошёл — показываем 0
-      document.querySelectorAll('#nyCountdown [data-cd]').forEach(el => el.textContent = '00');
+      cells.forEach(el => el.textContent = '00');
       return;
     }
     const d = Math.floor(diff / 86400000);
     const h = Math.floor((diff % 86400000) / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
-    const cells = document.querySelectorAll('#nyCountdown [data-cd]');
-    if (cells.length) {
+    if (cells.length >= 4) {
       cells[0].textContent = String(d).padStart(2, '0');
       cells[1].textContent = String(h).padStart(2, '0');
       cells[2].textContent = String(m).padStart(2, '0');
@@ -855,9 +847,12 @@ const Chat = {
   unread: 0,
   timer: null,
   isAdmin: false,
+  pendingFile: null,
+  pendingFileType: null,
   async load() {
     try {
       const r = await apiGet('/api/chat');
+      if (!r.ok) return;
       const msgs = await r.json();
       this.render(Array.isArray(msgs) ? msgs : []);
     } catch (e) {}
@@ -873,7 +868,6 @@ const Chat = {
         newCount++;
       }
     });
-    // Не считаем непрочитанными когда страница чата активна
     const chatVisible = $('screen-chat') && $('screen-chat').classList.contains('active');
     if (newCount > 0 && this.lastIds.size > newCount && !chatVisible) {
       this.unread += newCount;
@@ -886,14 +880,15 @@ const Chat = {
     box.innerHTML = msgs.map(m => {
       const isAdm = m.is_admin === true;
       const time = new Date(m.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-      const avatarLetter = (m.login || '?')[0].toUpperCase();
-      const delBtn = this.isAdmin ? `<button class="chat-delete-btn" onclick="Chat.deleteMsg('${m.id}')" title="Удалить">×</button>` : '';
-      const fileHtml = m.file ? `<img src="${m.file}" alt="img">` : '';
+      const avatarLetter = escapeHtml((m.login || '?')[0].toUpperCase());
+      const delBtn = this.isAdmin ? `<button class="chat-delete-btn" onclick="Chat.deleteMsg('${escapeHtml(m.id)}')" title="Удалить">×</button>` : '';
+      const safeFile = m.file && (String(m.file).startsWith('data:image/') || String(m.file).startsWith('/') || String(m.file).startsWith('https://')) ? m.file : '';
+      const fileHtml = safeFile ? `<img src="${safeFile}" alt="img">` : '';
       return `<div class="chat-row">
         <div class="chat-avatar ${isAdm ? 'admin' : ''}">${avatarLetter}</div>
         <div class="chat-bubble-wrap">
           <div class="chat-bubble-meta">
-            <span class="chat-bubble-login ${isAdm ? 'admin' : ''}">${m.login}</span>
+            <span class="chat-bubble-login ${isAdm ? 'admin' : ''}">${escapeHtml(m.login || 'Игрок')}</span>
             <span class="chat-bubble-time">${time}</span>
           </div>
           <div class="chat-bubble ${isAdm ? 'admin' : ''}">${escapeHtml(m.text || '')}${fileHtml}${delBtn}</div>
@@ -923,15 +918,24 @@ const Chat = {
   async send() {
     const input = $('chatPageInput');
     const text = input.value.trim();
-    if (!text) return;
+    if (!text && !this.pendingFile) return;
     try {
-      const res = await apiPost('/api/chat/send', { text });
+      const payload = {
+        text: text,
+        file: this.pendingFile || null,
+        fileType: this.pendingFileType || null
+      };
+      const res = await apiPost('/api/chat/send', payload);
       if (res.ok) {
         input.value = '';
+        this.pendingFile = null;
+        this.pendingFileType = null;
+        if ($('chatFileInput')) $('chatFileInput').value = '';
+        if ($('chatFileBtn')) $('chatFileBtn').style.borderColor = 'rgba(199,125,255,.4)';
         await this.load();
         $('chatScroll').scrollTop = $('chatScroll').scrollHeight;
       } else {
-        const d = await res.json();
+        const d = await res.json().catch(() => ({}));
         toast(d.error || 'Ошибка', 'error');
       }
     } catch (e) { toast('Ошибка сети', 'error'); }
@@ -940,7 +944,10 @@ const Chat = {
     if (!confirm('Удалить сообщение?')) return;
     try {
       const res = await apiPost('/api/chat/admin', { action: 'delete', msgId: id });
-      if (res.ok) this.load();
+      if (res.ok) {
+        this.lastIds.delete(id);
+        this.load();
+      }
     } catch (e) {}
   }
 };
@@ -948,7 +955,7 @@ const Chat = {
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 /* ============================================================
-   TOAST
+   TOAST & MODALS
    ============================================================ */
 function toast(msg, type = 'info') {
   const c = $('toastContainer');
@@ -1060,12 +1067,12 @@ function switchTab(tabId) {
   if (tabId === 'admin') renderAdminUI();
   if (tabId === 'inventory') renderInventory();
   if (tabId === 'chat') { Chat.clearUnread(); Chat.load().then(() => { const b = $('chatScroll'); if (b) b.scrollTop = b.scrollHeight; }); }
-  $('floatingChatBtn').classList.toggle('show', tabId !== 'chat' && currentUser);
+  $('floatingChatBtn').classList.toggle('show', tabId !== 'chat' && Boolean(currentUser));
 }
 function openGame(game) {
   switchTab(game);
   if (game === 'upgrade') { renderUpgradeGrid(); updateUpgradeUI(); }
-  if (game === 'rocket') { renderRocketHistory(); }
+  if (game === 'rocket') { renderRocketHistory(); updateRocketVisual(1.0, 'idle'); }
 }
 $('floatingChatBtn').onclick = () => switchTab('chat');
 
@@ -1077,7 +1084,7 @@ async function triggerDownload(url, filename) {
     const res = await apiGet(url);
     const data = await res.json().catch(() => null);
     if (!res.ok) return toast((data && data.error) || 'Нет доступа', 'error');
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = filename;
@@ -1114,7 +1121,7 @@ async function startCase(caseId, price) {
     let html = ''; const items = [];
     for (let i = 0; i < 50; i++) items.push(pool[Math.floor(Math.random() * pool.length)]);
     items[45] = currentWinItem;
-    items.forEach(it => { html += `<div class="roulette-item"><div class="r-img">${renderIcon(it.icon, 40)}</div><div class="r-name">${it.name}</div></div>`; });
+    items.forEach(it => { html += `<div class="roulette-item"><div class="r-img">${renderIcon(it.icon, 40)}</div><div class="r-name">${escapeHtml(it.name)}</div></div>`; });
     strip.innerHTML = html;
     strip.style.transition = 'none'; strip.style.transform = 'translateX(0)';
     setTimeout(() => {
@@ -1144,7 +1151,6 @@ function backToCases() {
   isCaseOpening = false;
 }
 $('btnCaseSell').onclick = () => {
-  // АДАПТАЦИЯ: сервер не поддерживает /api/inventory/sell. Предмет уже в инвентаре.
   $('caseActions').style.display = 'none';
   $('casesList').style.display = 'block'; $('caseRoller').style.display = 'none';
   toast('Предмет уже в инвентаре', 'success');
@@ -1265,10 +1271,11 @@ function resetMines() {
 let rocketRunning = false, rocketCashingOut = false, rocketRafId = null;
 let rocketStartTime = 0, rocketCurrentMult = 1.0, rocketTargetCrash = 1.0, rocketBetAmount = 0;
 const rocketHistory = [];
-function setRocketBet(v) { if (rocketRunning) return; $('rocketBetInput').value = String(v); }
+function setRocketBet(v) { if (rocketRunning) return; $('rocketBetInput').value = String(v); updateRocketVisual(1.0, 'idle'); }
 function updateRocketVisual(mult, state = 'idle') {
   const multEl = $('rocketMultDisplay'), shipEl = $('rocketShip'), trailEl = $('rocketTrail');
   const prevEl = $('rocketWinPreview'), statusEl = $('rocketStatusText'), btnEl = $('btnRocketAction');
+  if (!multEl || !shipEl || !trailEl || !prevEl || !statusEl || !btnEl) return;
   multEl.textContent = mult.toFixed(2) + 'x';
   multEl.classList.remove('cashed', 'crashed');
   shipEl.classList.remove('crashed');
@@ -1312,4 +1319,496 @@ function updateRocketVisual(mult, state = 'idle') {
 function renderRocketHistory() {
   const box = $('rocketHistory');
   if (!box) return;
-  if (!rocketHistory.length) { box.innerHTML = '<span style="font-size:11px;color:var(--dim);">История появится здесь
+  if (!rocketHistory.length) { box.innerHTML = '<span style="font-size:11px;color:var(--dim);">История раундов появится здесь</span>'; return; }
+  box.innerHTML = rocketHistory.slice(0, 8).map(r => {
+    const cls = r.crashPoint < 1.5 ? 'low' : (r.crashPoint >= 3.0 ? 'high' : '');
+    const tag = r.won ? `✅ ${r.mult.toFixed(2)}x (краш ${r.crashPoint.toFixed(2)}x)` : `💥 Краш ${r.crashPoint.toFixed(2)}x`;
+    return `<span class="rocket-hist-chip ${cls}">${tag}</span>`;
+  }).join('');
+}
+$('rocketBetInput').addEventListener('input', () => { if (!rocketRunning) updateRocketVisual(1.0, 'idle'); });
+$('btnRocketAction').onclick = async () => {
+  if (rocketRunning) {
+    if (rocketCashingOut) return;
+    if (rocketCurrentMult >= rocketTargetCrash) { resolveRocketCrashAtServer(rocketTargetCrash); return; }
+    rocketCashingOut = true;
+    $('btnRocketAction').disabled = true;
+    const claimMult = Number(rocketCurrentMult.toFixed(2));
+    try {
+      const res = await apiPost('/api/games/rocket', { action: 'cashout', multiplier: claimMult });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      if (data.crashed) { triggerRocketCrash(Number(data.crashPoint || claimMult)); return; }
+      stopRocketLoop();
+      rocketRunning = false; rocketCashingOut = false;
+      playerData.balance = data.balance; updateBalanceUI();
+      const actualMult = Number(data.multiplier || claimMult);
+      const actualCrash = Number(data.crashPoint || actualMult);
+      updateRocketVisual(actualMult, 'cashed');
+      $('rocketWinPreview').textContent = `Выигрыш: +${data.win} ★ (краш был на ${actualCrash.toFixed(2)}x)`;
+      rocketHistory.unshift({ crashPoint: actualCrash, mult: actualMult, won: true });
+      renderRocketHistory();
+      playSfx('coin'); launchFireworks();
+      toast(`Забрано ${actualMult.toFixed(2)}x (+${data.win} ★) • Краш: ${actualCrash.toFixed(2)}x`, 'success');
+      loadLiveDrops();
+      setTimeout(() => { if (!rocketRunning) updateRocketVisual(1.0, 'idle'); }, 1800);
+    } catch (e) { rocketCashingOut = false; $('btnRocketAction').disabled = false; toast(e.message, 'error'); }
+    return;
+  }
+  const bet = parseInt($('rocketBetInput').value) || 0;
+  if (bet < 10) return toast('Мин. ставка 10 ★', 'error');
+  if (bet > playerData.balance) return toast('Недостаточно средств', 'error');
+  $('btnRocketAction').disabled = true;
+  try {
+    const res = await apiPost('/api/games/rocket', { action: 'start', bet });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    playerData.balance = data.balance; updateBalanceUI();
+    rocketBetAmount = bet; rocketCurrentMult = 1.0;
+    rocketTargetCrash = Number(data.crashPoint || 1.15);
+    rocketRunning = true; rocketCashingOut = false;
+    rocketStartTime = performance.now();
+    $('rocketShip').textContent = '🚀';
+    updateRocketVisual(1.0, 'flying');
+    playSfx('click');
+    function tick(nowTs) {
+      if (!rocketRunning) return;
+      const elapsedSec = (nowTs - rocketStartTime) / 1000;
+      const nextMult = Number(Math.min(5.0, 1 + elapsedSec * 0.95 + Math.pow(elapsedSec, 1.35) * 0.14).toFixed(2));
+      rocketCurrentMult = nextMult;
+      if (rocketCurrentMult >= rocketTargetCrash) { resolveRocketCrashAtServer(rocketTargetCrash); return; }
+      updateRocketVisual(rocketCurrentMult, 'flying');
+      rocketRafId = requestAnimationFrame(tick);
+    }
+    rocketRafId = requestAnimationFrame(tick);
+  } catch (e) { $('btnRocketAction').disabled = false; toast(e.message, 'error'); }
+};
+function stopRocketLoop() { if (rocketRafId) { cancelAnimationFrame(rocketRafId); rocketRafId = null; } }
+async function resolveRocketCrashAtServer(fallbackCrash) {
+  stopRocketLoop();
+  if (!rocketRunning) return;
+  rocketRunning = false;
+  try {
+    const res = await apiPost('/api/games/rocket', { action: 'crash' });
+    const data = await res.json();
+    triggerRocketCrash(data && data.crashPoint ? Number(data.crashPoint) : fallbackCrash);
+  } catch (e) { triggerRocketCrash(fallbackCrash); }
+}
+function triggerRocketCrash(crashPoint) {
+  stopRocketLoop();
+  rocketRunning = false; rocketCashingOut = false;
+  const finalCrash = Math.min(5.0, Math.max(1.0, Number(crashPoint) || 1.0));
+  updateRocketVisual(finalCrash, 'crashed');
+  rocketHistory.unshift({ crashPoint: finalCrash, mult: finalCrash, won: false });
+  renderRocketHistory();
+  toast(`Ракета взорвалась на ${finalCrash.toFixed(2)}x!`, 'error');
+  loadLiveDrops();
+  setTimeout(() => { if (!rocketRunning) updateRocketVisual(1.0, 'idle'); }, 1600);
+}
+
+/* ============================================================
+   UPGRADE
+   ============================================================ */
+let myUpgradeItem = null, targetUpgradeItem = null, myBetType = null;
+function openMyUpgradeSelect() {
+  $('selectItemTitle').textContent = 'Что ставим?';
+  $('mySelectOptions').style.display = 'flex';
+  $('myItemsList').style.display = 'none';
+  $('targetItemsList').style.display = 'none';
+  $('selectItemModal').classList.add('show');
+}
+function selectMyBet(type) {
+  $('mySelectOptions').style.display = 'none';
+  if (type === 'stars') {
+    const amount = prompt('Введите сумму звёзд для ставки (мин. 10):', '100');
+    if (amount && Number(amount) >= 10) {
+      if (Number(amount) > playerData.balance) return toast('Мало звёзд на балансе!', 'error');
+      myBetType = 'stars';
+      myUpgradeItem = { price: Number(amount), name: 'Звёзды', icon: '⭐', uid: 'stars' };
+      $('upgMyContent').innerHTML = `<span style="color:var(--gold-bright);font-size:16px;">★</span> ${Number(amount)}`;
+      closeModal('selectItemModal');
+      updateUpgradeUI(); renderUpgradeGrid();
+    } else if (amount !== null) toast('Мин. ставка 10 ★', 'error');
+  } else if (type === 'items' || type === 'nft') {
+    myBetType = type;
+    $('myItemsList').style.display = 'grid';
+    const list = $('myItemsList'); list.innerHTML = '';
+    const allInv = Array.isArray(playerData.inventory) ? playerData.inventory : [];
+    const filtered = type === 'nft' ? allInv.filter(i => isNftItem(i)) : allInv.filter(i => !isNftItem(i));
+    if (!filtered.length) {
+      list.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--dim);">${type === 'nft' ? 'У вас пока нет NFT в инвентаре' : 'В инвентаре нет обычных предметов'}</div>`;
+      return;
+    }
+    filtered.sort((a, b) => Number(a.price) - Number(b.price)).forEach(item => {
+      const nftFlag = isNftItem(item);
+      const d = document.createElement('div');
+      d.style.cssText = `background:var(--card-2);border:1px solid ${nftFlag ? 'rgba(56,189,248,.7)' : 'var(--border)'};border-radius:10px;padding:9px;text-align:center;cursor:pointer;`;
+      d.innerHTML = `${renderIcon(item.icon, 30)}<div style="font-size:10px;font-weight:700;margin-top:5px;">${escapeHtml(item.name)}</div>${nftFlag ? '<div style="margin-top:2px;"><span class="nft-badge">NFT</span></div>' : ''}<div style="color:var(--gold-bright);font-size:10px;font-weight:800;margin-top:2px;">${item.price} ★</div>`;
+      d.onclick = () => {
+        myUpgradeItem = item; myBetType = nftFlag ? 'nft' : 'item';
+        $('upgMyContent').innerHTML = `${renderIcon(item.icon, 18)} <span>${escapeHtml(item.name)}</span> ${nftFlag ? '<span class="nft-badge">NFT</span>' : ''}`;
+        closeModal('selectItemModal');
+        updateUpgradeUI(); renderUpgradeGrid();
+      };
+      list.appendChild(d);
+    });
+  }
+}
+function openTargetUpgradeSelect() {
+  $('selectItemTitle').textContent = 'Что хотим получить?';
+  $('mySelectOptions').style.display = 'none';
+  $('myItemsList').style.display = 'none';
+  $('targetItemsList').style.display = 'grid';
+  const list = $('targetItemsList'); list.innerHTML = '';
+  const invNfts = (playerData.inventory || []).filter(i => isNftItem(i));
+  const uniqueMap = new Map();
+  [...SERVER_ITEMS, ...invNfts].forEach(it => { const k = it.id || it.item_id || it.uid; if (!uniqueMap.has(k)) uniqueMap.set(k, it); });
+  Array.from(uniqueMap.values()).sort((a, b) => Number(a.price) - Number(b.price)).forEach(item => {
+    const nftFlag = isNftItem(item);
+    const d = document.createElement('div');
+    d.style.cssText = `background:var(--card-2);border:1px solid ${nftFlag ? 'rgba(56,189,248,.7)' : 'var(--border)'};border-radius:10px;padding:9px;text-align:center;cursor:pointer;`;
+    d.innerHTML = `${renderIcon(item.icon, 30)}<div style="font-size:10px;font-weight:700;margin-top:5px;">${escapeHtml(item.name)}</div>${nftFlag ? '<div style="margin-top:2px;"><span class="nft-badge">NFT</span></div>' : ''}<div style="color:var(--gold-bright);font-size:10px;font-weight:800;margin-top:2px;">${item.price} ★</div>`;
+    d.onclick = () => {
+      targetUpgradeItem = item;
+      $('upgTargetContent').innerHTML = `${renderIcon(item.icon, 18)} <span>${escapeHtml(item.name)}</span> ${nftFlag ? '<span class="nft-badge">NFT</span>' : ''}`;
+      closeModal('selectItemModal');
+      updateUpgradeUI(); renderUpgradeGrid();
+    };
+    list.appendChild(d);
+  });
+  $('selectItemModal').classList.add('show');
+}
+function renderUpgradeGrid() {
+  const grid = $('upgradeItemsGrid'); grid.innerHTML = '';
+  const invNfts = (playerData.inventory || []).filter(i => isNftItem(i));
+  const uniqueMap = new Map();
+  [...SERVER_ITEMS, ...invNfts].forEach(it => { const k = it.id || it.item_id || it.uid; if (!uniqueMap.has(k)) uniqueMap.set(k, it); });
+  const pool = Array.from(uniqueMap.values()).sort((a, b) => Number(a.price) - Number(b.price));
+  pool.forEach(item => {
+    const nftFlag = isNftItem(item);
+    const isSelected = targetUpgradeItem && ((targetUpgradeItem.id && targetUpgradeItem.id === item.id) || (targetUpgradeItem.uid && targetUpgradeItem.uid === item.uid));
+    const d = document.createElement('div');
+    d.className = `item-card ${isSelected ? 'selected' : ''}`;
+    const mult = (myUpgradeItem && Number(myUpgradeItem.price) > 0 ? (Number(item.price) / Number(myUpgradeItem.price)) : 0).toFixed(1);
+    d.innerHTML = `<div class="ic-icon">${renderIcon(item.icon, 30)}</div><div class="ic-name">${escapeHtml(item.name)}</div>${nftFlag ? '<div style="margin-top:2px;"><span class="nft-badge">NFT</span></div>' : ''}<div class="ic-price">${item.price} ★</div>${myUpgradeItem && Number(item.price) > Number(myUpgradeItem.price) ? `<div class="ic-mult">x${mult}</div>` : ''}`;
+    d.onclick = () => {
+      targetUpgradeItem = item;
+      $('upgTargetContent').innerHTML = `${renderIcon(item.icon, 18)} <span>${escapeHtml(item.name)}</span> ${nftFlag ? '<span class="nft-badge">NFT</span>' : ''}`;
+      updateUpgradeUI(); renderUpgradeGrid();
+    };
+    grid.appendChild(d);
+  });
+}
+function updateUpgradeUI() {
+  const circle = $('upgProgressCircle');
+  circle.style.strokeDashoffset = '0';
+  if (!myUpgradeItem || !targetUpgradeItem || Number(myUpgradeItem.price) >= Number(targetUpgradeItem.price)) {
+    $('upgradeChanceText').textContent = '0%';
+    $('upgCenterItem').innerHTML = `<span style="opacity:.2;">${!myUpgradeItem || !targetUpgradeItem ? '❓' : '❌'}</span>`;
+    circle.style.strokeDasharray = '0 534';
+    return;
+  }
+  let chance = (Number(myUpgradeItem.price) / Number(targetUpgradeItem.price)) * 50;
+  if (chance > 50) chance = 50;
+  if (chance < 1) chance = 1;
+  $('upgradeChanceText').textContent = chance.toFixed(1) + '%';
+  $('upgCenterItem').innerHTML = renderIcon(targetUpgradeItem.icon, 60);
+  circle.style.strokeDasharray = `${(chance / 100) * 534} 534`;
+}
+$('btnDoUpgrade').onclick = async () => {
+  if (!myUpgradeItem || !targetUpgradeItem) return toast('Выберите ставку и цель', 'error');
+  if (Number(myUpgradeItem.price) >= Number(targetUpgradeItem.price)) return toast('Цель должна быть дороже', 'error');
+  $('btnDoUpgrade').disabled = true;
+  const pointer = $('upgPointer');
+  pointer.classList.remove('spinning');
+  pointer.style.transform = 'translate(-50%,-100%) rotate(0deg)';
+  try {
+    const bodyData = {
+      targetItemId: targetUpgradeItem.id || targetUpgradeItem.item_id,
+      targetItem: isNftItem(targetUpgradeItem) ? targetUpgradeItem : undefined
+    };
+    if (myBetType === 'stars') bodyData.betStars = Number(myUpgradeItem.price);
+    else bodyData.myUid = myUpgradeItem.uid;
+    const res = await apiPost('/api/upgrade', bodyData);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    setTimeout(() => {
+      pointer.classList.add('spinning'); playSfx('spin');
+      const chanceDeg = (data.chance / 100) * 360;
+      const gap = 360 - chanceDeg;
+      const targetAngle = data.win ? (chanceDeg * 0.15 + Math.random() * chanceDeg * 0.7) : (chanceDeg + gap * 0.1 + Math.random() * gap * 0.8);
+      pointer.style.transform = `translate(-50%,-100%) rotate(${360 * 5 + targetAngle}deg)`;
+      setTimeout(() => {
+        $('btnDoUpgrade').disabled = false;
+        myUpgradeItem = null; targetUpgradeItem = null; myBetType = null;
+        $('upgMyContent').textContent = 'Выбрать'; $('upgTargetContent').textContent = 'Выбрать';
+        pointer.classList.remove('spinning'); pointer.style.transform = 'translate(-50%,-100%) rotate(0deg)';
+        updateUpgradeUI(); renderUpgradeGrid(); enterGame(); loadLiveDrops();
+        if (data.win) { playSfx('coin'); launchFireworks(); toast('УСПЕХ! Вы получили ' + data.item.name, 'success'); }
+        else toast('НЕУДАЧА', 'error');
+      }, 4600);
+    }, 50);
+  } catch (e) { toast(e.message, 'error'); $('btnDoUpgrade').disabled = false; }
+};
+
+/* ============================================================
+   INVENTORY & WALLET
+   ============================================================ */
+function renderInventory() {
+  const inv = $('inventory'); inv.innerHTML = '';
+  if (!playerData.inventory || !playerData.inventory.length) {
+    inv.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--dim);padding:20px;">Пусто</div>';
+    return;
+  }
+  playerData.inventory.forEach(item => {
+    const nftFlag = isNftItem(item);
+    const rarityCls = item.rarity ? `rarity-${escapeHtml(item.rarity)}` : '';
+    const d = document.createElement('div');
+    d.className = `item ${nftFlag ? 'nft-item' : ''} ${rarityCls}`;
+    d.innerHTML = `<div class="ii">${renderIcon(item.icon, 32)}</div><div class="iname">${escapeHtml(item.name)}</div>${nftFlag ? '<div style="margin-top:3px;"><span class="nft-badge">NFT</span></div>' : ''}<div class="iprice">${item.price} ★</div><button onclick="sellItem('${escapeHtml(item.uid)}')">Продать</button>`;
+    inv.appendChild(d);
+  });
+}
+async function sellItem(uid) {
+  if (!confirm('Продать предмет?')) return;
+  try {
+    const res = await apiPost('/api/inventory/sell', { uid });
+    if (res.ok) { playSfx('coin'); toast('Предмет продан', 'success'); await enterGame(); }
+    else toast('Продажа предмета через сервер недоступна', 'info');
+  } catch (e) {}
+}
+$('btnWalletDeposit').onclick = async () => {
+  const amount = $('depositAmount').value;
+  if (!amount || Number(amount) <= 0) return toast('Введите сумму', 'error');
+  const res = await apiPost('/api/wallet/deposit', { amount: Number(amount) });
+  if (res.ok) { $('depositAmount').value = ''; toast('Заявка создана! Ожидайте.', 'success'); }
+  else toast('Ошибка', 'error');
+};
+$('btnWalletWithdraw').onclick = async () => {
+  const amount = $('withdrawAmount').value;
+  if (!amount || Number(amount) <= 0) return toast('Введите сумму', 'error');
+  const res = await apiPost('/api/wallet/withdraw', { amount: Number(amount) });
+  if (res.ok) { $('withdrawAmount').value = ''; toast('Заявка на вывод создана!', 'success'); enterGame(); }
+  else { const d = await res.json().catch(() => ({})); toast(d.error || 'Ошибка', 'error'); }
+};
+
+/* ============================================================
+   ADMIN
+   ============================================================ */
+function renderAdminUI() {
+  const c = $('adminContent');
+  const nftCatalog = SERVER_ITEMS.filter(it => isNftItem(it));
+  const presetOptions = nftCatalog.map(it => `<option value="${escapeHtml(it.id)}">${escapeHtml(it.name)} (${it.price} ★)</option>`).join('');
+  c.innerHTML = `
+    <div class="admin-box"><h3>👥 Игроки</h3><div id="adminPlayersList" style="font-size:12px;"></div></div>
+    <div class="admin-box"><h3>⭐ Выдача звёзд</h3><input type="text" id="aTarget" placeholder="Логин"><input type="number" id="aAmount" value="100"><button class="success" onclick="quickAdmin('give')">Выдать</button></div>
+    <div class="admin-box">
+      <h3>💎 Выдача NFT</h3>
+      <input type="text" id="nftTarget" placeholder="Логин">
+      <select id="nftPresetSelect" class="admin-select" onchange="applyNftPreset()">
+        <option value="">— Выбрать готовый NFT из каталога —</option>
+        ${presetOptions}
+      </select>
+      <input type="text" id="nftItemId" placeholder="ID (например nft_neon_punk)">
+      <input type="text" id="nftName" placeholder="Название">
+      <input type="text" id="nftIcon" placeholder="Иконка (эмодзи или /items/...)">
+      <input type="number" id="nftPrice" value="350">
+      <button onclick="adminGiveNft()">Выдать NFT</button>
+    </div>
+    ${playerData.is_super_admin ? `
+    <div class="admin-box"><h3 style="color:var(--bad);">🔥 Для Главного Админа</h3><input type="text" id="aTargetTake" placeholder="Логин"><input type="number" id="aAmountTake" value="100"><button class="danger" onclick="quickAdmin('take')">Забрать звёзды</button></div>
+    <div class="admin-box"><h3>📤 Выводы</h3><div id="aWithdraws"></div></div>
+    <div class="admin-box"><h3>📥 Пополнения</h3><div id="aDeposits"></div></div>
+    <div class="admin-box"><h3>🎟 Промокод</h3><input type="text" id="pCode" placeholder="Код"><input type="number" id="pStars" value="100"><input type="number" id="pLimit" value="10"><button class="success" onclick="createPromo()">Создать</button></div>
+    <div class="admin-box"><h3>🛡 Права и чат</h3><input type="text" id="adminLoginTarget" placeholder="Логин"><button onclick="makeAdmin()">Сделать админом</button><button class="danger" onclick="removeAdmin()">Снять права</button><button class="danger" onclick="adminClearChat()">Очистить чат</button></div>
+    <div class="admin-box"><h3>📜 Логи</h3><div id="adminLogs"></div></div>` : ''}
+  `;
+  loadAdminTable();
+  if (playerData.is_super_admin) { loadWithdraws(); loadDeposits(); loadLogs(); }
+}
+window.applyNftPreset = function () {
+  const sel = $('nftPresetSelect');
+  if (!sel || !sel.value) return;
+  const found = SERVER_ITEMS.find(it => it.id === sel.value);
+  if (!found) return;
+  $('nftItemId').value = found.id;
+  $('nftName').value = found.name;
+  $('nftIcon').value = found.icon || '💎';
+  $('nftPrice').value = Number(found.price) || 100;
+};
+window.loadAdminTable = async function () {
+  try {
+    const res = await apiGet('/api/admin/players'); if (!res.ok) return;
+    const players = await res.json();
+    $('adminPlayersList').innerHTML = players.map(p => {
+      const badge = p.is_super_admin ? '<span class="admin-user-badge super">SUPER</span>' : (p.is_admin ? '<span class="admin-user-badge admin">ADMIN</span>' : '');
+      return `<div class="admin-user-row">
+        <span style="font-weight:700;color:${p.is_super_admin ? 'var(--gold-bright)' : (p.is_admin ? 'var(--accent-bright)' : 'var(--text)')};">${escapeHtml(p.login)}</span>
+        ${badge}
+        <span style="margin-left:auto;color:var(--gold-bright);font-weight:800;">${p.balance}★</span>
+        <span style="color:var(--dim);">NFT: ${p.nft_count}</span>
+      </div>`;
+    }).join('');
+  } catch (e) {}
+};
+window.loadWithdraws = async function () {
+  try {
+    const res = await apiGet('/api/admin/withdraws'); const data = await res.json();
+    $('aWithdraws').innerHTML = data.map(w => `<div class="admin-user-row"><span>${escapeHtml(w.user_login)} → Вывод ${w.amount_stars}★</span><button onclick="acceptWithdraw('${escapeHtml(w.id)}')" style="width:auto;padding:5px 12px;margin:0 0 0 auto;">ОК</button></div>`).join('') || '<div style="font-size:12px;color:var(--dim);">Пусто</div>';
+  } catch (e) {}
+};
+window.loadDeposits = async function () {
+  try {
+    const res = await apiGet('/api/admin/deposits'); const data = await res.json();
+    $('aDeposits').innerHTML = data.map(d => `<div class="admin-user-row"><span>${escapeHtml(d.user_login)} просит ${d.amount_stars}★</span><button onclick="acceptDeposit('${escapeHtml(d.id)}')" style="width:auto;padding:5px 12px;margin:0 0 0 auto;">ОК</button></div>`).join('') || '<div style="font-size:12px;color:var(--dim);">Пусто</div>';
+  } catch (e) {}
+};
+window.loadLogs = async function () {
+  try {
+    const res = await apiGet('/api/admin/logs'); const data = await res.json();
+    $('adminLogs').innerHTML = data.map(l => `<div style="font-size:11px;margin-bottom:6px;border-bottom:1px solid var(--border-soft);padding-bottom:4px;">[${new Date(l.created_at).toLocaleTimeString()}] <span style="color:var(--gold-bright);font-weight:700;">${escapeHtml(l.admin_login)}</span>: ${escapeHtml(l.action)} (${escapeHtml(l.details)})</div>`).join('') || '<div style="font-size:12px;color:var(--dim);">Пусто</div>';
+  } catch (e) {}
+};
+window.quickAdmin = async function (act) {
+  const t = (act === 'take' ? $('aTargetTake').value : $('aTarget').value).trim();
+  const a = act === 'take' ? $('aAmountTake').value : $('aAmount').value;
+  if (!t || !a) return toast('Заполните поля', 'error');
+  const url = '/api/admin/' + (act === 'give' ? 'give-stars' : 'take-stars');
+  try {
+    const res = await apiPost(url, { targetLogin: t, amount: Number(a) });
+    const data = await res.json();
+    if (res.ok) { toast('Успешно', 'success'); if (t === currentUser) enterGame(); loadAdminTable(); if (playerData.is_super_admin) loadLogs(); }
+    else toast(data.error, 'error');
+  } catch (e) { toast('Ошибка сети', 'error'); }
+};
+window.acceptDeposit = async function (id) {
+  try {
+    const res = await apiPost('/api/admin/deposit/accept', { id });
+    if (res.ok) { toast('Одобрено', 'success'); loadDeposits(); loadLogs(); enterGame(); }
+    else { const d = await res.json(); toast(d.error, 'error'); }
+  } catch (e) { toast('Ошибка сети', 'error'); }
+};
+window.acceptWithdraw = async function (id) {
+  try {
+    const res = await apiPost('/api/admin/withdraws/accept', { id });
+    if (res.ok) { toast('Одобрено', 'success'); loadWithdraws(); loadLogs(); }
+    else { const d = await res.json(); toast(d.error, 'error'); }
+  } catch (e) { toast('Ошибка сети', 'error'); }
+};
+window.adminGiveNft = async function () {
+  const t = $('nftTarget').value.trim(), id = $('nftItemId').value.trim(), name = $('nftName').value.trim(), icon = $('nftIcon').value.trim(), price = $('nftPrice').value;
+  if (!t || !id || !name) return toast('Заполните поля', 'error');
+  try {
+    const res = await apiPost('/api/admin/give-nft', { targetLogin: t, item: { id, name, icon: icon || '💎', price: Number(price) || 100, rarity: 'nft', is_nft: true } });
+    if (res.ok) { toast('NFT выдан', 'success'); loadAdminTable(); if (t === currentUser) enterGame(); loadLiveDrops(); }
+    else toast('Ошибка', 'error');
+  } catch (e) { toast('Ошибка сети', 'error'); }
+};
+window.createPromo = async function () {
+  const code = $('pCode').value.trim(), stars = $('pStars').value, limit = $('pLimit').value;
+  try {
+    const res = await apiPost('/api/admin/create-promo', { code, stars: Number(stars), limit: Number(limit) });
+    if (res.ok) { toast('Создан', 'success'); loadLogs(); }
+    else { const d = await res.json(); toast(d.error, 'error'); }
+  } catch (e) { toast('Ошибка сети', 'error'); }
+};
+window.makeAdmin = async function () {
+  const t = $('adminLoginTarget').value.trim();
+  try {
+    const res = await apiPost('/api/admin/make-admin', { targetLogin: t });
+    if (res.ok) { toast('Теперь админ', 'success'); loadAdminTable(); loadLogs(); }
+    else { const d = await res.json(); toast(d.error, 'error'); }
+  } catch (e) { toast('Ошибка сети', 'error'); }
+};
+window.removeAdmin = async function () {
+  const t = $('adminLoginTarget').value.trim();
+  try {
+    const res = await apiPost('/api/admin/remove-admin', { targetLogin: t });
+    if (res.ok) { toast('Права сняты', 'success'); loadAdminTable(); loadLogs(); }
+    else { const d = await res.json(); toast(d.error, 'error'); }
+  } catch (e) { toast('Ошибка сети', 'error'); }
+};
+window.adminClearChat = async function () {
+  if (!confirm('Очистить весь чат?')) return;
+  try {
+    const res = await apiPost('/api/chat/admin', { action: 'clear' });
+    if (res.ok) { Chat.lastIds.clear(); Chat.load(); loadLogs(); toast('Чат очищен', 'success'); }
+  } catch (e) {}
+};
+$('adminFromSettings').onclick = () => switchTab('admin');
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  applyAudioVolumes();
+  renderFeedItems(DEMO_FEED);
+  initSnow();
+  initCountdown();
+
+  if ($('toggleSnowBtn')) {
+    $('toggleSnowBtn').textContent = snowEnabled ? 'Вкл' : 'Выкл';
+    $('toggleSnowBtn').onclick = () => {
+      snowEnabled = !snowEnabled;
+      localStorage.setItem('tg_snow', snowEnabled ? 'on' : 'off');
+      $('toggleSnowBtn').textContent = snowEnabled ? 'Вкл' : 'Выкл';
+      toast(snowEnabled ? 'Снегопад включён' : 'Снегопад выключён');
+    };
+  }
+  if ($('toggleFireworksBtn')) {
+    $('toggleFireworksBtn').textContent = fireworksEnabled ? 'Вкл' : 'Выкл';
+    $('toggleFireworksBtn').onclick = () => {
+      fireworksEnabled = !fireworksEnabled;
+      localStorage.setItem('tg_fireworks', fireworksEnabled ? 'on' : 'off');
+      $('toggleFireworksBtn').textContent = fireworksEnabled ? 'Вкл' : 'Выкл';
+      toast(fireworksEnabled ? 'Салюты включены' : 'Салюты выключены');
+    };
+  }
+
+  const bgmSlider = $('bgmVolumeSlider'), sfxSlider = $('sfxVolumeSlider');
+  if (bgmSlider) {
+    bgmSlider.addEventListener('input', e => {
+      bgmVolume = Number(e.target.value) / 100;
+      localStorage.setItem('tg_bgm_vol', String(bgmVolume));
+      applyAudioVolumes();
+      if (bgmVolume > 0 && bgm.paused) bgm.play().catch(() => {});
+    });
+  }
+  if (sfxSlider) {
+    sfxSlider.addEventListener('input', e => {
+      sfxVolume = Number(e.target.value) / 100;
+      localStorage.setItem('tg_sfx_vol', String(sfxVolume));
+      applyAudioVolumes();
+    });
+  }
+
+  if ($('chatPageSend')) $('chatPageSend').onclick = () => Chat.send();
+  if ($('chatPageInput')) {
+    $('chatPageInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); Chat.send(); }
+    });
+  }
+  if ($('chatFileBtn') && $('chatFileInput')) {
+    $('chatFileBtn').onclick = () => $('chatFileInput').click();
+    $('chatFileInput').addEventListener('change', e => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      if (file.size > 4 * 1024 * 1024) return toast('Картинка слишком большая (макс 4МБ)', 'error');
+      const reader = new FileReader();
+      reader.onload = () => {
+        Chat.pendingFile = reader.result;
+        Chat.pendingFileType = file.type;
+        $('chatFileBtn').style.borderColor = 'var(--gold-bright)';
+        toast('Картинка прикреплена — нажмите ➤', 'success');
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  checkLogin();
+  loadLiveDrops();
+  setInterval(loadLiveDrops, 8000);
+});
+</script>
+</body>
+</html>

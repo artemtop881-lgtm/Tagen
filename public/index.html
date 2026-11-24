@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>TagenGame</title>
+<title>TagenGame — Новогоднее обновление</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -32,8 +32,8 @@ body{
   color:var(--text); height:100vh; height:100dvh;
   background:
     radial-gradient(circle at 15% 10%, rgba(157, 78, 221, 0.22), transparent 42%),
-    radial-gradient(circle at 88% 22%, rgba(56, 189, 248, 0.12), transparent 38%),
-    radial-gradient(circle at 50% 85%, rgba(199, 125, 255, 0.14), transparent 45%),
+    radial-gradient(circle at 88% 22%, rgba(56, 189, 248, 0.14), transparent 38%),
+    radial-gradient(circle at 50% 85%, rgba(199, 125, 255, 0.15), transparent 45%),
     var(--bg);
   display:flex; flex-direction:column;
 }
@@ -44,6 +44,15 @@ body::before {
   background: linear-gradient(180deg, rgba(9,5,16,0.35) 0%, rgba(9,5,16,0.78) 100%);
   z-index: -1;
   pointer-events: none;
+}
+
+#nyEffectsCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 95;
 }
 
 .page-screen {
@@ -87,22 +96,31 @@ header{
 .balance-pill:active { transform: translateY(2px); box-shadow: 0 2px 0 #0c0616, var(--neon-strong); }
 
 #screen-games { padding-left: 16px; padding-right: 16px; }
-.hero-banner { position:relative; padding: 14px 0 12px; }
+.hero-banner { position:relative; padding: 12px 0 10px; }
+.hero-top-row { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
 .hero-subtitle {
-  color:var(--accent-bright); font-size:11px; font-weight:800; letter-spacing:2px;
-  text-transform:uppercase; margin-bottom:7px; display:inline-flex; align-items:center; gap:7px;
+  color:var(--accent-bright); font-size:11px; font-weight:800; letter-spacing:1.6px;
+  text-transform:uppercase; display:inline-flex; align-items:center; gap:7px;
   padding: 5px 10px; border-radius: 999px;
   background: rgba(199, 125, 255, 0.12);
   border: 1px solid rgba(199, 125, 255, 0.4);
   box-shadow: 0 0 12px rgba(199, 125, 255, 0.25);
 }
+.ny-timer-pill {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:11px; font-weight:800; color:#bae6fd;
+  padding:5px 11px; border-radius:999px;
+  background: linear-gradient(135deg, rgba(56,189,248,0.18), rgba(199,125,255,0.18));
+  border: 1px solid rgba(125,211,252,0.5);
+  box-shadow: 0 0 12px rgba(56,189,248,0.25);
+}
 .hero-title {
-  font-size:44px; font-weight:900; line-height:0.94; letter-spacing:-1.5px;
+  font-size:42px; font-weight:900; line-height:0.94; letter-spacing:-1.5px;
   text-transform:uppercase; margin-bottom:10px; color:#fff;
   text-shadow: 0 4px 0 #2d0a4e, 0 10px 24px rgba(0,0,0,0.85), 0 0 18px rgba(199,125,255,0.35);
 }
 .hero-title span {
-  color:var(--accent-bright); display:block; font-size:48px; letter-spacing:-1.5px;
+  color:var(--accent-bright); display:block; font-size:46px; letter-spacing:-1.5px;
   text-shadow: 0 4px 0 #3c096c, 0 12px 26px rgba(0,0,0,0.9), 0 0 22px rgba(199,125,255,0.65);
 }
 .online-dot {
@@ -139,16 +157,28 @@ header{
   background:#0d0618;
   border:1.5px solid rgba(224,170,255,0.55);
   border-radius:16px;
-  padding:10px 12px;
+  padding:10px 0;
+  overflow:hidden;
+  min-height:52px;
   display:flex;
   align-items:center;
-  gap:8px;
-  overflow-x:auto;
-  white-space:nowrap;
-  scrollbar-width:none;
-  min-height:48px;
+  position:relative;
 }
-.live-feed-line::-webkit-scrollbar { display:none; }
+.live-feed-track {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+  padding-left:12px;
+  animation: marqueeLeftToRight 26s linear infinite;
+}
+.live-feed-line:hover .live-feed-track {
+  animation-play-state: paused;
+}
+@keyframes marqueeLeftToRight {
+  0% { transform: translateX(-35%); }
+  100% { transform: translateX(15%); }
+}
 .feed-pill {
   display:inline-flex;
   align-items:center;
@@ -560,6 +590,30 @@ input:focus, select.admin-select:focus {
   cursor: pointer;
 }
 
+.ny-toggle-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 0;
+  font-size:13px;
+  font-weight:700;
+}
+.ny-toggle-btn {
+  padding:6px 12px;
+  border-radius:10px;
+  border:1px solid rgba(199,125,255,0.45);
+  background:rgba(11,6,20,0.85);
+  color:var(--dim);
+  font-size:11px;
+  font-weight:800;
+  cursor:pointer;
+}
+.ny-toggle-btn.on {
+  color:#04130d;
+  background:linear-gradient(145deg, #6ee7b7, #10b981);
+  border-color:#a7f3d0;
+}
+
 #toastContainer { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display:flex; flex-direction:column; gap:10px; pointer-events:none; width: 90%; max-width: 400px; }
 .toast {
   background: linear-gradient(145deg, #ffffff, #f3e8ff);
@@ -621,12 +675,13 @@ input:focus, select.admin-select:focus {
 </head>
 <body>
 
+<canvas id="nyEffectsCanvas"></canvas>
 <div id="toastContainer"></div>
 
 <!-- ЭКРАН АВТОРИЗАЦИИ -->
 <div id="authScreen" class="page-screen active" style="justify-content:center; align-items:center; padding:20px;">
   <div style="text-align:center; margin-bottom:22px;">
-    <div class="logo-icon" style="margin:0 auto 12px; width:64px; height:64px; font-size:30px;">TG</div>
+    <div class="logo-icon" style="margin:0 auto 12px; width:64px; height:64px; font-size:30px;">🎄</div>
     <h1 style="font-size:30px; font-weight:900; text-transform:uppercase; text-shadow:0 4px 0 #2d0a4e, 0 0 18px rgba(199,125,255,0.45);">Tagen<span style="color:var(--accent-bright)">Game</span></h1>
   </div>
   <div style="width:100%; max-width:360px; background:linear-gradient(160deg, var(--card-2), var(--card)); padding:24px 20px; border-radius:24px; border:1px solid rgba(199,125,255,0.55); box-shadow:var(--depth-shadow), var(--neon-strong);">
@@ -642,10 +697,10 @@ input:focus, select.admin-select:focus {
 <div id="screen-games" class="page-screen">
   <header>
     <div class="logo-container">
-      <div class="logo-icon">TG</div>
+      <div class="logo-icon">🎄</div>
       <div class="logo-text">
         <div class="logo-title">Tagen<span>Game</span></div>
-        <div class="logo-sub">Online Casino</div>
+        <div class="logo-sub">New Year Edition</div>
       </div>
     </div>
     <div class="top-actions">
@@ -654,7 +709,10 @@ input:focus, select.admin-select:focus {
   </header>
 
   <div class="hero-banner">
-    <div class="hero-subtitle"><div class="online-dot"></div> Live Table</div>
+    <div class="hero-top-row">
+      <div class="hero-subtitle"><div class="online-dot"></div> ❄️ New Year Live</div>
+      <div class="ny-timer-pill" id="nyCountdown">🎅 До НГ: --:--:--</div>
+    </div>
     <div class="hero-title">Лови куш<br><span>На максимуме</span></div>
   </div>
 
@@ -663,7 +721,9 @@ input:focus, select.admin-select:focus {
       <div class="live-tag">ДРОП ЛАЙВ</div>
       <div class="live-status-pill" id="liveDropsCount">● Лента активна</div>
     </div>
-    <div class="live-feed-line" id="liveFeedBar"></div>
+    <div class="live-feed-line">
+      <div class="live-feed-track" id="liveFeedBar"></div>
+    </div>
   </div>
 
   <div class="section-title">Арсенал</div>
@@ -882,6 +942,18 @@ input:focus, select.admin-select:focus {
   </div>
   <div style="padding: 0 16px;">
     <div class="settings-card">
+      <h3>🎄 Новогоднее оформление</h3>
+      <div class="ny-toggle-row">
+        <span>❄️ Снегопад</span>
+        <button type="button" class="ny-toggle-btn on" id="btnToggleSnow">Вкл</button>
+      </div>
+      <div class="ny-toggle-row">
+        <span>🎆 Праздничные салюты</span>
+        <button type="button" class="ny-toggle-btn on" id="btnToggleFireworks">Вкл</button>
+      </div>
+    </div>
+
+    <div class="settings-card">
       <h3>🔊 Регулировка звука</h3>
       <div style="margin-bottom:14px;">
         <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700;">
@@ -907,6 +979,8 @@ input:focus, select.admin-select:focus {
 
     <button class="btn-main" id="adminFromSettings" style="display:none; background:linear-gradient(145deg, #ffe066, var(--gold)); color:#090510; margin-bottom:11px; box-shadow:0 5px 0 #856404, 0 0 18px rgba(255,215,0,0.45);">🛡 Админ-панель</button>
     <button class="btn-main" id="logoutBtn" style="background:linear-gradient(145deg, #f87171, var(--bad)); color:#fff; box-shadow:0 5px 0 #7f1d1d, 0 0 16px rgba(239,68,68,0.45);">Выйти</button>
+
+    <div style="text-align:center; color:#6b7280; font-size:11px; margin-top:14px;">создано при помощи @tagen и @tgweb</div>
   </div>
 </div>
 
@@ -986,6 +1060,9 @@ let sfxVolume = Number(localStorage.getItem('tg_sfx_vol'));
 if (Number.isNaN(sfxVolume)) sfxVolume = 1.0;
 sfxVolume = Math.max(0, Math.min(1, sfxVolume));
 
+let snowEnabled = localStorage.getItem('tg_ny_snow') !== '0';
+let fireworksEnabled = localStorage.getItem('tg_ny_fw') !== '0';
+
 function applyAudioVolumes() {
   bgm.volume = bgmVolume;
   Object.values(sfx).forEach(a => { a.volume = sfxVolume; });
@@ -1023,6 +1100,126 @@ async function apiPost(path, body){ return fetch(path, { method:'POST', headers:
 
 const $ = id => document.getElementById(id);
 
+function updateNyCountdown() {
+  const el = $('nyCountdown');
+  if (!el) return;
+  const now = new Date();
+  const targetYear = (now.getMonth() === 11 && now.getDate() === 31 && now.getHours() === 23 && now.getMinutes() === 59 && now.getSeconds() === 59)
+    ? now.getFullYear()
+    : now.getFullYear() + 1;
+  const nyDate = new Date(targetYear, 0, 1, 0, 0, 0);
+  const diff = Math.max(0, nyDate.getTime() - now.getTime());
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  const pad = n => String(n).padStart(2, '0');
+  el.textContent = `🎅 До НГ: ${days}д ${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+}
+
+const nyCanvas = $('nyEffectsCanvas');
+const nyCtx = nyCanvas ? nyCanvas.getContext('2d') : null;
+let snowflakes = [];
+let sparks = [];
+let lastFwTime = 0;
+
+function resizeNyCanvas() {
+  if (!nyCanvas) return;
+  nyCanvas.width = window.innerWidth;
+  nyCanvas.height = window.innerHeight;
+  if (snowflakes.length === 0) {
+    const count = Math.min(55, Math.floor(nyCanvas.width / 12));
+    for (let i = 0; i < count; i++) {
+      snowflakes.push({
+        x: Math.random() * nyCanvas.width,
+        y: Math.random() * nyCanvas.height,
+        r: 1.5 + Math.random() * 2.5,
+        vy: 0.6 + Math.random() * 1.3,
+        vx: -0.4 + Math.random() * 0.8,
+        a: 0.35 + Math.random() * 0.55
+      });
+    }
+  }
+}
+
+function spawnFirework(cx, cy) {
+  if (!fireworksEnabled || !nyCanvas) return;
+  const x = cx || (60 + Math.random() * Math.max(80, nyCanvas.width - 120));
+  const y = cy || (50 + Math.random() * Math.max(80, nyCanvas.height * 0.45));
+  const palette = ['#e0aaff', '#7dd3fc', '#ffd700', '#6ee7b7', '#f472b6'];
+  const color = palette[Math.floor(Math.random() * palette.length)];
+  for (let i = 0; i < 22; i++) {
+    const angle = (Math.PI * 2 * i) / 22 + (Math.random() - 0.5) * 0.2;
+    const speed = 1.4 + Math.random() * 2.8;
+    sparks.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      alpha: 1,
+      color
+    });
+  }
+}
+
+function renderNyEffects(ts) {
+  if (nyCtx && nyCanvas) {
+    nyCtx.clearRect(0, 0, nyCanvas.width, nyCanvas.height);
+
+    if (snowEnabled) {
+      for (const f of snowflakes) {
+        f.x += f.vx;
+        f.y += f.vy;
+        if (f.y > nyCanvas.height) { f.y = -6; f.x = Math.random() * nyCanvas.width; }
+        if (f.x > nyCanvas.width) f.x = 0;
+        if (f.x < 0) f.x = nyCanvas.width;
+        nyCtx.beginPath();
+        nyCtx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        nyCtx.fillStyle = `rgba(255, 255, 255, ${f.a})`;
+        nyCtx.fill();
+      }
+    }
+
+    if (fireworksEnabled) {
+      if (ts - lastFwTime > 3600) {
+        lastFwTime = ts;
+        spawnFirework();
+      }
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i];
+        s.x += s.vx;
+        s.y += s.vy;
+        s.vy += 0.04;
+        s.alpha -= 0.022;
+        if (s.alpha <= 0) {
+          sparks.splice(i, 1);
+          continue;
+        }
+        nyCtx.save();
+        nyCtx.globalAlpha = Math.max(0, s.alpha);
+        nyCtx.beginPath();
+        nyCtx.arc(s.x, s.y, 2.4, 0, Math.PI * 2);
+        nyCtx.fillStyle = s.color;
+        nyCtx.fill();
+        nyCtx.restore();
+      }
+    }
+  }
+  requestAnimationFrame(renderNyEffects);
+}
+
+function syncNyButtons() {
+  const sBtn = $('btnToggleSnow');
+  const fBtn = $('btnToggleFireworks');
+  if (sBtn) {
+    sBtn.textContent = snowEnabled ? 'Вкл' : 'Выкл';
+    sBtn.classList.toggle('on', snowEnabled);
+  }
+  if (fBtn) {
+    fBtn.textContent = fireworksEnabled ? 'Вкл' : 'Выкл';
+    fBtn.classList.toggle('on', fireworksEnabled);
+  }
+}
+
 function isNftItem(item) {
   if (!item) return false;
   return item.is_nft === true || String(item.rarity || '').toLowerCase() === 'nft' || String(item.item_id || item.id || '').toLowerCase().startsWith('nft');
@@ -1037,7 +1234,7 @@ function renderIcon(icon, size = 24) {
 }
 
 const DEMO_FEED = [
-  { user_login: 'tagen', item_name: 'выиграл Подарок', item_icon: '🎁', is_win: true },
+  { user_login: 'tagen', item_name: 'выиграл Новогодний Подарок', item_icon: '🎄', is_win: true },
   { user_login: 'tgweb', item_name: 'выиграл Neon Punk #01', item_icon: '👾', is_win: true },
   { user_login: 'admin', item_name: 'проиграл на 1.16x', item_icon: '🚀', is_win: false },
   { user_login: 'player', item_name: 'подорвался на мине', item_icon: '💣', is_win: false }
@@ -1051,7 +1248,8 @@ function renderFeedItems(list) {
   const items = Array.isArray(list) && list.length > 0 ? list : DEMO_FEED;
   if (badge) badge.textContent = `● ${items.length} событий`;
 
-  bar.innerHTML = items.slice(0, 15).map(d => {
+  const loopList = [...items.slice(0, 15), ...items.slice(0, 15)];
+  bar.innerHTML = loopList.map(d => {
     const nick = (d && d.user_login) ? String(d.user_login) : 'Игрок';
     const icon = (d && d.item_icon) ? d.item_icon : '🎁';
     const rawLabel = (d && d.item_name) ? String(d.item_name) : 'выиграл Подарок';
@@ -1082,7 +1280,31 @@ async function loadLiveDrops() {
 
 document.addEventListener('DOMContentLoaded', () => {
   applyAudioVolumes();
+  syncNyButtons();
+  resizeNyCanvas();
+  window.addEventListener('resize', resizeNyCanvas);
+  requestAnimationFrame(renderNyEffects);
+  updateNyCountdown();
+  setInterval(updateNyCountdown, 1000);
   renderFeedItems(DEMO_FEED);
+
+  const sBtn = $('btnToggleSnow');
+  const fBtn = $('btnToggleFireworks');
+  if (sBtn) {
+    sBtn.addEventListener('click', () => {
+      snowEnabled = !snowEnabled;
+      localStorage.setItem('tg_ny_snow', snowEnabled ? '1' : '0');
+      syncNyButtons();
+    });
+  }
+  if (fBtn) {
+    fBtn.addEventListener('click', () => {
+      fireworksEnabled = !fireworksEnabled;
+      localStorage.setItem('tg_ny_fw', fireworksEnabled ? '1' : '0');
+      syncNyButtons();
+      if (fireworksEnabled) spawnFirework();
+    });
+  }
 
   const bgmSlider = $('bgmVolumeSlider');
   const sfxSlider = $('sfxVolumeSlider');
@@ -1119,6 +1341,7 @@ function toast(msg, type = 'info') {
     d.style.background = 'linear-gradient(145deg, #6ee7b7, #10b981)';
     d.style.color = '#04130d';
     d.style.borderColor = '#a7f3d0';
+    spawnFirework();
   }
   d.textContent = msg; c.appendChild(d);
   setTimeout(() => d.remove(), 3000);

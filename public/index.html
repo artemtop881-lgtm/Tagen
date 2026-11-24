@@ -86,34 +86,58 @@
       cursor: pointer;
     }
 
-    /* LIVE DROPS */
+    /* LIVE DROPS (БЕЗ НИКОВ, КАК НА СКРИНШОТЕ) */
     .live-strip {
       display: flex;
-      gap: 8px;
+      align-items: center;
+      gap: 10px;
       overflow-x: auto;
       padding: 6px 2px 10px;
       scrollbar-width: none;
     }
-    .live-strip::-webkit-scrollbar { display: none; }
+    .live-strip::-webkit-scrollbar {
+      display: none;
+    }
 
     .drop-chip {
       flex: 0 0 auto;
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: var(--bg-card-soft);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 5px 9px;
-      font-size: 11px;
+      gap: 12px;
+      background: linear-gradient(135deg, rgba(22, 18, 43, 0.96), rgba(31, 24, 58, 0.92));
+      border: 1px solid rgba(56, 189, 248, 0.42);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.14), inset 0 0 10px rgba(168, 85, 247, 0.12);
+      border-radius: 16px;
+      padding: 8px 16px 8px 12px;
+      min-height: 54px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #f8fafc;
+      white-space: nowrap;
     }
-    .drop-chip.win { border-color: rgba(34, 197, 94, 0.45); }
-    .drop-chip.loss { border-color: rgba(239, 68, 68, 0.35); opacity: 0.8; }
+
+    .drop-chip.loss {
+      border-color: rgba(244, 63, 94, 0.38);
+      opacity: 0.85;
+    }
 
     .drop-chip img {
-      width: 22px;
-      height: 22px;
+      width: 34px;
+      height: 34px;
       object-fit: contain;
+      flex-shrink: 0;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+    }
+
+    .drop-chip .emoji-fallback {
+      font-size: 28px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .drop-chip-text {
+      letter-spacing: 0.2px;
+      color: #e2e8f0;
     }
 
     /* SCREENS */
@@ -653,8 +677,8 @@
           <div class="section-title"><span>⚡ Апгрейд подарка</span></div>
           <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">1. Выберите целевой подарок:</div>
           <select id="upgTargetSelect" class="input" onchange="updateUpgradeInfo()"></select>
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">2. Ставка звёздами (или выберите предмет ниже):</div>
-          <input id="upgBetStars" class="input" type="number" value="50" min="10" oninput="selectedUpgUid=''; updateUpgradeInfo();" />
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">2. Ставка звёздами:</div>
+          <input id="upgBetStars" class="input" type="number" value="50" min="10" oninput="updateUpgradeInfo();" />
           <div id="upgChanceText" style="text-align:center;font-weight:800;color:var(--accent-gold);margin:8px 0;">Шанс: —</div>
           <button class="btn-purple" onclick="runUpgrade()">Апгрейд</button>
         </div>
@@ -771,7 +795,6 @@
     let userState = { login: '', balance: 0, inventory: [], is_admin: false, is_super_admin: false };
     let catalogItems = [];
     let soundEnabled = true;
-    let selectedUpgUid = '';
 
     // Mines state
     let minesActive = false;
@@ -1193,18 +1216,30 @@
       await enterGame();
     }
 
-    /* LIVE DROPS */
+    /* LIVE DROPS (БЕЗ НИКОВ) */
+    function formatDropTextWithoutNick(d) {
+      let text = String(d.item_name || '').trim();
+      if (d.user_login && text.toLowerCase().startsWith(String(d.user_login).toLowerCase() + ' ')) {
+        text = text.slice(String(d.user_login).length).trim();
+      }
+      return text || 'выбил подарок';
+    }
+
     async function loadDrops() {
-      const res = await apiGet('/api/drops');
-      if (!res.ok) return;
-      const drops = await res.json();
-      const strip = document.getElementById('liveStrip');
-      strip.innerHTML = drops.map((d) => `
-        <div class="drop-chip ${d.is_win ? 'win' : 'loss'}">
-          ${renderImgOrEmoji(d.item_icon, '🎁')}
-          <span><strong>${d.user_login}</strong> ${d.item_name}</span>
-        </div>
-      `).join('');
+      try {
+        const res = await apiGet('/api/drops');
+        if (!res.ok) return;
+        const drops = await res.json();
+        const strip = document.getElementById('liveStrip');
+        strip.innerHTML = drops.map((d) => `
+          <div class="drop-chip ${d.is_win === false ? 'loss' : 'win'}">
+            ${renderImgOrEmoji(d.item_icon, '🎁')}
+            <span class="drop-chip-text">${escapeHtml(formatDropTextWithoutNick(d))}</span>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error('loadDrops error:', e);
+      }
     }
 
     /* CHAT */

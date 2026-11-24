@@ -47,16 +47,16 @@ header{display:flex;align-items:center;justify-content:space-between;padding:14p
 .top-actions{display:flex;align-items:center;gap:8px}
 .balance-pill{display:flex;align-items:center;gap:6px;background:linear-gradient(160deg,var(--card-3),var(--card-2));padding:7px 13px;border-radius:20px;font-weight:800;font-size:13px;border:1px solid var(--gold-border);cursor:pointer;box-shadow:0 4px 0 #0c0616,0 0 12px rgba(255,215,0,.25);transition:transform .15s,box-shadow .15s}
 .balance-pill:active{transform:translateY(2px)}
-.ny-banner{background:linear-gradient(135deg,#2d0a4e,#7b2cbf 50%,#b8860b);border-radius:18px;padding:14px 16px;margin-bottom:14px;border:1.5px solid var(--gold-border);display:flex;align-items:center;gap:12px;box-shadow:var(--depth-shadow),0 0 24px rgba(255,215,0,.2);position:relative;overflow:hidden}
+.ny-banner{background:linear-gradient(135deg,#2d0a4e,#7b2cbf 50%,#b8860b);border-radius:20px;padding:16px;margin-bottom:16px;border:1.5px solid var(--gold-border);display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;box-shadow:var(--depth-shadow),0 0 24px rgba(255,215,0,.22);position:relative;overflow:hidden}
 .ny-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(255,215,0,.35),transparent 55%);pointer-events:none}
-.ny-banner-text{flex:1;position:relative;z-index:1}
-.ny-banner-title{font-size:14px;font-weight:900;color:var(--gold-bright);text-shadow:0 0 10px rgba(255,215,0,.6);letter-spacing:.5px}
-.ny-banner-sub{font-size:11px;color:#f0d9ff;margin-top:3px}
-.ny-countdown{position:relative;z-index:1;display:flex;gap:4px}
-.ny-cd-cell{background:rgba(0,0,0,.4);border:1px solid var(--gold-border);padding:5px 8px;border-radius:8px;text-align:center;min-width:38px}
-.ny-cd-num{font-size:14px;font-weight:900;color:var(--gold-bright);line-height:1}
-.ny-cd-lbl{font-size:8px;color:#ddd;text-transform:uppercase;margin-top:2px;letter-spacing:.5px}
-.ny-ornament{position:absolute;font-size:50px;opacity:.15;z-index:0;pointer-events:none}
+.ny-banner-text{position:relative;z-index:1}
+.ny-banner-title{font-size:17px;font-weight:900;color:var(--gold-bright);text-shadow:0 0 12px rgba(255,215,0,.65);letter-spacing:.6px}
+.ny-banner-sub{font-size:12px;color:#f0d9ff;margin-top:3px}
+.ny-countdown{position:relative;z-index:1;display:flex;justify-content:center;gap:8px;width:100%}
+.ny-cd-cell{background:rgba(10,5,20,.65);border:1.5px solid var(--gold-border);padding:10px 8px;border-radius:14px;text-align:center;flex:1;max-width:74px;box-shadow:0 4px 12px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.15)}
+.ny-cd-num{font-size:24px;font-weight:900;color:var(--gold-bright);line-height:1;text-shadow:0 0 12px rgba(255,215,0,.5)}
+.ny-cd-lbl{font-size:10px;font-weight:800;color:#e9d5ff;text-transform:uppercase;margin-top:4px;letter-spacing:.8px}
+.ny-ornament{position:absolute;font-size:56px;opacity:.16;z-index:0;pointer-events:none}
 #screen-games{padding-left:16px;padding-right:16px}
 .hero-banner{position:relative;padding:14px 0 12px}
 .hero-subtitle{color:var(--gold-bright);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border-radius:999px;background:rgba(255,215,0,.14);border:1px solid rgba(255,215,0,.5);box-shadow:0 0 12px rgba(255,215,0,.25)}
@@ -64,17 +64,22 @@ header{display:flex;align-items:center;justify-content:space-between;padding:14p
 .hero-title span{color:var(--gold-bright);display:block;font-size:48px;letter-spacing:-1.5px;text-shadow:0 4px 0 #7b2cbf,0 12px 26px rgba(0,0,0,.9),0 0 22px rgba(255,215,0,.55)}
 .online-dot{width:7px;height:7px;background:var(--cyan);border-radius:50%;box-shadow:0 0 8px var(--cyan),0 0 14px var(--cyan);animation:pulse 1.5s ease infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.live-table-card{background:linear-gradient(155deg,#2b1846,#190e2b 58%,#120920);border-radius:24px;padding:16px;border:1.5px solid rgba(224,170,255,.65);margin-bottom:20px;position:relative;overflow:hidden;box-shadow:var(--depth-shadow),var(--neon-strong)}
-.live-table-card::before{content:'';position:absolute;top:-45px;right:-35px;width:150px;height:150px;background:radial-gradient(circle,rgba(199,125,255,.34),transparent 70%);pointer-events:none}
-.live-table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.live-tag{background:linear-gradient(145deg,rgba(255,215,0,.25),rgba(199,125,255,.2));color:#fff;font-size:10.5px;font-weight:900;padding:5px 11px;border-radius:8px;border:1px solid rgba(255,215,0,.65);text-transform:uppercase;letter-spacing:1.2px;box-shadow:0 0 14px rgba(255,215,0,.35)}
-.live-status-pill{font-size:11px;font-weight:800;color:#7dd3fc;background:rgba(56,189,248,.14);border:1px solid rgba(56,189,248,.45);padding:4px 9px;border-radius:999px}
-.live-feed-line{background:#0d0618;border:1.5px solid rgba(255,215,0,.45);border-radius:16px;padding:10px 12px;display:flex;align-items:center;gap:8px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;min-height:48px}
-.live-feed-line::-webkit-scrollbar{display:none}
-.feed-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:11px;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;animation:feedIn .4s ease}
-@keyframes feedIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
-.feed-pill.win{background:rgba(16,185,129,.14);border:1px solid rgba(16,185,129,.5)}
-.feed-pill.loss{background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.5)}
+
+/* Новостная лента */
+.news-feed-card{background:linear-gradient(155deg,#2b1846,#190e2b 58%,#120920);border-radius:24px;padding:16px;border:1.5px solid rgba(224,170,255,.65);margin-bottom:20px;position:relative;overflow:hidden;box-shadow:var(--depth-shadow),var(--neon-strong)}
+.news-feed-card::before{content:'';position:absolute;top:-45px;right:-35px;width:150px;height:150px;background:radial-gradient(circle,rgba(199,125,255,.34),transparent 70%);pointer-events:none}
+.news-feed-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.news-tag{background:linear-gradient(145deg,rgba(255,215,0,.25),rgba(199,125,255,.2));color:#fff;font-size:11px;font-weight:900;padding:5px 12px;border-radius:8px;border:1px solid rgba(255,215,0,.65);text-transform:uppercase;letter-spacing:1.2px;box-shadow:0 0 14px rgba(255,215,0,.35)}
+.news-status-pill{font-size:11px;font-weight:800;color:#7dd3fc;background:rgba(56,189,248,.14);border:1px solid rgba(56,189,248,.45);padding:4px 9px;border-radius:999px}
+.news-list{display:flex;flex-direction:column;gap:10px;max-height:220px;overflow-y:auto;padding-right:2px}
+.news-item{background:rgba(13,6,24,.88);border:1px solid rgba(199,125,255,.35);border-radius:14px;padding:11px 13px;animation:feedIn .35s ease}
+@keyframes feedIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.news-item-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:5px}
+.news-item-title{font-size:13.5px;font-weight:900;color:var(--gold-bright)}
+.news-item-date{font-size:10px;color:var(--dim);white-space:nowrap}
+.news-item-text{font-size:12px;color:#ede4ff;line-height:1.4}
+.news-item-del{background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.5);color:#fca5a5;border-radius:6px;padding:2px 6px;font-size:10px;font-weight:800;cursor:pointer;margin-left:6px}
+
 .section-title{font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:14px;color:var(--accent-bright);display:flex;align-items:center;gap:9px;text-shadow:0 0 12px rgba(199,125,255,.4)}
 .section-title::before{content:'';display:block;width:5px;height:17px;background:linear-gradient(180deg,var(--gold-bright),var(--accent-dk));border-radius:3px;box-shadow:0 0 10px var(--gold)}
 .arsenal-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-bottom:20px}
@@ -238,10 +243,10 @@ input:focus,select.admin-select:focus,textarea:focus{border-color:var(--gold-bri
 @media (max-width:380px){
   .hero-title{font-size:36px}
   .hero-title span{font-size:40px}
-  .ny-countdown{gap:2px}
-  .ny-cd-cell{padding:4px 5px;min-width:32px}
-  .ny-cd-num{font-size:12px}
-  .ny-cd-lbl{font-size:7px}
+  .ny-countdown{gap:6px}
+  .ny-cd-cell{padding:8px 4px}
+  .ny-cd-num{font-size:20px}
+  .ny-cd-lbl{font-size:9px}
   .arsenal-title{font-size:18px}
   .nav-item{padding:6px 6px;font-size:8.5px}
   .nav-item .ni{font-size:17px}
@@ -295,13 +300,13 @@ input:focus,select.admin-select:focus,textarea:focus{border-color:var(--gold-bri
     <div class="ny-ornament" style="bottom:-15px;left:-10px;font-size:70px;">🎁</div>
     <div class="ny-banner-text">
       <div class="ny-banner-title">🎅 С Новым Годом!</div>
-      <div class="ny-banner-sub">Праздничные кейсы ждут тебя</div>
+      <div class="ny-banner-sub">До главного праздника года осталось:</div>
     </div>
     <div class="ny-countdown" id="nyCountdown">
-      <div class="ny-cd-cell"><div class="ny-cd-num" data-cd="d">00</div><div class="ny-cd-lbl">дн</div></div>
-      <div class="ny-cd-cell"><div class="ny-cd-num" data-cd="h">00</div><div class="ny-cd-lbl">ч</div></div>
-      <div class="ny-cd-cell"><div class="ny-cd-num" data-cd="m">00</div><div class="ny-cd-lbl">мин</div></div>
-      <div class="ny-cd-cell"><div class="ny-cd-num" data-cd="s">00</div><div class="ny-cd-lbl">сек</div></div>
+      <div class="ny-cd-cell"><div class="ny-cd-num" data-cd="d">00</div><div class="ny-cd-lbl">дней</div></div>
+      <div class="ny-cd-cell"><div class="ny-cd-num" data-cd="h">00</div><div class="ny-cd-lbl">часов</div></div>
+      <div class="ny-cd-cell"><div class="ny-cd-num" data-cd="m">00</div><div class="ny-cd-lbl">минут</div></div>
+      <div class="ny-cd-cell"><div class="ny-cd-num" data-cd="s">00</div><div class="ny-cd-lbl">секунд</div></div>
     </div>
   </div>
 
@@ -310,12 +315,12 @@ input:focus,select.admin-select:focus,textarea:focus{border-color:var(--gold-bri
     <div class="hero-title">Лови куш<br><span>На максимуме</span></div>
   </div>
 
-  <div class="live-table-card">
-    <div class="live-table-header">
-      <div class="live-tag">❄️ ДРОП ЛАЙВ ❄️</div>
-      <div class="live-status-pill" id="liveDropsCount">● Лента активна</div>
+  <div class="news-feed-card">
+    <div class="news-feed-header">
+      <div class="news-tag">📰 НОВОСТНАЯ ЛЕНТА</div>
+      <div class="news-status-pill" id="newsCountBadge">● Актуально</div>
     </div>
-    <div class="live-feed-line" id="liveFeedBar"></div>
+    <div class="news-list" id="newsFeedList"></div>
   </div>
 
   <div class="section-title">Арсенал</div>
@@ -675,34 +680,57 @@ function renderIcon(icon, size = 24) {
   return `<span style="font-size:${size}px;line-height:1">${icon}</span>`;
 }
 
-const DEMO_FEED = [
-  { user_login: 'tagen', item_name: 'выиграл Подарок', item_icon: '🎁', is_win: true },
-  { user_login: 'tgweb', item_name: 'выиграл Neon Punk #01', item_icon: '👾', is_win: true },
-  { user_login: 'admin', item_name: 'проиграл на 1.16x', item_icon: '🚀', is_win: false },
-  { user_login: 'player', item_name: 'подорвался на мине', item_icon: '💣', is_win: false }
+const DEMO_NEWS = [
+  {
+    id: 'demo_1',
+    title: '🎄 Новогодний сезон открыт!',
+    text: 'Крутите кейсы, запускайте ракетку до 5.00x и улучшайте NFT-предметы.',
+    created_at: Date.now()
+  }
 ];
 
-function renderFeedItems(list) {
-  const bar = $('liveFeedBar'); const badge = $('liveDropsCount');
-  if (!bar) return;
-  const items = Array.isArray(list) && list.length > 0 ? list : DEMO_FEED;
-  if (badge) badge.textContent = `● ${items.length} событий`;
-  bar.innerHTML = items.slice(0, 15).map(d => {
-    const nick = (d && d.user_login) ? String(d.user_login) : 'Игрок';
-    const icon = (d && d.item_icon) ? d.item_icon : '🎁';
-    const rawLabel = (d && d.item_name) ? String(d.item_name) : 'выиграл Подарок';
-    const isWin = d && typeof d.is_win === 'boolean' ? d.is_win : (!rawLabel.toLowerCase().includes('проигр') && !rawLabel.toLowerCase().includes('подорв'));
-    const textColor = isWin ? '#6ee7b7' : '#fca5a5';
-    return `<span class="feed-pill ${isWin ? 'win' : 'loss'}"><span>${renderIcon(icon, 18)}</span><span style="color:var(--accent-bright);">${escapeHtml(nick)}</span><span style="color:${textColor};">${escapeHtml(rawLabel)}</span></span>`;
+function renderNewsItems(list) {
+  const box = $('newsFeedList');
+  const badge = $('newsCountBadge');
+  if (!box) return;
+  const items = Array.isArray(list) && list.length > 0 ? list : DEMO_NEWS;
+  if (badge) badge.textContent = `● ${items.length} новост${items.length === 1 ? 'ь' : (items.length < 5 ? 'и' : 'ей')}`;
+  const isAdm = !!(playerData.is_admin || playerData.is_super_admin);
+
+  box.innerHTML = items.map(n => {
+    const dt = new Date(n.created_at || Date.now()).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    const delBtn = (isAdm && !String(n.id).startsWith('demo_'))
+      ? `<button class="news-item-del" onclick="deleteNewsItem('${escapeHtml(String(n.id))}')">✕</button>`
+      : '';
+    return `<div class="news-item">
+      <div class="news-item-top">
+        <div class="news-item-title">${escapeHtml(n.title || 'Новость')}</div>
+        <div style="display:flex;align-items:center;"><span class="news-item-date">${dt}</span>${delBtn}</div>
+      </div>
+      <div class="news-item-text">${escapeHtml(n.text || '')}</div>
+    </div>`;
   }).join('');
 }
 
-async function loadLiveDrops() {
+async function loadNewsFeed() {
   try {
-    const r = await fetch('/api/drops', { cache: 'no-store' });
+    const r = await fetch('/api/news', { cache: 'no-store' });
     const data = r.ok ? await r.json() : [];
-    renderFeedItems(Array.isArray(data) && data.length > 0 ? data : DEMO_FEED);
-  } catch (e) { renderFeedItems(DEMO_FEED); }
+    renderNewsItems(Array.isArray(data) && data.length > 0 ? data : DEMO_NEWS);
+  } catch (e) {
+    renderNewsItems(DEMO_NEWS);
+  }
+}
+
+async function deleteNewsItem(id) {
+  if (!confirm('Удалить новость?')) return;
+  try {
+    const res = await apiPost('/api/admin/news/delete', { id });
+    if (res.ok) {
+      toast('Новость удалена', 'success');
+      loadNewsFeed();
+    }
+  } catch (e) {}
 }
 
 async function loadServerItems() {
@@ -996,6 +1024,7 @@ async function enterGame() {
       if (playerData.is_admin || playerData.is_super_admin) $('adminFromSettings').style.display = 'block';
       else $('adminFromSettings').style.display = 'none';
       renderInventory();
+      loadNewsFeed();
       Chat.isAdmin = !!(playerData.is_admin || playerData.is_super_admin);
       Chat.start();
     } else {
@@ -1031,7 +1060,7 @@ function switchTab(tabId) {
   if (target) target.classList.add('active');
   const navBtn = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
   if (navBtn) navBtn.classList.add('active');
-  if (tabId === 'games') loadLiveDrops();
+  if (tabId === 'games') loadNewsFeed();
   if (tabId === 'admin') renderAdminUI();
   if (tabId === 'inventory') renderInventory();
   if (tabId === 'chat') { Chat.clearUnread(); Chat.load().then(() => { const b = $('chatScroll'); if (b) b.scrollTop = b.scrollHeight; }); }
@@ -1099,7 +1128,7 @@ async function startCase(caseId, price) {
         playSfx('coin'); launchFireworks();
         $('caseActions').style.display = 'flex';
         isCaseOpening = false;
-        enterGame(); loadLiveDrops();
+        enterGame();
       }, 4100);
     }, 100);
   } catch (e) {
@@ -1181,7 +1210,6 @@ async function clickMine(cell, idx) {
         }
       });
       toast('Вы подорвались!', 'error');
-      loadLiveDrops();
       setTimeout(() => { enterGame(); resetMines(); }, 1800);
     } else {
       cell.textContent = '💎';
@@ -1213,7 +1241,6 @@ $('btnCashout').onclick = async () => {
     });
     playSfx('coin'); launchFireworks();
     toast(`Вы забрали ${data.win} ★`, 'success');
-    loadLiveDrops();
     setTimeout(() => resetMines(), 1400);
   } catch (e) { toast(e.message, 'error'); }
 };
@@ -1293,7 +1320,6 @@ async function triggerRocketCrash() {
   rocketHistory.unshift(crashAt); renderRocketHistory();
   toast(`Ракета взорвалась на ${crashAt.toFixed(2)}x`, 'error');
   try { await apiPost('/api/games/rocket', { action: 'crash' }); } catch (e) {}
-  loadLiveDrops();
   setTimeout(() => { if (!rocketRunning) updateRocketVisual(1.0, 'idle'); }, 1500);
 }
 function rocketFlightStep(now) {
@@ -1344,7 +1370,6 @@ $('btnRocketAction').onclick = async () => {
         playSfx('coin'); launchFireworks();
         toast(`Забрано ${data.win} ★ на ${(data.multiplier || claimed).toFixed(2)}x`, 'success');
       }
-      loadLiveDrops();
       setTimeout(() => { if (!rocketRunning) updateRocketVisual(1.0, 'idle'); }, 1500);
     } catch (e) { rocketCashingOut = false; toast(e.message, 'error'); if (rocketRunning) rocketRafId = requestAnimationFrame(rocketFlightStep); }
   }
@@ -1525,7 +1550,7 @@ $('btnDoUpgrade').onclick = async () => {
       upgradeState.isSpinning = false;
       $('btnDoUpgrade').disabled = false;
       updateUpgradeUI();
-      enterGame(); loadLiveDrops();
+      enterGame();
     }, 4600);
   } catch (e) {
     upgradeState.isSpinning = false;
@@ -1651,6 +1676,12 @@ async function renderAdminUI() {
 
     box.innerHTML = `
       <div class="admin-box">
+        <h3>📰 Опубликовать новость</h3>
+        <input type="text" id="admNewsTitle" placeholder="Заголовок новости" maxlength="80">
+        <textarea id="admNewsText" placeholder="Текст новости..." rows="3" maxlength="400"></textarea>
+        <button class="success" onclick="adminPublishNews()">Опубликовать</button>
+      </div>
+      <div class="admin-box">
         <h3>⭐ Выдать / снять звёзды</h3>
         <select id="admTargetUser" class="admin-select">${optionsHtml}</select>
         <input type="number" id="admStarsAmount" placeholder="Количество звёзд" value="100">
@@ -1679,6 +1710,18 @@ async function renderAdminUI() {
     box.innerHTML = '<div class="admin-box"><h3>Ошибка загрузки админки</h3></div>';
   }
 }
+async function adminPublishNews() {
+  const title = $('admNewsTitle').value.trim();
+  const text = $('admNewsText').value.trim();
+  if (!title || !text) return toast('Введите заголовок и текст', 'error');
+  const res = await apiPost('/api/admin/news', { title, text });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) return toast(data.error || 'Ошибка', 'error');
+  $('admNewsTitle').value = '';
+  $('admNewsText').value = '';
+  toast('Новость опубликована', 'success');
+  loadNewsFeed();
+}
 async function adminStarsAction(mode) {
   const targetLogin = $('admTargetUser').value;
   const amount = parseInt($('admStarsAmount').value, 10) || 0;
@@ -1699,7 +1742,7 @@ async function adminGiveNft() {
   if (!res.ok) return toast(data.error || 'Ошибка', 'error');
   $('admNftName').value = '';
   toast('NFT выдан', 'success');
-  renderAdminUI(); loadLiveDrops();
+  renderAdminUI();
 }
 
 /* INIT */
@@ -1707,8 +1750,8 @@ applyAudioVolumes();
 syncNyButtons();
 initSnow();
 initCountdown();
-renderFeedItems(DEMO_FEED);
-loadLiveDrops();
+renderNewsItems(DEMO_NEWS);
+loadNewsFeed();
 checkLogin();
 </script>
 </body>

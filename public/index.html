@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>TagenGame — Новогоднее обновление</title>
+<title>TagenGame ❄️ New Year Casino</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -31,9 +31,9 @@ body{
   font-family:'Segoe UI',Roboto,-apple-system,sans-serif;
   color:var(--text); height:100vh; height:100dvh;
   background:
-    radial-gradient(circle at 15% 10%, rgba(157, 78, 221, 0.22), transparent 42%),
-    radial-gradient(circle at 88% 22%, rgba(56, 189, 248, 0.14), transparent 38%),
-    radial-gradient(circle at 50% 85%, rgba(199, 125, 255, 0.15), transparent 45%),
+    radial-gradient(circle at 15% 10%, rgba(157, 78, 221, 0.24), transparent 42%),
+    radial-gradient(circle at 88% 22%, rgba(56, 189, 248, 0.13), transparent 38%),
+    radial-gradient(circle at 50% 85%, rgba(199, 125, 255, 0.16), transparent 45%),
     var(--bg);
   display:flex; flex-direction:column;
 }
@@ -59,69 +59,103 @@ body::before {
   display: none; flex-direction: column; height: 100%; min-height: 0;
   overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  padding-bottom: calc(92px + env(safe-area-inset-bottom));
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
 }
 .page-screen.active { display: flex; }
 
 header{
   display:flex; align-items:center; justify-content:space-between;
-  padding:14px 0; background:transparent; flex-shrink: 0;
+  padding:14px 0 10px; background:transparent; flex-shrink: 0;
 }
 .logo-container { display:flex; align-items:center; gap:11px; }
 .logo-icon {
-  width:40px; height:40px;
+  width:42px; height:42px;
   background: linear-gradient(145deg, var(--accent-bright), var(--accent-dk));
-  border-radius:12px; display:flex; align-items:center; justify-content:center;
-  color:#090510; font-weight:900; font-size:18px;
+  border-radius:13px; display:flex; align-items:center; justify-content:center;
+  color:#090510; font-weight:900; font-size:17px;
   border: 1px solid rgba(255,255,255,0.35);
   box-shadow: 0 5px 0 #3c096c, 0 0 16px rgba(199, 125, 255, 0.55);
 }
-.logo-text { display:flex; flex-direction:column; line-height:1.1; }
+.logo-text { display:flex; flex-direction:column; line-height:1.15; }
 .logo-title {
-  font-size:19px; font-weight:900; letter-spacing:0.5px; color:#fff;
+  font-size:20px; font-weight:900; letter-spacing:0.3px; color:#fff;
   text-shadow: 0 0 12px rgba(199, 125, 255, 0.45);
 }
-.logo-title span { color: var(--accent-bright); text-shadow: 0 0 14px var(--accent); }
-.logo-sub { font-size:9px; color:var(--dim); text-transform:uppercase; letter-spacing:1.2px; }
+.logo-sub {
+  font-size:9.5px; color:var(--accent-bright); font-weight:800;
+  text-transform:uppercase; letter-spacing:1.1px; margin-top:2px;
+}
 
 .top-actions { display:flex; align-items:center; gap:8px; }
 .balance-pill {
   display:flex; align-items:center; gap:6px;
   background: linear-gradient(160deg, var(--card-3), var(--card-2));
-  padding:7px 13px; border-radius:20px; font-weight:800; font-size:13px;
-  border:1px solid var(--border-soft); cursor:pointer;
+  padding:7px 14px; border-radius:20px; font-weight:800; font-size:14px;
+  border:1px solid rgba(224, 170, 255, 0.55); cursor:pointer;
   box-shadow: 0 4px 0 #0c0616, var(--neon-border);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .balance-pill:active { transform: translateY(2px); box-shadow: 0 2px 0 #0c0616, var(--neon-strong); }
 
 #screen-games { padding-left: 16px; padding-right: 16px; }
-.hero-banner { position:relative; padding: 12px 0 10px; }
-.hero-top-row { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
-.hero-subtitle {
-  color:var(--accent-bright); font-size:11px; font-weight:800; letter-spacing:1.6px;
-  text-transform:uppercase; display:inline-flex; align-items:center; gap:7px;
-  padding: 5px 10px; border-radius: 999px;
-  background: rgba(199, 125, 255, 0.12);
-  border: 1px solid rgba(199, 125, 255, 0.4);
-  box-shadow: 0 0 12px rgba(199, 125, 255, 0.25);
+
+.ny-promo-banner {
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  background: linear-gradient(135deg, #2a1444 0%, #1b0d2e 65%, #130921 100%);
+  border: 1.5px solid rgba(224, 170, 255, 0.65);
+  border-radius: 20px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6), var(--neon-border);
 }
-.ny-timer-pill {
-  display:inline-flex; align-items:center; gap:6px;
-  font-size:11px; font-weight:800; color:#bae6fd;
-  padding:5px 11px; border-radius:999px;
-  background: linear-gradient(135deg, rgba(56,189,248,0.18), rgba(199,125,255,0.18));
-  border: 1px solid rgba(125,211,252,0.5);
-  box-shadow: 0 0 12px rgba(56,189,248,0.25);
+.ny-promo-left { display:flex; align-items:center; gap:9px; min-width:0; }
+.ny-promo-badge {
+  width:28px; height:28px; border-radius:9px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(236, 72, 153, 0.22); border: 1px solid rgba(244, 114, 182, 0.55);
+  font-size:14px;
+}
+.ny-promo-top {
+  font-size:10px; font-weight:900; color:#f9a8d4;
+  text-transform:uppercase; letter-spacing:0.6px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.ny-promo-sub {
+  font-size:12px; font-weight:800; color:#ffffff;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.ny-countdown-boxes { display:flex; align-items:center; gap:5px; flex-shrink:0; }
+.ny-cd-unit {
+  background:#11081f;
+  border:1px solid rgba(250, 204, 21, 0.45);
+  border-radius:10px;
+  padding:5px 7px;
+  min-width:34px;
+  text-align:center;
+}
+.ny-cd-num { font-size:12px; font-weight:900; color:#fde047; line-height:1.1; }
+.ny-cd-lbl { font-size:8px; font-weight:800; color:var(--dim); text-transform:uppercase; line-height:1.1; margin-top:1px; }
+
+.hero-banner { position:relative; padding: 6px 0 12px; }
+.hero-subtitle {
+  color:#7dd3fc; font-size:10.5px; font-weight:900; letter-spacing:1.8px;
+  text-transform:uppercase; margin-bottom:8px; display:inline-flex; align-items:center; gap:7px;
+  padding: 5px 11px; border-radius: 999px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(125, 211, 252, 0.42);
 }
 .hero-title {
-  font-size:42px; font-weight:900; line-height:0.94; letter-spacing:-1.5px;
+  font-size:40px; font-weight:900; line-height:0.95; letter-spacing:-1px;
   text-transform:uppercase; margin-bottom:10px; color:#fff;
   text-shadow: 0 4px 0 #2d0a4e, 0 10px 24px rgba(0,0,0,0.85), 0 0 18px rgba(199,125,255,0.35);
 }
 .hero-title span {
-  color:var(--accent-bright); display:block; font-size:46px; letter-spacing:-1.5px;
-  text-shadow: 0 4px 0 #3c096c, 0 12px 26px rgba(0,0,0,0.9), 0 0 22px rgba(199,125,255,0.65);
+  background: linear-gradient(90deg, #fff3b0, #e0aaff, #7dd3fc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display:block; font-size:41px; letter-spacing:-1px;
+  filter: drop-shadow(0 4px 14px rgba(199,125,255,0.45));
 }
 .online-dot {
   width:7px; height:7px; background:var(--cyan); border-radius:50%;
@@ -129,80 +163,58 @@ header{
 }
 
 .live-table-card {
-  background: linear-gradient(155deg, #2b1846 0%, #190e2b 58%, #120920 100%);
-  border-radius:24px; padding:16px;
-  border:1.5px solid rgba(224, 170, 255, 0.65);
-  margin-bottom:20px; position:relative; overflow:hidden;
-  box-shadow: var(--depth-shadow), var(--neon-strong);
+  background: linear-gradient(155deg, #24133b 0%, #170c28 58%, #11081e 100%);
+  border-radius:22px; padding:14px;
+  border:1.5px solid rgba(224, 170, 255, 0.52);
+  margin-bottom:18px; position:relative; overflow:hidden;
+  box-shadow: var(--depth-shadow), var(--neon-border);
 }
-.live-table-card::before {
-  content:''; position:absolute; top:-45px; right:-35px; width:150px; height:150px;
-  background: radial-gradient(circle, rgba(199,125,255,0.34), transparent 70%);
-  pointer-events:none;
-}
-.live-table-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.live-table-header { display:flex; justify-content:space-between; align-items:center; gap:8px; }
 .live-tag {
-  background:rgba(199,125,255,0.22); color:#fff;
-  font-size:10.5px; font-weight:900; padding:5px 11px; border-radius:8px;
-  border:1px solid rgba(224,170,255,0.75); text-transform:uppercase; letter-spacing:1.2px;
-  box-shadow: 0 0 14px rgba(199,125,255,0.45);
+  background:rgba(199,125,255,0.18); color:#fff;
+  font-size:10.5px; font-weight:900; padding:5px 11px; border-radius:9px;
+  border:1px solid rgba(224,170,255,0.65); text-transform:uppercase; letter-spacing:1px;
 }
 .live-status-pill {
   font-size:11px; font-weight:800; color:#7dd3fc;
   background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.45);
-  padding:4px 9px; border-radius:999px;
+  padding:4px 10px; border-radius:999px;
 }
-
 .live-feed-line {
   background:#0d0618;
-  border:1.5px solid rgba(224,170,255,0.55);
-  border-radius:16px;
-  padding:10px 0;
+  border:1px solid rgba(224,170,255,0.42);
+  border-radius:15px;
+  padding:8px 0;
+  margin-top:10px;
   overflow:hidden;
-  min-height:52px;
+  min-height:44px;
   display:flex;
   align-items:center;
-  position:relative;
 }
 .live-feed-track {
   display:inline-flex;
   align-items:center;
   gap:8px;
   white-space:nowrap;
-  padding-left:12px;
+  padding-left:10px;
   animation: marqueeLeftToRight 26s linear infinite;
 }
-.live-feed-line:hover .live-feed-track {
-  animation-play-state: paused;
-}
+.live-feed-line:hover .live-feed-track { animation-play-state: paused; }
 @keyframes marqueeLeftToRight {
   0% { transform: translateX(-35%); }
   100% { transform: translateX(15%); }
 }
 .feed-pill {
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:6px 10px;
-  border-radius:11px;
-  font-size:12px;
-  font-weight:800;
-  color:#fff;
-  flex-shrink:0;
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 10px; border-radius:10px;
+  font-size:11.5px; font-weight:800; color:#fff; flex-shrink:0;
 }
-.feed-pill.win {
-  background:rgba(16,185,129,0.14);
-  border:1px solid rgba(16,185,129,0.5);
-}
-.feed-pill.loss {
-  background:rgba(239,68,68,0.14);
-  border:1px solid rgba(239,68,68,0.5);
-}
+.feed-pill.win { background:rgba(16,185,129,0.14); border:1px solid rgba(16,185,129,0.5); }
+.feed-pill.loss { background:rgba(239,68,68,0.14); border:1px solid rgba(239,68,68,0.5); }
 
 .section-title {
   font-size:14px; font-weight:900; text-transform:uppercase; letter-spacing:1.2px;
-  margin-bottom:14px; color:var(--accent-bright); display:flex; align-items:center; gap:9px;
-  text-shadow: 0 0 12px rgba(199,125,255,0.4);
+  margin-bottom:14px; color:#fff; display:flex; align-items:center; gap:9px;
 }
 .section-title::before {
   content:''; display:block; width:5px; height:17px;
@@ -226,25 +238,18 @@ header{
   transform:translateY(3px) scale(0.985);
   box-shadow: 0 3px 0 #0a0512, var(--neon-strong);
 }
-.arsenal-card::after {
-  content:''; position:absolute; right:-24px; bottom:-24px; width:96px; height:96px;
-  background:radial-gradient(circle, rgba(199,125,255,0.24), transparent 70%);
-  border-radius:50%; z-index:0; pointer-events:none;
-}
 .arsenal-badge {
   display:inline-block; background:rgba(199,125,255,0.16); color:var(--accent-bright);
   font-size:9.5px; font-weight:800; padding:4px 9px; border-radius:7px;
-  border:1px solid rgba(199,125,255,0.45); margin-bottom:20px; position:relative; z-index:1;
-  box-shadow: 0 0 10px rgba(199,125,255,0.25);
+  border:1px solid rgba(199,125,255,0.45); margin-bottom:18px; position:relative; z-index:1;
 }
 .arsenal-title {
   font-size:21px; font-weight:900; text-transform:uppercase; line-height:1.05;
   margin-bottom:6px; position:relative; z-index:1;
-  text-shadow: 0 3px 0 #260942, 0 0 12px rgba(199,125,255,0.3);
 }
 .arsenal-desc { font-size:11.5px; color:var(--dim); font-weight:600; position:relative; z-index:1; }
 .arsenal-icon-bg {
-  position:absolute; right:10px; bottom:8px; font-size:58px; opacity:0.18; z-index:0;
+  position:absolute; right:10px; bottom:8px; font-size:58px; opacity:0.2; z-index:0;
   transform:rotate(-14deg); filter: drop-shadow(0 0 10px rgba(199,125,255,0.45));
 }
 
@@ -257,7 +262,6 @@ header{
   cursor:pointer; color:#fff;
   box-shadow: 0 4px 0 #0b0514, var(--neon-border);
 }
-.back-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #0b0514, var(--neon-strong); }
 .game-title-h1 {
   font-size:21px; font-weight:900; text-transform:uppercase;
   text-shadow: 0 3px 0 #280a46, 0 0 14px rgba(199,125,255,0.4);
@@ -272,149 +276,83 @@ header{
 }
 .mines-stat { text-align:center; }
 .mines-stat .l { font-size:10px; color:var(--dim); font-weight:700; text-transform:uppercase; }
-.mines-stat .v { font-size:16px; font-weight:900; color:var(--accent-bright); text-shadow: 0 0 10px rgba(199,125,255,0.45); }
+.mines-stat .v { font-size:16px; font-weight:900; color:var(--accent-bright); }
 .mines-grid { display:grid; gap:7px; margin:15px 0; justify-content: center; }
 .mine-cell {
   background:linear-gradient(155deg, var(--card-3), var(--card-2));
   border:1px solid rgba(199,125,255,0.45); border-radius:12px;
   display:flex; align-items:center; justify-content:center; font-size:24px;
   cursor:pointer; aspect-ratio: 1; min-width: 42px; min-height: 42px;
-  box-shadow: 0 4px 0 #0b0514, 0 0 10px rgba(157,78,221,0.2);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  box-shadow: 0 4px 0 #0b0514;
 }
-.mine-cell:active { transform: translateY(2px); box-shadow: 0 2px 0 #0b0514, var(--neon-strong); }
 .mine-cell.opened {
   background:linear-gradient(155deg, #351d57, #22123a);
-  border-color: var(--accent-bright);
-  box-shadow: inset 0 2px 8px rgba(0,0,0,0.6), 0 0 14px rgba(199,125,255,0.45);
-  pointer-events:none;
+  border-color: var(--accent-bright); pointer-events:none;
 }
 .mine-cell.bomb {
   background:linear-gradient(155deg, #ef4444, #991b1b);
   border-color: #fca5a5;
-  box-shadow: 0 4px 0 #450a0a, 0 0 18px rgba(239,68,68,0.7);
 }
 .mine-pill-btn.active {
-  border-color: var(--accent-bright);
-  color: var(--accent-bright);
+  border-color: var(--accent-bright); color: var(--accent-bright);
   box-shadow: 0 4px 0 #0b0514, var(--neon-strong);
 }
 
 .rocket-stage {
-  position: relative;
-  height: 250px;
-  border-radius: 22px;
+  position: relative; height: 250px; border-radius: 22px;
   background:
     radial-gradient(circle at 50% 25%, rgba(199, 125, 255, 0.18), transparent 55%),
-    radial-gradient(circle at 80% 75%, rgba(56, 189, 248, 0.12), transparent 50%),
     linear-gradient(180deg, #0d0618 0%, #190d2d 65%, #23123d 100%);
   border: 1.5px solid rgba(224, 170, 255, 0.52);
   box-shadow: var(--depth-shadow), var(--neon-strong);
-  overflow: hidden;
-  margin-bottom: 14px;
+  overflow: hidden; margin-bottom: 14px;
 }
 .rocket-grid-bg {
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background-image:
     linear-gradient(rgba(199,125,255,0.08) 1px, transparent 1px),
     linear-gradient(90deg, rgba(199,125,255,0.08) 1px, transparent 1px);
-  background-size: 28px 28px;
-  pointer-events: none;
+  background-size: 28px 28px; pointer-events: none;
 }
 .rocket-mult-hud {
-  position: relative;
-  z-index: 4;
-  padding: 14px 16px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  position: relative; z-index: 4; padding: 14px 16px 0;
+  display: flex; justify-content: space-between; align-items: flex-start;
 }
 .rocket-mult-val {
-  font-size: 38px;
-  font-weight: 900;
-  line-height: 1;
-  color: #ffffff;
+  font-size: 38px; font-weight: 900; line-height: 1; color: #ffffff;
   text-shadow: 0 3px 0 #2d0a4e, 0 0 20px rgba(199, 125, 255, 0.65);
-  transition: color 0.15s ease, transform 0.15s ease;
 }
-.rocket-mult-val.cashed {
-  color: #34d399;
-  text-shadow: 0 0 20px rgba(16, 185, 129, 0.75);
-}
-.rocket-mult-val.crashed {
-  color: #f87171;
-  text-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
-}
+.rocket-mult-val.cashed { color: #34d399; }
+.rocket-mult-val.crashed { color: #f87171; }
 .rocket-cap-badge {
-  font-size: 11px;
-  font-weight: 800;
-  color: #7dd3fc;
-  background: rgba(56, 189, 248, 0.14);
-  border: 1px solid rgba(56, 189, 248, 0.45);
-  padding: 5px 10px;
-  border-radius: 10px;
+  font-size: 11px; font-weight: 800; color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.14); border: 1px solid rgba(56, 189, 248, 0.45);
+  padding: 5px 10px; border-radius: 10px;
 }
 .rocket-trail {
-  position: absolute;
-  left: 50%;
-  bottom: 36px;
-  width: 6px;
-  height: 0;
-  transform: translateX(-50%);
-  border-radius: 999px;
+  position: absolute; left: 50%; bottom: 36px; width: 6px; height: 0;
+  transform: translateX(-50%); border-radius: 999px;
   background: linear-gradient(180deg, rgba(224,170,255,0.9), rgba(56,189,248,0.45), transparent);
-  box-shadow: 0 0 16px rgba(199,125,255,0.7);
-  z-index: 2;
-  pointer-events: none;
+  z-index: 2; pointer-events: none;
 }
 .rocket-ship {
-  position: absolute;
-  left: 50%;
-  bottom: 24px;
-  transform: translate(-50%, 0);
-  font-size: 46px;
-  line-height: 1;
-  z-index: 3;
+  position: absolute; left: 50%; bottom: 24px; transform: translate(-50%, 0);
+  font-size: 46px; line-height: 1; z-index: 3; pointer-events: none;
   filter: drop-shadow(0 0 16px rgba(224, 170, 255, 0.75));
-  transition: transform 0.06s linear;
-  pointer-events: none;
-}
-.rocket-ship.crashed {
-  filter: drop-shadow(0 0 22px rgba(239, 68, 68, 0.95));
 }
 .rocket-panel {
   background: linear-gradient(155deg, var(--card-2), var(--card));
-  padding: 16px;
-  border-radius: 18px;
+  padding: 16px; border-radius: 18px;
   border: 1px solid rgba(199,125,255,0.45);
   box-shadow: var(--depth-shadow), var(--neon-border);
 }
-.rocket-history {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
+.rocket-history { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
 .rocket-hist-chip {
-  font-size: 11px;
-  font-weight: 800;
-  padding: 5px 9px;
-  border-radius: 8px;
-  background: rgba(199,125,255,0.14);
-  border: 1px solid rgba(199,125,255,0.38);
-  color: var(--accent-bright);
+  font-size: 11px; font-weight: 800; padding: 5px 9px; border-radius: 8px;
+  background: rgba(199,125,255,0.14); border: 1px solid rgba(199,125,255,0.38); color: var(--accent-bright);
 }
-.rocket-hist-chip.low {
-  background: rgba(239,68,68,0.16);
-  border-color: rgba(248,113,113,0.45);
-  color: #fca5a5;
-}
-.rocket-hist-chip.high {
-  background: rgba(16,185,129,0.16);
-  border-color: rgba(52,211,153,0.45);
-  color: #6ee7b7;
-}
+.rocket-hist-chip.low { background: rgba(239,68,68,0.16); border-color: rgba(248,113,113,0.45); color: #fca5a5; }
+.rocket-hist-chip.high { background: rgba(16,185,129,0.16); border-color: rgba(52,211,153,0.45); color: #6ee7b7; }
 
 .cases-grid { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
 .case-card {
@@ -423,12 +361,11 @@ header{
   padding:20px 10px; text-align:center; cursor:pointer;
   display:flex; flex-direction:column; align-items:center;
   box-shadow: var(--depth-shadow), var(--neon-border);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.case-card:active { transform:translateY(3px); box-shadow:0 3px 0 #0b0514, var(--neon-strong); }
-.case-card .c-icon { width:96px; height:96px; margin-bottom:10px; display:flex; justify-content:center; align-items:center; filter: drop-shadow(0 0 12px rgba(199,125,255,0.35)); }
+.case-card:active { transform:translateY(3px); }
+.case-card .c-icon { width:96px; height:96px; margin-bottom:10px; display:flex; justify-content:center; align-items:center; }
 .case-card .c-name { font-size:15px; font-weight:900; }
-.case-card .c-price { color:var(--accent-bright); font-weight:800; margin-top:5px; font-size:13px; text-shadow: 0 0 10px rgba(199,125,255,0.45); }
+.case-card .c-price { color:var(--accent-bright); font-weight:800; margin-top:5px; font-size:13px; }
 
 #caseRoller { display:none; margin-top:20px; }
 .roulette-container{
@@ -436,24 +373,23 @@ header{
   background:linear-gradient(160deg, var(--card-2), var(--card));
   border:1px solid rgba(199,125,255,0.6); position:relative; overflow:hidden;
   display:flex; align-items:center; border-radius:16px;
-  box-shadow: var(--depth-shadow), var(--neon-strong);
 }
 .roulette-strip{display:flex; position:absolute; left:0; will-change:transform}
 .roulette-item{ width:80px; height:104px; display:flex; flex-direction:column; align-items:center; justify-content:center; border-right:1px solid rgba(199,125,255,0.22); flex-shrink:0; }
 .roulette-item .r-img { width:40px; height:40px; display:flex; align-items:center; justify-content:center; }
 .roulette-item .r-img img { max-width:100%; max-height:100%; object-fit:contain; }
 .roulette-item .r-name { font-size:9px; color:var(--dim); margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%; text-align:center; }
-.roulette-pointer{ position:absolute; left:50%; top:0; bottom:0; width:4px; background:var(--accent-bright); transform:translateX(-50%); z-index:10; box-shadow:0 0 16px var(--accent), 0 0 26px var(--accent-bright); }
+.roulette-pointer{ position:absolute; left:50%; top:0; bottom:0; width:4px; background:var(--accent-bright); transform:translateX(-50%); z-index:10; box-shadow:0 0 16px var(--accent); }
 
 .upgrade-container { display: flex; flex-direction: column; align-items: center; padding: 12px 0; }
-.upg-circle-wrap { position: relative; width: 232px; height: 232px; margin-bottom: 14px; filter: drop-shadow(0 0 18px rgba(199,125,255,0.32)); }
+.upg-circle-wrap { position: relative; width: 232px; height: 232px; margin-bottom: 14px; }
 .upg-svg { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
 .upg-svg-bg { fill: none; stroke: rgba(199,125,255,0.12); stroke-width: 15; }
-.upg-svg-win { fill: none; stroke: #ffffff; stroke-width: 15; stroke-linecap: butt; filter: drop-shadow(0 0 12px rgba(224,170,255,0.95)); transition: stroke-dashoffset 0.3s ease, stroke-dasharray 0.3s ease; }
+.upg-svg-win { fill: none; stroke: #ffffff; stroke-width: 15; stroke-linecap: butt; }
 #upgCenterItem { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2; }
-#upgCenterItem img { max-width: 70px; max-height: 70px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.65)); }
-#upgPointer { position: absolute; top: 50%; left: 50%; width: 8px; height: 92px; background: linear-gradient(to top, rgba(255,255,255,0.1), #fff, var(--accent-bright)); transform-origin: bottom center; transform: translate(-50%, -100%) rotate(0deg); z-index: 5; border-radius: 8px; pointer-events: none; box-shadow: 0 0 16px var(--accent); }
-#upgPointer::after { content: ''; position: absolute; top: -10px; left: -6px; width: 20px; height: 20px; background: #fff; border-radius: 50%; box-shadow: 0 0 20px #fff; }
+#upgCenterItem img { max-width: 70px; max-height: 70px; }
+#upgPointer { position: absolute; top: 50%; left: 50%; width: 8px; height: 92px; background: linear-gradient(to top, rgba(255,255,255,0.1), #fff, var(--accent-bright)); transform-origin: bottom center; transform: translate(-50%, -100%) rotate(0deg); z-index: 5; border-radius: 8px; pointer-events: none; }
+#upgPointer::after { content: ''; position: absolute; top: -10px; left: -6px; width: 20px; height: 20px; background: #fff; border-radius: 50%; }
 .spinning { transition: transform 4.5s cubic-bezier(0.15, 0.85, 0.3, 1); }
 
 .upgrade-slots { display: flex; gap: 12px; width: 100%; margin-bottom: 14px; }
@@ -461,7 +397,6 @@ header{
   flex: 1; background: linear-gradient(155deg, var(--card-2), var(--card));
   border: 1px solid rgba(199,125,255,0.45); border-radius: 18px;
   padding: 13px 10px; text-align: center; cursor: pointer;
-  box-shadow: 0 5px 0 #0b0514, var(--neon-border);
 }
 .slot-card.active { border-color: var(--accent-bright); box-shadow: 0 5px 0 #0b0514, var(--neon-strong); }
 .slot-card .s-label { font-size: 10px; color: var(--dim); margin-bottom: 5px; font-weight: 700; text-transform: uppercase; }
@@ -471,51 +406,80 @@ header{
 .item-card {
   background: linear-gradient(155deg, var(--card-2), var(--card));
   border: 1px solid rgba(199,125,255,0.35); border-radius: 14px;
-  padding: 10px; text-align: center; cursor: pointer; position: relative;
-  box-shadow: 0 4px 0 #0b0514;
+  padding: 10px; text-align: center; cursor: pointer;
 }
-.item-card.selected { border-color: var(--accent-bright); background: rgba(199,125,255,0.16); box-shadow: 0 4px 0 #0b0514, var(--neon-strong); }
+.item-card.selected { border-color: var(--accent-bright); background: rgba(199,125,255,0.16); }
 .item-card .ic-icon { margin-bottom: 5px; height: 30px; display:flex; align-items:center; justify-content:center; }
 .item-card .ic-name { font-size: 10px; font-weight: 700; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .item-card .ic-price { font-size: 10px; color: var(--accent-bright); font-weight: 800; }
 .item-card .ic-mult { font-size: 9px; color: var(--cyan); font-weight: 800; margin-top: 2px; }
 
 .nft-badge {
-  display: inline-block;
-  font-size: 8.5px;
-  font-weight: 900;
-  color: #7dd3fc;
-  background: rgba(56, 189, 248, 0.16);
-  border: 1px solid rgba(56, 189, 248, 0.5);
-  border-radius: 5px;
-  padding: 1px 5px;
-  text-transform: uppercase;
+  display: inline-block; font-size: 8.5px; font-weight: 900; color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.16); border: 1px solid rgba(56, 189, 248, 0.5);
+  border-radius: 5px; padding: 1px 5px; text-transform: uppercase;
 }
-
 .upg-chance-text { text-align: center; margin-bottom: 12px; font-size: 16px; font-weight: 900; color:var(--dim); }
-.upg-chance-text span { color: var(--accent-bright); font-size:21px; text-shadow: 0 0 12px rgba(199,125,255,0.6); }
+.upg-chance-text span { color: var(--accent-bright); font-size:21px; }
+
+.chat-box {
+  background: linear-gradient(155deg, var(--card-2), var(--card));
+  border: 1px solid rgba(199,125,255,0.45);
+  border-radius: 20px;
+  padding: 14px;
+  box-shadow: var(--depth-shadow), var(--neon-border);
+}
+.chat-messages {
+  max-height: 52vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.chat-msg {
+  background: rgba(11,6,20,0.75);
+  border: 1px solid rgba(199,125,255,0.25);
+  border-radius: 12px;
+  padding: 9px 11px;
+  font-size: 12.5px;
+}
+.chat-msg-author { font-weight: 800; color: var(--accent-bright); margin-right: 6px; }
+.chat-input-row { display: flex; gap: 8px; }
+.chat-input-row input { margin-bottom: 0; flex: 1; }
+.chat-input-row button { width: auto; padding: 0 18px; }
 
 .bottom-nav {
   position: fixed; left: 10px; right: 10px; bottom: 8px; z-index: 120;
   display: flex; justify-content: space-around;
-  padding: 9px 8px calc(9px + env(safe-area-inset-bottom));
-  background: rgba(20, 11, 34, 0.92); backdrop-filter: blur(20px);
+  padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+  background: rgba(20, 11, 34, 0.94); backdrop-filter: blur(20px);
   border: 1px solid rgba(199, 125, 255, 0.55); border-radius: 22px;
   box-shadow: 0 10px 28px rgba(0,0,0,0.85), var(--neon-strong);
 }
 .nav-item {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 3px; padding: 7px 12px; border-radius: 15px; cursor: pointer;
+  gap: 3px; padding: 6px 8px; border-radius: 15px; cursor: pointer;
   border: 1px solid transparent; background: transparent; color: var(--dim);
-  font-size: 10px; font-weight: 700; font-family: inherit;
-  transition: all 0.15s ease;
+  font-size: 10px; font-weight: 700; font-family: inherit; flex: 1;
 }
-.nav-item .ni { font-size: 20px; }
+.nav-item .ni { font-size: 19px; }
 .nav-item.active {
-  color: var(--accent-bright);
-  background: rgba(199, 125, 255, 0.14);
-  border-color: rgba(199, 125, 255, 0.5);
+  color: #fde047;
+  background: rgba(199, 125, 255, 0.16);
+  border-color: rgba(250, 204, 21, 0.45);
   box-shadow: 0 0 14px rgba(199, 125, 255, 0.35);
+}
+
+.support-fab {
+  position: fixed; right: 16px; bottom: calc(82px + env(safe-area-inset-bottom)); z-index: 125;
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.45);
+  background: linear-gradient(145deg, #fde047, #eab308);
+  color: #1a1204; font-size: 22px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.65), 0 0 18px rgba(250,204,21,0.5);
 }
 
 .btn-main {
@@ -525,10 +489,8 @@ header{
   color:#090510; font-weight:900; font-size:14.5px; cursor:pointer;
   text-transform:uppercase; letter-spacing:1px;
   box-shadow: 0 5px 0 #4a148c, 0 0 18px rgba(199,125,255,0.45);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-.btn-main:hover { box-shadow: 0 5px 0 #4a148c, 0 0 24px rgba(224,170,255,0.7); }
-.btn-main:active { transform:translateY(3px); box-shadow: 0 2px 0 #4a148c, 0 0 16px rgba(199,125,255,0.6); }
+.btn-main:active { transform:translateY(3px); }
 .btn-main:disabled { opacity:0.5; cursor:not-allowed; }
 .btn-cashout-green {
   background:linear-gradient(145deg, #34d399, #059669) !important;
@@ -539,9 +501,8 @@ header{
   background:linear-gradient(155deg, var(--card-3), var(--card-2));
   color:#fff; border:1px solid rgba(199,125,255,0.42);
   font-size:13px; padding:12px; border-radius:13px; font-weight:700;
-  cursor:pointer; box-shadow: 0 4px 0 #0b0514, 0 0 10px rgba(157,78,221,0.2);
+  cursor:pointer; box-shadow: 0 4px 0 #0b0514;
 }
-.btn-grey:active { transform:translateY(2px); box-shadow: 0 2px 0 #0b0514; }
 
 .modal{ display:none; position:fixed; inset:0; background:rgba(5,2,10,0.86); backdrop-filter:blur(7px); align-items:center; justify-content:center; z-index:300; padding:14px; }
 .modal.show{display:flex;}
@@ -555,73 +516,38 @@ input[type="text"], input[type="number"], input[type="password"], select.admin-s
   width:100%; padding:13px 14px; background:rgba(11, 6, 20, 0.85);
   border:1px solid rgba(199,125,255,0.42); border-radius:13px;
   color:#fff; font-size:15px; margin-bottom:12px; outline:none;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.6), 0 0 10px rgba(157,78,221,0.16);
 }
-select.admin-select option {
-  background: #160d24;
-  color: #fff;
-}
-input:focus, select.admin-select:focus {
-  border-color: var(--accent-bright);
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.6), 0 0 14px rgba(199,125,255,0.45);
-}
+select.admin-select option { background: #160d24; color: #fff; }
 
 .vol-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(11, 6, 20, 0.9);
-  border: 1px solid rgba(199,125,255,0.45);
-  box-shadow: 0 0 10px rgba(157,78,221,0.3);
-  outline: none;
-  margin-top: 8px;
+  -webkit-appearance: none; appearance: none; width: 100%; height: 8px;
+  border-radius: 999px; background: rgba(11, 6, 20, 0.9);
+  border: 1px solid rgba(199,125,255,0.45); outline: none; margin-top: 8px;
 }
 .vol-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: linear-gradient(145deg, #fff, var(--accent-bright));
-  border: 2px solid var(--accent-dk);
-  box-shadow: 0 0 14px var(--accent);
-  cursor: pointer;
+  -webkit-appearance: none; appearance: none; width: 22px; height: 22px;
+  border-radius: 50%; background: linear-gradient(145deg, #fff, var(--accent-bright));
+  border: 2px solid var(--accent-dk); cursor: pointer;
 }
 
 .ny-toggle-row {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:10px 0;
-  font-size:13px;
-  font-weight:700;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 0; font-size:13px; font-weight:700;
 }
 .ny-toggle-btn {
-  padding:6px 12px;
-  border-radius:10px;
-  border:1px solid rgba(199,125,255,0.45);
-  background:rgba(11,6,20,0.85);
-  color:var(--dim);
-  font-size:11px;
-  font-weight:800;
-  cursor:pointer;
+  padding:6px 12px; border-radius:10px;
+  border:1px solid rgba(199,125,255,0.45); background:rgba(11,6,20,0.85);
+  color:var(--dim); font-size:11px; font-weight:800; cursor:pointer;
 }
 .ny-toggle-btn.on {
-  color:#04130d;
-  background:linear-gradient(145deg, #6ee7b7, #10b981);
-  border-color:#a7f3d0;
+  color:#04130d; background:linear-gradient(145deg, #6ee7b7, #10b981); border-color:#a7f3d0;
 }
 
 #toastContainer { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display:flex; flex-direction:column; gap:10px; pointer-events:none; width: 90%; max-width: 400px; }
 .toast {
-  background: linear-gradient(145deg, #ffffff, #f3e8ff);
-  color: #090510; padding: 12px 20px; border-radius: 14px;
-  font-weight: 800; font-size: 13px; text-align: center;
-  border: 1px solid var(--accent-bright);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.5), 0 0 18px rgba(199,125,255,0.65);
-  animation: fadeInOut 3s forwards;
+  background: linear-gradient(145deg, #ffffff, #f3e8ff); color: #090510;
+  padding: 12px 20px; border-radius: 14px; font-weight: 800; font-size: 13px;
+  text-align: center; border: 1px solid var(--accent-bright); animation: fadeInOut 3s forwards;
 }
 @keyframes fadeInOut { 0% { opacity: 0; transform: translateY(-10px); } 10% { opacity: 1; transform: translateY(0); } 90% { opacity: 1; } 100% { opacity: 0; } }
 
@@ -630,46 +556,38 @@ input:focus, select.admin-select:focus {
   background:linear-gradient(155deg, var(--card-2), var(--card));
   border:1px solid rgba(199,125,255,0.42); border-radius:17px;
   padding:11px 8px 9px; text-align:center;
-  box-shadow: 0 5px 0 #0b0514, 0 0 12px rgba(157,78,221,0.22);
 }
-.item.nft-item {
-  border-color: rgba(56, 189, 248, 0.72);
-  box-shadow: 0 5px 0 #0b0514, 0 0 14px rgba(56, 189, 248, 0.3);
-}
+.item.nft-item { border-color: rgba(56, 189, 248, 0.72); }
 .item .ii { height: 34px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; }
 .item .ii img { width:34px; height:34px; object-fit:contain; }
 .item .iname{font-size:10.5px; font-weight:700;}
 .item .iprice{color:var(--accent-bright); font-size:10.5px; font-weight:800; margin-top:2px;}
 .item button{
-  width:100%; padding:6px; border:none; border-radius:8px;
-  color:#090510; font-weight:800; margin-top:7px; cursor:pointer;
-  font-size:10px; background:linear-gradient(145deg, var(--accent-bright), var(--accent));
-  box-shadow: 0 3px 0 #4a148c;
+  width:100%; padding:6px; border:none; border-radius:8px; color:#090510;
+  font-weight:800; margin-top:7px; cursor:pointer; font-size:10px;
+  background:linear-gradient(145deg, var(--accent-bright), var(--accent));
 }
 
 .wallet-card, .settings-card {
   background:linear-gradient(155deg, var(--card-2), var(--card));
   border:1px solid rgba(199,125,255,0.48); border-radius:20px;
-  padding:18px; margin-bottom:15px;
-  box-shadow: var(--depth-shadow), var(--neon-border);
+  padding:18px; margin-bottom:15px; box-shadow: var(--depth-shadow), var(--neon-border);
 }
 .wallet-card h3, .settings-card h3 {
-  font-size:13.5px; font-weight:800; margin-bottom:12px;
-  color:var(--accent-bright); text-transform:uppercase; letter-spacing:0.8px;
-  text-shadow: 0 0 10px rgba(199,125,255,0.35);
+  font-size:13.5px; font-weight:800; margin-bottom:12px; color:var(--accent-bright);
+  text-transform:uppercase; letter-spacing:0.8px;
 }
 .admin-box {
   background:linear-gradient(155deg, var(--card-2), var(--card));
   padding:16px; border-radius:18px; margin-bottom:15px;
   border:1px solid rgba(199,125,255,0.48);
-  box-shadow: var(--depth-shadow), var(--neon-border);
 }
-.admin-box h3 { font-size:12.5px; color:var(--accent-bright); margin-bottom:11px; text-transform:uppercase; letter-spacing:0.8px; }
+.admin-box h3 { font-size:12.5px; color:var(--accent-bright); margin-bottom:11px; text-transform:uppercase; }
 .admin-box button {
   padding:11px; border:1px solid rgba(255,255,255,0.28); border-radius:12px;
   font-weight:800; cursor:pointer; color:#090510;
   background:linear-gradient(145deg, var(--accent-bright), var(--accent));
-  margin-top:6px; width:100%; box-shadow: 0 4px 0 #4a148c, 0 0 12px rgba(199,125,255,0.35);
+  margin-top:6px; width:100%;
 }
 </style>
 </head>
@@ -681,8 +599,9 @@ input:focus, select.admin-select:focus {
 <!-- ЭКРАН АВТОРИЗАЦИИ -->
 <div id="authScreen" class="page-screen active" style="justify-content:center; align-items:center; padding:20px;">
   <div style="text-align:center; margin-bottom:22px;">
-    <div class="logo-icon" style="margin:0 auto 12px; width:64px; height:64px; font-size:30px;">🎄</div>
-    <h1 style="font-size:30px; font-weight:900; text-transform:uppercase; text-shadow:0 4px 0 #2d0a4e, 0 0 18px rgba(199,125,255,0.45);">Tagen<span style="color:var(--accent-bright)">Game</span></h1>
+    <div class="logo-icon" style="margin:0 auto 12px; width:64px; height:64px; font-size:28px;">TG</div>
+    <h1 style="font-size:30px; font-weight:900; text-transform:uppercase;">Tagen<span style="color:var(--accent-bright)">Game</span></h1>
+    <div style="font-size:11px; color:var(--accent-bright); font-weight:800; letter-spacing:1.2px; margin-top:4px;">❄️ NEW YEAR CASINO ❄️</div>
   </div>
   <div style="width:100%; max-width:360px; background:linear-gradient(160deg, var(--card-2), var(--card)); padding:24px 20px; border-radius:24px; border:1px solid rgba(199,125,255,0.55); box-shadow:var(--depth-shadow), var(--neon-strong);">
     <h2 id="authTitle" style="text-align:center; margin-bottom:18px; font-size:18px; text-transform:uppercase; color:var(--accent-bright);">Вход</h2>
@@ -697,58 +616,71 @@ input:focus, select.admin-select:focus {
 <div id="screen-games" class="page-screen">
   <header>
     <div class="logo-container">
-      <div class="logo-icon">🎄</div>
+      <div class="logo-icon">TG</div>
       <div class="logo-text">
-        <div class="logo-title">Tagen<span>Game</span></div>
-        <div class="logo-sub">New Year Edition</div>
+        <div class="logo-title">TagenGame</div>
+        <div class="logo-sub">❄️ NEW YEAR CASINO ❄️</div>
       </div>
     </div>
     <div class="top-actions">
-      <div class="balance-pill" onclick="openProfile()"><span style="color:var(--accent-bright); text-shadow:0 0 8px var(--accent);">★</span> <span id="uiBalanceTop">0</span></div>
+      <div class="balance-pill" onclick="openProfile()"><span style="color:#facc15;">★</span> <span id="uiBalanceTop">100</span></div>
     </div>
   </header>
 
-  <div class="hero-banner">
-    <div class="hero-top-row">
-      <div class="hero-subtitle"><div class="online-dot"></div> ❄️ New Year Live</div>
-      <div class="ny-timer-pill" id="nyCountdown">🎅 До НГ: --:--:--</div>
+  <div class="ny-promo-banner">
+    <div class="ny-promo-left">
+      <div class="ny-promo-badge">🎄</div>
+      <div style="min-width:0;">
+        <div class="ny-promo-top">♥ С НОВЫМ ГОДОМ!</div>
+        <div class="ny-promo-sub">Праздничные кейсы ждут</div>
+      </div>
     </div>
-    <div class="hero-title">Лови куш<br><span>На максимуме</span></div>
+    <div class="ny-countdown-boxes">
+      <div class="ny-cd-unit"><div class="ny-cd-num" id="cdDays">38</div><div class="ny-cd-lbl">ДН</div></div>
+      <div class="ny-cd-unit"><div class="ny-cd-num" id="cdHours">00</div><div class="ny-cd-lbl">Ч</div></div>
+      <div class="ny-cd-unit"><div class="ny-cd-num" id="cdMins">53</div><div class="ny-cd-lbl">МИН</div></div>
+      <div class="ny-cd-unit"><div class="ny-cd-num" id="cdSecs">18</div><div class="ny-cd-lbl">СЕК</div></div>
+    </div>
+  </div>
+
+  <div class="hero-banner">
+    <div class="hero-subtitle"><div class="online-dot"></div> LIVE TABLE</div>
+    <div class="hero-title">ЛОВИ КУШ<br><span>НА МАКСИМУМЕ</span></div>
   </div>
 
   <div class="live-table-card">
     <div class="live-table-header">
-      <div class="live-tag">ДРОП ЛАЙВ</div>
-      <div class="live-status-pill" id="liveDropsCount">● Лента активна</div>
+      <div class="live-tag">❄️ ДРОП ЛАЙВ ❄️</div>
+      <div class="live-status-pill" id="liveDropsCount">• 4 событий</div>
     </div>
     <div class="live-feed-line">
       <div class="live-feed-track" id="liveFeedBar"></div>
     </div>
   </div>
 
-  <div class="section-title">Арсенал</div>
+  <div class="section-title">АРСЕНАЛ</div>
   <div class="arsenal-grid">
     <div class="arsenal-card" onclick="openGame('mines')">
       <div class="arsenal-badge">Минное поле</div>
-      <div class="arsenal-title">Мины</div>
+      <div class="arsenal-title">МИНЫ</div>
       <div class="arsenal-desc">Открывай кристаллы и забирай x</div>
       <div class="arsenal-icon-bg">💣</div>
     </div>
     <div class="arsenal-card" onclick="openGame('cases')">
       <div class="arsenal-badge">6 кейсов</div>
-      <div class="arsenal-title">Кейсы</div>
+      <div class="arsenal-title">КЕЙСЫ</div>
       <div class="arsenal-desc">Крути и забирай</div>
       <div class="arsenal-icon-bg">🎁</div>
     </div>
     <div class="arsenal-card" onclick="openGame('rocket')">
       <div class="arsenal-badge">Кэш до 5.00x</div>
-      <div class="arsenal-title">Ракетка</div>
+      <div class="arsenal-title">РАКЕТКА</div>
       <div class="arsenal-desc">Взлёт вверх и рост икса</div>
       <div class="arsenal-icon-bg">🚀</div>
     </div>
     <div class="arsenal-card" onclick="openGame('upgrade')">
       <div class="arsenal-badge">NFT + Предметы</div>
-      <div class="arsenal-title">Апгрейд</div>
+      <div class="arsenal-title">АПГРЕЙД</div>
       <div class="arsenal-desc">Повышай ставки и NFT</div>
       <div class="arsenal-icon-bg">⚡</div>
     </div>
@@ -769,8 +701,8 @@ input:focus, select.admin-select:focus {
       <div class="mines-stat"><div class="l">Множитель</div><div class="v" id="minesMultLbl">1.00x</div></div>
     </div>
 
-    <div id="minesSetup" style="background:linear-gradient(155deg, var(--card-2), var(--card)); padding:16px; border-radius:18px; border:1px solid rgba(199,125,255,0.45); margin-bottom:15px; box-shadow:var(--depth-shadow), var(--neon-border);">
-      <input type="number" id="minesBetInput" placeholder="Ставка (★)" value="100" min="10" style="background:rgba(11,6,20,0.85); margin-bottom:10px;">
+    <div id="minesSetup" style="background:linear-gradient(155deg, var(--card-2), var(--card)); padding:16px; border-radius:18px; border:1px solid rgba(199,125,255,0.45); margin-bottom:15px;">
+      <input type="number" id="minesBetInput" placeholder="Ставка (★)" value="100" min="10">
       <div style="display:flex; gap:6px; margin-bottom:12px;">
         <button class="btn-grey mine-pill-btn" data-mines="1" onclick="setMines(1)" style="padding:10px; flex:1;">1</button>
         <button class="btn-grey mine-pill-btn active" data-mines="3" onclick="setMines(3)" style="padding:10px; flex:1;">3</button>
@@ -894,7 +826,7 @@ input:focus, select.admin-select:focus {
             <div class="s-label">Ставка (★ / Предмет / NFT)</div>
             <div class="s-content" id="upgMyContent">Выбрать</div>
           </div>
-          <div style="display:flex; align-items:center; font-size:20px; color:var(--accent-bright); text-shadow:0 0 10px var(--accent);">➔</div>
+          <div style="display:flex; align-items:center; font-size:20px; color:var(--accent-bright);">➔</div>
           <div id="upgradeTargetSlot" class="slot-card" onclick="openTargetUpgradeSelect()">
             <div class="s-label">Получить</div>
             <div class="s-content" id="upgTargetContent">Выбрать</div>
@@ -902,8 +834,27 @@ input:focus, select.admin-select:focus {
         </div>
 
         <div class="items-grid" id="upgradeItemsGrid"></div>
-
         <button class="btn-main" id="btnDoUpgrade">Улучшить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ЧАТ -->
+<div id="screen-chat" class="page-screen">
+  <div class="game-header">
+    <div class="back-btn" onclick="switchTab('games')">←</div>
+    <div class="game-title-h1">Чат</div>
+  </div>
+  <div class="game-content">
+    <div class="chat-box">
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg"><span class="chat-msg-author">@tagen:</span> С наступающим! Крутим праздничные кейсы и ловим иксы 🎄</div>
+        <div class="chat-msg"><span class="chat-msg-author">@tgweb:</span> Лента дропов и новогодние эффекты запущены ❄️</div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="Написать сообщение...">
+        <button class="btn-main" id="btnSendChat">Отправить</button>
+      </div>
     </div>
   </div>
 </div>
@@ -977,8 +928,8 @@ input:focus, select.admin-select:focus {
       <button class="btn-grey" id="btnDownloadDB" style="width:100%; border-color:rgba(56,189,248,0.6); color:#7dd3fc;">🗄 Скачать БД (database.json)</button>
     </div>
 
-    <button class="btn-main" id="adminFromSettings" style="display:none; background:linear-gradient(145deg, #ffe066, var(--gold)); color:#090510; margin-bottom:11px; box-shadow:0 5px 0 #856404, 0 0 18px rgba(255,215,0,0.45);">🛡 Админ-панель</button>
-    <button class="btn-main" id="logoutBtn" style="background:linear-gradient(145deg, #f87171, var(--bad)); color:#fff; box-shadow:0 5px 0 #7f1d1d, 0 0 16px rgba(239,68,68,0.45);">Выйти</button>
+    <button class="btn-main" id="adminFromSettings" style="display:none; background:linear-gradient(145deg, #ffe066, var(--gold)); color:#090510; margin-bottom:11px;">🛡 Админ-панель</button>
+    <button class="btn-main" id="logoutBtn" style="background:linear-gradient(145deg, #f87171, var(--bad)); color:#fff;">Выйти</button>
 
     <div style="text-align:center; color:#6b7280; font-size:11px; margin-top:14px;">создано при помощи @tagen и @tgweb</div>
   </div>
@@ -993,10 +944,14 @@ input:focus, select.admin-select:focus {
   <div style="padding: 0 16px;" id="adminContent"></div>
 </div>
 
+<!-- ПЛАВАЮЩАЯ КНОПКА ПОДДЕРЖКИ -->
+<button type="button" class="support-fab" id="supportFabBtn" title="Поддержка">💬</button>
+
 <!-- НАВИГАЦИЯ -->
 <nav class="bottom-nav" id="bottomNav" style="display:none;">
   <button class="nav-item active" data-tab="games" onclick="switchTab('games')"><span class="ni">🏠</span>Главная</button>
   <button class="nav-item" data-tab="inventory" onclick="switchTab('inventory')"><span class="ni">🎒</span>Инвентарь</button>
+  <button class="nav-item" data-tab="chat" onclick="switchTab('chat')"><span class="ni">💬</span>Чат</button>
   <button class="nav-item" data-tab="wallet" onclick="switchTab('wallet')"><span class="ni">💼</span>Баланс</button>
   <button class="nav-item" data-tab="settings" onclick="switchTab('settings')"><span class="ni">⚙️</span>Настройки</button>
 </nav>
@@ -1005,13 +960,13 @@ input:focus, select.admin-select:focus {
 <div class="modal" id="profileModal">
   <div class="box" style="text-align:left;">
     <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px;">
-      <div style="width:70px; height:70px; background:var(--card-3); border:1px solid var(--accent); border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:900; color:var(--accent-bright); box-shadow:0 0 14px rgba(199,125,255,0.4);">T</div>
+      <div style="width:70px; height:70px; background:var(--card-3); border:1px solid var(--accent); border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:900; color:var(--accent-bright);">T</div>
       <div>
         <h2 id="profileName" style="font-size:20px; font-weight:900;">Игрок</h2>
         <div style="color:var(--dim); font-size:12px;">@user</div>
       </div>
       <div style="margin-left:auto; text-align:right;">
-        <div style="font-size:18px; font-weight:900; color:var(--accent-bright);" id="profileBalance">0 ★</div>
+        <div style="font-size:18px; font-weight:900; color:var(--accent-bright);" id="profileBalance">100 ★</div>
       </div>
     </div>
     <button class="btn-grey" onclick="closeModal('profileModal')" style="margin-top:20px; width:100%;">Закрыть</button>
@@ -1022,16 +977,13 @@ input:focus, select.admin-select:focus {
 <div class="modal" id="selectItemModal">
   <div class="box">
     <h3 style="margin-bottom:15px; text-align:center; text-transform:uppercase;" id="selectItemTitle">Выберите предмет</h3>
-
     <div id="mySelectOptions" style="display:flex; flex-direction:column; gap:10px; margin-bottom:15px;">
         <button class="btn-main" onclick="selectMyBet('stars')" style="padding:12px; font-size:14px;">★ Поставить Звёзды</button>
         <button class="btn-main" onclick="selectMyBet('items')" style="padding:12px; font-size:14px; background:linear-gradient(145deg, var(--card-3), var(--card-2)); color:#fff;">🎁 Предмет из инвентаря</button>
         <button class="btn-main" onclick="selectMyBet('nft')" style="padding:12px; font-size:14px; background:linear-gradient(145deg, #0284c7, #1e3a8a); color:#fff;">💎 Выбрать NFT</button>
     </div>
-
     <div id="myItemsList" style="display:none; grid-template-columns:repeat(auto-fill,minmax(82px,1fr)); gap:10px; max-height:50vh; overflow-y:auto; padding:5px;"></div>
     <div id="targetItemsList" style="display:none; grid-template-columns:repeat(auto-fill,minmax(82px,1fr)); gap:10px; max-height:50vh; overflow-y:auto; padding:5px;"></div>
-
     <button class="btn-grey" onclick="closeModal('selectItemModal')" style="margin-top:15px; padding:12px; width:100%;">Отмена</button>
   </div>
 </div>
@@ -1039,7 +991,7 @@ input:focus, select.admin-select:focus {
 <script>
 let currentUser = null;
 let authMode = 'login';
-let playerData = { balance: 0, inventory: [], is_admin: false, is_super_admin: false };
+let playerData = { balance: 100, inventory: [], is_admin: false, is_super_admin: false };
 let SERVER_ITEMS = [];
 let activeCaseData = { price: 0, caseId: '' };
 
@@ -1101,8 +1053,6 @@ async function apiPost(path, body){ return fetch(path, { method:'POST', headers:
 const $ = id => document.getElementById(id);
 
 function updateNyCountdown() {
-  const el = $('nyCountdown');
-  if (!el) return;
   const now = new Date();
   const targetYear = (now.getMonth() === 11 && now.getDate() === 31 && now.getHours() === 23 && now.getMinutes() === 59 && now.getSeconds() === 59)
     ? now.getFullYear()
@@ -1114,7 +1064,10 @@ function updateNyCountdown() {
   const mins = Math.floor((diff % 3600000) / 60000);
   const secs = Math.floor((diff % 60000) / 1000);
   const pad = n => String(n).padStart(2, '0');
-  el.textContent = `🎅 До НГ: ${days}д ${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+  if ($('cdDays')) $('cdDays').textContent = String(days);
+  if ($('cdHours')) $('cdHours').textContent = pad(hours);
+  if ($('cdMins')) $('cdMins').textContent = pad(mins);
+  if ($('cdSecs')) $('cdSecs').textContent = pad(secs);
 }
 
 const nyCanvas = $('nyEffectsCanvas');
@@ -1151,24 +1104,16 @@ function spawnFirework(cx, cy) {
   for (let i = 0; i < 22; i++) {
     const angle = (Math.PI * 2 * i) / 22 + (Math.random() - 0.5) * 0.2;
     const speed = 1.4 + Math.random() * 2.8;
-    sparks.push({
-      x, y,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      alpha: 1,
-      color
-    });
+    sparks.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, alpha: 1, color });
   }
 }
 
 function renderNyEffects(ts) {
   if (nyCtx && nyCanvas) {
     nyCtx.clearRect(0, 0, nyCanvas.width, nyCanvas.height);
-
     if (snowEnabled) {
       for (const f of snowflakes) {
-        f.x += f.vx;
-        f.y += f.vy;
+        f.x += f.vx; f.y += f.vy;
         if (f.y > nyCanvas.height) { f.y = -6; f.x = Math.random() * nyCanvas.width; }
         if (f.x > nyCanvas.width) f.x = 0;
         if (f.x < 0) f.x = nyCanvas.width;
@@ -1178,22 +1123,12 @@ function renderNyEffects(ts) {
         nyCtx.fill();
       }
     }
-
     if (fireworksEnabled) {
-      if (ts - lastFwTime > 3600) {
-        lastFwTime = ts;
-        spawnFirework();
-      }
+      if (ts - lastFwTime > 3600) { lastFwTime = ts; spawnFirework(); }
       for (let i = sparks.length - 1; i >= 0; i--) {
         const s = sparks[i];
-        s.x += s.vx;
-        s.y += s.vy;
-        s.vy += 0.04;
-        s.alpha -= 0.022;
-        if (s.alpha <= 0) {
-          sparks.splice(i, 1);
-          continue;
-        }
+        s.x += s.vx; s.y += s.vy; s.vy += 0.04; s.alpha -= 0.022;
+        if (s.alpha <= 0) { sparks.splice(i, 1); continue; }
         nyCtx.save();
         nyCtx.globalAlpha = Math.max(0, s.alpha);
         nyCtx.beginPath();
@@ -1210,14 +1145,8 @@ function renderNyEffects(ts) {
 function syncNyButtons() {
   const sBtn = $('btnToggleSnow');
   const fBtn = $('btnToggleFireworks');
-  if (sBtn) {
-    sBtn.textContent = snowEnabled ? 'Вкл' : 'Выкл';
-    sBtn.classList.toggle('on', snowEnabled);
-  }
-  if (fBtn) {
-    fBtn.textContent = fireworksEnabled ? 'Вкл' : 'Выкл';
-    fBtn.classList.toggle('on', fireworksEnabled);
-  }
+  if (sBtn) { sBtn.textContent = snowEnabled ? 'Вкл' : 'Выкл'; sBtn.classList.toggle('on', snowEnabled); }
+  if (fBtn) { fBtn.textContent = fireworksEnabled ? 'Вкл' : 'Выкл'; fBtn.classList.toggle('on', fireworksEnabled); }
 }
 
 function isNftItem(item) {
@@ -1246,7 +1175,7 @@ function renderFeedItems(list) {
   if (!bar) return;
 
   const items = Array.isArray(list) && list.length > 0 ? list : DEMO_FEED;
-  if (badge) badge.textContent = `● ${items.length} событий`;
+  if (badge) badge.textContent = `• ${items.length} событий`;
 
   const loopList = [...items.slice(0, 15), ...items.slice(0, 15)];
   bar.innerHTML = loopList.map(d => {
@@ -1322,6 +1251,33 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('tg_sfx_vol', String(sfxVolume));
       applyAudioVolumes();
     });
+  }
+
+  const supBtn = $('supportFabBtn');
+  if (supBtn) {
+    supBtn.addEventListener('click', () => {
+      toast('Поддержка в чате и @manto_rezka на связи', 'info');
+      switchTab('chat');
+    });
+  }
+
+  const sendChatBtn = $('btnSendChat');
+  const chatInput = $('chatInput');
+  if (sendChatBtn && chatInput) {
+    const postMsg = () => {
+      const txt = chatInput.value.trim();
+      if (!txt) return;
+      const box = $('chatMessages');
+      const div = document.createElement('div');
+      div.className = 'chat-msg';
+      div.innerHTML = `<span class="chat-msg-author">@${currentUser || 'player'}:</span> ${txt.replace(/</g, '&lt;')}`;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+      chatInput.value = '';
+      playSfx('click');
+    };
+    sendChatBtn.addEventListener('click', postMsg);
+    chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') postMsg(); });
   }
 
   checkLogin();
@@ -1778,9 +1734,7 @@ $('btnRocketAction').onclick = async () => {
       playSfx('coin');
       toast(`Забрано ${actualMult.toFixed(2)}x (+${data.win} ★) • Краш: ${actualCrash.toFixed(2)}x`, 'success');
       loadLiveDrops();
-      setTimeout(() => {
-        if (!rocketRunning) updateRocketVisual(1.0, 'idle');
-      }, 1800);
+      setTimeout(() => { if (!rocketRunning) updateRocketVisual(1.0, 'idle'); }, 1800);
     } catch (e) {
       rocketCashingOut = false;
       $('btnRocketAction').disabled = false;
@@ -1808,8 +1762,7 @@ $('btnRocketAction').onclick = async () => {
     rocketCashingOut = false;
     rocketStartTime = performance.now();
 
-    const shipEl = $('rocketShip');
-    shipEl.textContent = '🚀';
+    $('rocketShip').textContent = '🚀';
     updateRocketVisual(1.0, 'flying');
     playSfx('click');
 
@@ -1818,12 +1771,10 @@ $('btnRocketAction').onclick = async () => {
       const elapsedSec = (nowTs - rocketStartTime) / 1000;
       const nextMult = Number(Math.min(5.0, 1 + elapsedSec * 0.95 + Math.pow(elapsedSec, 1.35) * 0.14).toFixed(2));
       rocketCurrentMult = nextMult;
-
       if (rocketCurrentMult >= rocketTargetCrash) {
         resolveRocketCrashAtServer(rocketTargetCrash);
         return;
       }
-
       updateRocketVisual(rocketCurrentMult, 'flying');
       rocketRafId = requestAnimationFrame(tick);
     }
@@ -1835,10 +1786,7 @@ $('btnRocketAction').onclick = async () => {
 };
 
 function stopRocketLoop() {
-  if (rocketRafId) {
-    cancelAnimationFrame(rocketRafId);
-    rocketRafId = null;
-  }
+  if (rocketRafId) { cancelAnimationFrame(rocketRafId); rocketRafId = null; }
 }
 
 async function resolveRocketCrashAtServer(fallbackCrash) {
@@ -1848,8 +1796,7 @@ async function resolveRocketCrashAtServer(fallbackCrash) {
   try {
     const res = await apiPost('/api/games/rocket', { action: 'crash' });
     const data = await res.json();
-    const cp = data && data.crashPoint ? Number(data.crashPoint) : fallbackCrash;
-    triggerRocketCrash(cp);
+    triggerRocketCrash(data && data.crashPoint ? Number(data.crashPoint) : fallbackCrash);
   } catch (e) {
     triggerRocketCrash(fallbackCrash);
   }
@@ -1865,9 +1812,7 @@ function triggerRocketCrash(crashPoint) {
   renderRocketHistory();
   toast(`Ракета взорвалась на ${finalCrash.toFixed(2)}x!`, 'error');
   loadLiveDrops();
-  setTimeout(() => {
-    if (!rocketRunning) updateRocketVisual(1.0, 'idle');
-  }, 1600);
+  setTimeout(() => { if (!rocketRunning) updateRocketVisual(1.0, 'idle'); }, 1600);
 }
 
 let myUpgradeItem = null, targetUpgradeItem = null;
@@ -1902,9 +1847,7 @@ function selectMyBet(type) {
     const list = $('myItemsList');
     list.innerHTML = '';
     const allInv = Array.isArray(playerData.inventory) ? playerData.inventory : [];
-    const filtered = type === 'nft'
-      ? allInv.filter(item => isNftItem(item))
-      : allInv.filter(item => !isNftItem(item));
+    const filtered = type === 'nft' ? allInv.filter(item => isNftItem(item)) : allInv.filter(item => !isNftItem(item));
 
     if (filtered.length === 0) {
       list.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--dim);">${type === 'nft' ? 'У вас пока нет NFT в инвентаре' : 'В инвентаре нет обычных предметов'}</div>`;
@@ -2047,30 +1990,18 @@ $('btnDoUpgrade').onclick = async () => {
 
       const chanceDeg = (data.chance / 100) * 360;
       const gap = 360 - chanceDeg;
-      let targetAngle;
-      if (data.win) {
-        targetAngle = chanceDeg * 0.15 + Math.random() * chanceDeg * 0.7;
-      } else {
-        targetAngle = chanceDeg + gap * 0.1 + Math.random() * gap * 0.8;
-      }
-      const totalSpins = 360 * 5;
-      pointer.style.transform = `translate(-50%, -100%) rotate(${totalSpins + targetAngle}deg)`;
+      const targetAngle = data.win
+        ? chanceDeg * 0.15 + Math.random() * chanceDeg * 0.7
+        : chanceDeg + gap * 0.1 + Math.random() * gap * 0.8;
+      pointer.style.transform = `translate(-50%, -100%) rotate(${360 * 5 + targetAngle}deg)`;
 
       setTimeout(() => {
         $('btnDoUpgrade').disabled = false;
-        myUpgradeItem = null;
-        targetUpgradeItem = null;
-        myBetType = null;
-        $('upgMyContent').textContent = 'Выбрать';
-        $('upgTargetContent').textContent = 'Выбрать';
-
+        myUpgradeItem = null; targetUpgradeItem = null; myBetType = null;
+        $('upgMyContent').textContent = 'Выбрать'; $('upgTargetContent').textContent = 'Выбрать';
         pointer.classList.remove('spinning');
         pointer.style.transform = 'translate(-50%, -100%) rotate(0deg)';
-
-        updateUpgradeUI();
-        renderUpgradeGrid();
-        enterGame();
-        loadLiveDrops();
+        updateUpgradeUI(); renderUpgradeGrid(); enterGame(); loadLiveDrops();
 
         if (data.win) {
           playSfx('coin');

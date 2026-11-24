@@ -49,6 +49,7 @@ function buildUserRecord(login, password, balance = 5000, isSuperAdmin = false) 
     inventory: [],
     is_admin: Boolean(isSuperAdmin),
     is_super_admin: Boolean(isSuperAdmin),
+    is_banned: false,
     created_at: Date.now()
   };
 }
@@ -62,6 +63,9 @@ function ensureStaffAccounts(db) {
   for (const login of staff) {
     if (!db.users[login]) {
       db.users[login] = buildUserRecord(login, 'admin123', 5000, true);
+      changed = true;
+    } else if (typeof db.users[login].is_banned !== 'boolean') {
+      db.users[login].is_banned = false;
       changed = true;
     }
   }
@@ -82,7 +86,7 @@ function normalizeItemsCatalog(items) {
 }
 
 function createInitialDB() {
-  const db = {
+  return {
     users: {
       admin: buildUserRecord('admin', 'admin123', 5000, true),
       tagen: buildUserRecord('tagen', 'admin123', 5000, true),
@@ -106,7 +110,6 @@ function createInitialDB() {
     promos: {},
     logs: []
   };
-  return db;
 }
 
 function readDB() {
@@ -183,6 +186,9 @@ function requireAuth(req, res, next) {
   if (!user) {
     return res.status(401).json({ error: 'Требуется авторизация' });
   }
+  if (user.is_banned) {
+    return res.status(403).json({ error: 'Ваш аккаунт заблокирован' });
+  }
   req.db = db;
   req.user = user;
   next();
@@ -236,6 +242,9 @@ app.post('/api/login', (req, res) => {
     if (!user) {
       return res.status(401).json({ error: 'Неверный логин или пароль' });
     }
+    if (user.is_banned) {
+      return res.status(403).json({ error: 'Аккаунт заблокирован администратором' });
+    }
     const computed = hashPassword(password, user.salt || '');
     if (computed !== user.passwordHash) {
       return res.status(401).json({ error: 'Неверный логин или пароль' });
@@ -270,7 +279,8 @@ app.get('/api/user/:login', requireAuth, (req, res) => {
     balance: Number(target.balance) || 0,
     inventory: Array.isArray(target.inventory) ? target.inventory : [],
     is_admin: Boolean(target.is_admin),
-    is_super_admin: Boolean(target.is_super_admin)
+    is_super_admin: Boolean(target.is_super_admin),
+    is_banned: Boolean(target.is_banned)
   });
 });
 
@@ -290,12 +300,12 @@ app.get('/api/drops', (req, res) => {
 
 app.get('/api/news', (req, res) => {
   const db = readDB();
-  return res.json(db.news.slice(0, 20));
+  return res.json(db.news.slice(0, 30));
 });
 
 app.post('/api/admin/news', requireAuth, requireAdmin, (req, res) => {
   const title = String(req.body?.title || '').trim().slice(0, 80);
-  const text = String(req.body?.text || '').trim().slice(0, 400);
+  const text = String(req.body?.text || '').trim().slice(0, 500);
   if (!title || !text) {
     return res.status(400).json({ error: 'Заполните заголовок и текст новости' });
   }
@@ -306,7 +316,7 @@ app.post('/api/admin/news', requireAuth, requireAdmin, (req, res) => {
     author: req.user.login,
     created_at: Date.now()
   });
-  if (req.db.news.length > 30) req.db.news.length = 30;
+  if (req.db.news.length > 40) req.db.news.length = 40;
   addLog(req.db, req.user.login, 'ADD_NEWS', title);
   writeDB(req.db);
   return res.json({ ok: true });
@@ -315,6 +325,7 @@ app.post('/api/admin/news', requireAuth, requireAdmin, (req, res) => {
 app.post('/api/admin/news/delete', requireAuth, requireAdmin, (req, res) => {
   const id = String(req.body?.id || '');
   req.db.news = req.db.news.filter((n) => String(n.id) !== id);
+  addLog(req.db, req.user.login, 'DELETE_NEWS', id);
   writeDB(req.db);
   return res.json({ ok: true });
 });
@@ -351,7 +362,7 @@ app.post('/api/inventory/sell', requireAuth, (req, res) => {
 });
 
 /* ============================================================
-   CASES (90% дешевле цены кейса, ~10% дороже цены кейса)
+   CASES
    ============================================================ */
 app.post('/api/cases/open', requireAuth, (req, res) => {
   try {
@@ -436,7 +447,7 @@ app.post('/api/cases/open', requireAuth, (req, res) => {
 });
 
 /* ============================================================
-   MINES (сетка зависит от количества мин)
+   MINES
    ============================================================ */
 function getGridSizeByMines(minesCount) {
   const m = Math.max(1, Number(minesCount) || 1);
@@ -779,6 +790,7 @@ app.get('/api/admin/players', requireAuth, requireAdmin, (req, res) => {
     balance: Number(u.balance) || 0,
     is_admin: Boolean(u.is_admin),
     is_super_admin: Boolean(u.is_super_admin),
+    is_banned: Boolean(u.is_banned),
     nft_count: (u.inventory || []).filter((i) => i.is_nft || i.rarity === 'nft').length
   }));
   return res.json(list);
@@ -821,6 +833,35 @@ app.post('/api/admin/give-nft', requireAuth, requireAdmin, (req, res) => {
   addLog(req.db, req.user.login, 'GIVE_NFT', `${target.login}: ${item.name}`);
   writeDB(req.db);
   return res.json({ ok: true });
+});
+
+app.post('/api/admin/ban', requireAuth, requireAdmin, (req, res) => {
+  const target = req.db.users[String(req.body?.targetLogin || '').trim()];
+  const banned = Boolean(req.body?.banned);
+  if (!target) return res.status(404).json({ error: 'Игрок не найден' });
+  if (target.login === req.user.login) {
+    return res.status(400).json({ error: 'Нельзя заблокировать самого себя' });
+  }
+  if (target.is_super_admin && !req.user.is_super_admin) {
+    return res.status(403).json({ error: 'Недостаточно прав для блокировки супер-админа' });
+  }
+  target.is_banned = banned;
+  addLog(req.db, req.user.login, banned ? 'BAN_USER' : 'UNBAN_USER', target.login);
+  writeDB(req.db);
+  return res.json({ ok: true, is_banned: target.is_banned });
+});
+
+app.post('/api/admin/set-role', requireAuth, requireSuperAdmin, (req, res) => {
+  const target = req.db.users[String(req.body?.targetLogin || '').trim()];
+  const makeAdmin = Boolean(req.body?.is_admin);
+  if (!target) return res.status(404).json({ error: 'Игрок не найден' });
+  if (target.login === req.user.login && !makeAdmin) {
+    return res.status(400).json({ error: 'Нельзя снять админку с самого себя' });
+  }
+  target.is_admin = makeAdmin;
+  addLog(req.db, req.user.login, makeAdmin ? 'MAKE_ADMIN' : 'REMOVE_ADMIN', target.login);
+  writeDB(req.db);
+  return res.json({ ok: true, is_admin: target.is_admin });
 });
 
 app.get('/api/admin/deposits', requireAuth, requireSuperAdmin, (req, res) => {

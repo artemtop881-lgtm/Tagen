@@ -91,6 +91,15 @@ function createInitialDB() {
     sessions: {},
     items: DEFAULT_ITEMS.slice(),
     drops: [],
+    news: [
+      {
+        id: 'news_init_1',
+        title: '🎄 Новогоднее обновление!',
+        text: 'Добавлены праздничные кейсы, салюты при победе и зимнее оформление. Удачи в играх!',
+        author: 'admin',
+        created_at: Date.now()
+      }
+    ],
     chat: [],
     deposits: [],
     withdraws: [],
@@ -114,6 +123,7 @@ function readDB() {
       sessions: parsed.sessions || {},
       items: normalizeItemsCatalog(parsed.items),
       drops: Array.isArray(parsed.drops) ? parsed.drops : [],
+      news: Array.isArray(parsed.news) ? parsed.news : [],
       chat: Array.isArray(parsed.chat) ? parsed.chat : [],
       deposits: Array.isArray(parsed.deposits) ? parsed.deposits : [],
       withdraws: Array.isArray(parsed.withdraws) ? parsed.withdraws : [],
@@ -276,6 +286,37 @@ app.get('/api/items', (req, res) => {
 app.get('/api/drops', (req, res) => {
   const db = readDB();
   return res.json(db.drops.slice(0, 20));
+});
+
+app.get('/api/news', (req, res) => {
+  const db = readDB();
+  return res.json(db.news.slice(0, 20));
+});
+
+app.post('/api/admin/news', requireAuth, requireAdmin, (req, res) => {
+  const title = String(req.body?.title || '').trim().slice(0, 80);
+  const text = String(req.body?.text || '').trim().slice(0, 400);
+  if (!title || !text) {
+    return res.status(400).json({ error: 'Заполните заголовок и текст новости' });
+  }
+  req.db.news.unshift({
+    id: `news_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    title,
+    text,
+    author: req.user.login,
+    created_at: Date.now()
+  });
+  if (req.db.news.length > 30) req.db.news.length = 30;
+  addLog(req.db, req.user.login, 'ADD_NEWS', title);
+  writeDB(req.db);
+  return res.json({ ok: true });
+});
+
+app.post('/api/admin/news/delete', requireAuth, requireAdmin, (req, res) => {
+  const id = String(req.body?.id || '');
+  req.db.news = req.db.news.filter((n) => String(n.id) !== id);
+  writeDB(req.db);
+  return res.json({ ok: true });
 });
 
 /* ============================================================

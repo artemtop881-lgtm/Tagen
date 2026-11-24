@@ -65,20 +65,36 @@ header{display:flex;align-items:center;justify-content:space-between;padding:14p
 .online-dot{width:7px;height:7px;background:var(--cyan);border-radius:50%;box-shadow:0 0 8px var(--cyan),0 0 14px var(--cyan);animation:pulse 1.5s ease infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-/* Новостная лента */
+/* Новостная лента (карточка на главной и чат-окно новостей) */
 .news-feed-card{background:linear-gradient(155deg,#2b1846,#190e2b 58%,#120920);border-radius:24px;padding:16px;border:1.5px solid rgba(224,170,255,.65);margin-bottom:20px;position:relative;overflow:hidden;box-shadow:var(--depth-shadow),var(--neon-strong)}
-.news-feed-card::before{content:'';position:absolute;top:-45px;right:-35px;width:150px;height:150px;background:radial-gradient(circle,rgba(199,125,255,.34),transparent 70%);pointer-events:none}
 .news-feed-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .news-tag{background:linear-gradient(145deg,rgba(255,215,0,.25),rgba(199,125,255,.2));color:#fff;font-size:11px;font-weight:900;padding:5px 12px;border-radius:8px;border:1px solid rgba(255,215,0,.65);text-transform:uppercase;letter-spacing:1.2px;box-shadow:0 0 14px rgba(255,215,0,.35)}
 .news-status-pill{font-size:11px;font-weight:800;color:#7dd3fc;background:rgba(56,189,248,.14);border:1px solid rgba(56,189,248,.45);padding:4px 9px;border-radius:999px}
-.news-list{display:flex;flex-direction:column;gap:10px;max-height:220px;overflow-y:auto;padding-right:2px}
-.news-item{background:rgba(13,6,24,.88);border:1px solid rgba(199,125,255,.35);border-radius:14px;padding:11px 13px;animation:feedIn .35s ease}
+.news-list{display:flex;flex-direction:column;gap:10px;max-height:200px;overflow-y:auto;padding-right:2px}
+.news-item{background:rgba(13,6,24,.88);border:1px solid rgba(199,125,255,.35);border-radius:4px 16px 16px 16px;padding:11px 13px;animation:feedIn .35s ease}
 @keyframes feedIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .news-item-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:5px}
 .news-item-title{font-size:13.5px;font-weight:900;color:var(--gold-bright)}
 .news-item-date{font-size:10px;color:var(--dim);white-space:nowrap}
-.news-item-text{font-size:12px;color:#ede4ff;line-height:1.4}
+.news-item-text{font-size:12px;color:#ede4ff;line-height:1.45;word-wrap:break-word;overflow-wrap:anywhere}
 .news-item-del{background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.5);color:#fca5a5;border-radius:6px;padding:2px 6px;font-size:10px;font-weight:800;cursor:pointer;margin-left:6px}
+
+#screen-news{padding:0}
+.news-page{display:flex;flex-direction:column;height:100%;min-height:0;padding-bottom:84px}
+.news-page-header{display:flex;align-items:center;gap:12px;padding:15px 16px;flex-shrink:0;border-bottom:1px solid rgba(199,125,255,.25)}
+.news-readonly-pill{margin-left:auto;font-size:10.5px;font-weight:800;color:var(--gold-bright);background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.45);padding:4px 10px;border-radius:999px}
+.news-scroll{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-height:0}
+.news-msg-row{display:flex;gap:10px;align-items:flex-start;animation:chatIn .25s ease}
+.news-msg-avatar{width:34px;height:34px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;background:linear-gradient(145deg,var(--gold-bright),var(--gold-dk));color:#090510;box-shadow:0 0 12px rgba(255,215,0,.45)}
+.news-msg-body{flex:1;min-width:0}
+.news-msg-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;font-size:11px}
+.news-msg-author{font-weight:800;color:var(--gold-bright)}
+.news-msg-time{color:var(--dim);font-size:10px}
+.news-msg-bubble{background:rgba(32,19,52,.9);border:1px solid rgba(255,215,0,.35);border-radius:4px 16px 16px 16px;padding:10px 13px;word-wrap:break-word;overflow-wrap:anywhere}
+.news-msg-title{font-size:14px;font-weight:900;color:#fff;margin-bottom:4px}
+.news-msg-text{font-size:13px;color:#ede4ff;line-height:1.45}
+.news-admin-bar{padding:10px 12px;background:rgba(16,8,28,.95);border-top:1px solid rgba(199,125,255,.3);flex-shrink:0;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+.news-readonly-bar{padding:11px 14px;background:rgba(16,8,28,.95);border-top:1px solid rgba(199,125,255,.25);text-align:center;font-size:12px;color:var(--dim);flex-shrink:0;padding-bottom:calc(11px + env(safe-area-inset-bottom))}
 
 .section-title{font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:14px;color:var(--accent-bright);display:flex;align-items:center;gap:9px;text-shadow:0 0 12px rgba(199,125,255,.4)}
 .section-title::before{content:'';display:block;width:5px;height:17px;background:linear-gradient(180deg,var(--gold-bright),var(--accent-dk));border-radius:3px;box-shadow:0 0 10px var(--gold)}
@@ -159,11 +175,11 @@ header{display:flex;align-items:center;justify-content:space-between;padding:14p
 .nft-badge{display:inline-block;font-size:8.5px;font-weight:900;color:#7dd3fc;background:rgba(56,189,248,.16);border:1px solid rgba(56,189,248,.5);border-radius:5px;padding:1px 5px;text-transform:uppercase}
 .upg-chance-text{text-align:center;margin-bottom:12px;font-size:16px;font-weight:900;color:var(--dim)}
 .upg-chance-text span{color:var(--gold-bright);font-size:21px;text-shadow:0 0 12px rgba(255,215,0,.6)}
-.bottom-nav{position:fixed;left:10px;right:10px;bottom:8px;z-index:120;display:flex;justify-content:space-around;padding:9px 8px calc(9px + env(safe-area-inset-bottom));background:rgba(20,11,34,.92);backdrop-filter:blur(20px);border:1px solid rgba(199,125,255,.55);border-radius:22px;box-shadow:0 10px 28px rgba(0,0,0,.85),var(--neon-strong)}
-.nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:7px 10px;border-radius:15px;cursor:pointer;border:1px solid transparent;background:transparent;color:var(--dim);font-size:9.5px;font-weight:700;font-family:inherit;transition:all .15s;position:relative}
-.nav-item .ni{font-size:19px}
+.bottom-nav{position:fixed;left:8px;right:8px;bottom:8px;z-index:120;display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom));background:rgba(20,11,34,.94);backdrop-filter:blur(20px);border:1px solid rgba(199,125,255,.55);border-radius:22px;box-shadow:0 10px 28px rgba(0,0,0,.85),var(--neon-strong)}
+.nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 6px;border-radius:14px;cursor:pointer;border:1px solid transparent;background:transparent;color:var(--dim);font-size:8.8px;font-weight:700;font-family:inherit;transition:all .15s;position:relative;flex:1}
+.nav-item .ni{font-size:18px}
 .nav-item.active{color:var(--gold-bright);background:rgba(255,215,0,.12);border-color:rgba(255,215,0,.5);box-shadow:0 0 14px rgba(255,215,0,.35)}
-.nav-item .unread-badge{position:absolute;top:2px;right:6px;background:var(--bad);color:#fff;font-size:9px;font-weight:900;min-width:16px;height:16px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 0 8px var(--bad)}
+.nav-item .unread-badge{position:absolute;top:2px;right:4px;background:var(--bad);color:#fff;font-size:9px;font-weight:900;min-width:15px;height:15px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 3px;box-shadow:0 0 8px var(--bad)}
 .nav-item .unread-badge.show{display:flex;animation:bump .4s ease}
 @keyframes bump{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
 .btn-main{width:100%;padding:15px;border:1px solid rgba(255,255,255,.35);border-radius:16px;background:linear-gradient(145deg,var(--accent-bright),var(--accent));color:#090510;font-weight:900;font-size:14.5px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;box-shadow:0 5px 0 #4a148c,0 0 18px rgba(199,125,255,.45);transition:transform .12s,box-shadow .12s}
@@ -178,7 +194,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:14p
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .modal .box{background:linear-gradient(160deg,var(--card-2),var(--card));border:1px solid rgba(255,215,0,.5);border-radius:24px;padding:22px 18px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto;box-shadow:var(--depth-shadow),var(--gold-border);animation:slideUp .3s ease}
 @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
-input[type="text"],input[type="number"],input[type="password"],select.admin-select,textarea{width:100%;padding:13px 14px;background:rgba(11,6,20,.85);border:1px solid rgba(199,125,255,.42);border-radius:13px;color:#fff;font-size:15px;margin-bottom:12px;outline:none;box-shadow:inset 0 2px 6px rgba(0,0,0,.6),0 0 10px rgba(157,78,221,.16);font-family:inherit}
+input[type="text"],input[type="number"],input[type="password"],select.admin-select,textarea{width:100%;padding:12px 14px;background:rgba(11,6,20,.85);border:1px solid rgba(199,125,255,.42);border-radius:13px;color:#fff;font-size:15px;margin-bottom:10px;outline:none;box-shadow:inset 0 2px 6px rgba(0,0,0,.6),0 0 10px rgba(157,78,221,.16);font-family:inherit}
 select.admin-select option{background:#160d24;color:#fff}
 input:focus,select.admin-select:focus,textarea:focus{border-color:var(--gold-bright);box-shadow:inset 0 2px 6px rgba(0,0,0,.6),0 0 14px rgba(255,215,0,.45)}
 .vol-slider{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:999px;background:rgba(11,6,20,.9);border:1px solid rgba(199,125,255,.45);box-shadow:0 0 10px rgba(157,78,221,.3);outline:none;margin-top:8px}
@@ -202,6 +218,7 @@ input:focus,select.admin-select:focus,textarea:focus{border-color:var(--gold-bri
 .admin-box button{padding:11px;border:1px solid rgba(255,255,255,.28);border-radius:12px;font-weight:800;cursor:pointer;color:#090510;background:linear-gradient(145deg,var(--gold-bright),var(--gold));margin-top:6px;width:100%;box-shadow:0 4px 0 var(--gold-dk),0 0 12px rgba(255,215,0,.35)}
 .admin-box button.danger{background:linear-gradient(145deg,#f87171,var(--bad));color:#fff;box-shadow:0 4px 0 #7f1d1d,0 0 12px rgba(239,68,68,.4)}
 .admin-box button.success{background:linear-gradient(145deg,#6ee7b7,var(--ok));color:#04130d;box-shadow:0 4px 0 #065f46,0 0 12px rgba(16,185,129,.4)}
+.admin-box button.mini-btn{width:auto;padding:6px 10px;margin-top:0;font-size:11px;border-radius:8px;box-shadow:none}
 /* CHAT */
 #screen-chat{padding:0}
 .chat-page{display:flex;flex-direction:column;height:100%;min-height:0;padding-bottom:82px}
@@ -235,11 +252,14 @@ input:focus,select.admin-select:focus,textarea:focus{border-color:var(--gold-bri
 .floating-chat-btn:active{transform:translateY(3px)}
 .floating-chat-btn .unread-badge{position:absolute;top:-4px;right:-4px;background:var(--bad);color:#fff;font-size:11px;font-weight:900;min-width:20px;height:20px;border-radius:10px;display:none;align-items:center;justify-content:center;padding:0 5px;border:2px solid var(--bg)}
 .floating-chat-btn .unread-badge.show{display:flex;animation:bump .4s ease}
-.admin-user-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(199,125,255,.15);font-size:12px}
+.admin-user-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid rgba(199,125,255,.15);font-size:12px;flex-wrap:wrap}
 .admin-user-row:last-child{border-bottom:none}
+.admin-user-info{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.admin-user-actions{display:flex;gap:6px;flex-wrap:wrap}
 .admin-user-badge{font-size:9px;font-weight:800;padding:2px 6px;border-radius:5px}
 .admin-user-badge.super{background:rgba(255,215,0,.2);color:var(--gold-bright)}
 .admin-user-badge.admin{background:rgba(199,125,255,.2);color:var(--accent-bright)}
+.admin-user-badge.banned{background:rgba(239,68,68,.25);color:#fca5a5}
 @media (max-width:380px){
   .hero-title{font-size:36px}
   .hero-title span{font-size:40px}
@@ -248,8 +268,8 @@ input:focus,select.admin-select:focus,textarea:focus{border-color:var(--gold-bri
   .ny-cd-num{font-size:20px}
   .ny-cd-lbl{font-size:9px}
   .arsenal-title{font-size:18px}
-  .nav-item{padding:6px 6px;font-size:8.5px}
-  .nav-item .ni{font-size:17px}
+  .nav-item{padding:6px 2px;font-size:8px}
+  .nav-item .ni{font-size:16px}
 }
 .loading-spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--gold-bright);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -348,6 +368,28 @@ input:focus,select.admin-select:focus,textarea:focus{border-color:var(--gold-bri
       <div class="arsenal-title">Апгрейд</div>
       <div class="arsenal-desc">Повышай ставки и NFT</div>
       <div class="arsenal-icon-bg">⚡</div>
+    </div>
+  </div>
+</div>
+
+<!-- NEWS CHANNEL SCREEN (CHAT-LIKE FEED, READ-ONLY FOR PLAYERS) -->
+<div id="screen-news" class="page-screen">
+  <div class="news-page">
+    <div class="news-page-header">
+      <div class="back-btn" onclick="switchTab('games')">←</div>
+      <div class="game-title-h1" style="font-size:19px;">📰 Новости</div>
+      <div class="news-readonly-pill">🔒 Только чтение</div>
+    </div>
+    <div class="news-scroll" id="newsChannelScroll"><div class="chat-empty">Загрузка новостей...</div></div>
+    <div id="newsAdminPublishBar" class="news-admin-bar" style="display:none;">
+      <input type="text" id="chanNewsTitle" placeholder="Заголовок новости..." maxlength="80" style="margin-bottom:8px;padding:10px 12px;font-size:14px;">
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="chanNewsText" placeholder="Текст новости для игроков..." maxlength="500" style="margin-bottom:0;flex:1;padding:10px 12px;font-size:14px;">
+        <button class="chat-send-btn" id="chanNewsSend" title="Опубликовать">📢</button>
+      </div>
+    </div>
+    <div id="newsPlayerReadonlyBar" class="news-readonly-bar">
+      Публиковать новости могут только администраторы. Писать в эту ленту нельзя.
     </div>
   </div>
 </div>
@@ -573,6 +615,7 @@ input:focus,select.admin-select:focus,textarea:focus{border-color:var(--gold-bri
 <!-- NAV -->
 <nav class="bottom-nav" id="bottomNav" style="display:none;">
   <button class="nav-item active" data-tab="games" onclick="switchTab('games')"><span class="ni">🏠</span>Главная</button>
+  <button class="nav-item" data-tab="news" onclick="switchTab('news')"><span class="ni">📰</span>Новости</button>
   <button class="nav-item" data-tab="inventory" onclick="switchTab('inventory')"><span class="ni">🎒</span>Инвентарь</button>
   <button class="nav-item" data-tab="chat" onclick="switchTab('chat')"><span class="ni">💬</span>Чат<span class="unread-badge" id="chatUnreadBadgeNav">0</span></button>
   <button class="nav-item" data-tab="wallet" onclick="switchTab('wallet')"><span class="ni">💼</span>Баланс</button>
@@ -629,7 +672,7 @@ const ITEMS_CATALOG_FALLBACK = [
 
 let currentUser = null;
 let authMode = 'login';
-let playerData = { balance: 0, inventory: [], is_admin: false, is_super_admin: false };
+let playerData = { balance: 0, inventory: [], is_admin: false, is_super_admin: false, is_banned: false };
 let SERVER_ITEMS = ITEMS_CATALOG_FALLBACK.slice();
 let activeCaseData = { price: 0, caseId: '' };
 
@@ -685,6 +728,7 @@ const DEMO_NEWS = [
     id: 'demo_1',
     title: '🎄 Новогодний сезон открыт!',
     text: 'Крутите кейсы, запускайте ракетку до 5.00x и улучшайте NFT-предметы.',
+    author: 'admin',
     created_at: Date.now()
   }
 ];
@@ -692,24 +736,58 @@ const DEMO_NEWS = [
 function renderNewsItems(list) {
   const box = $('newsFeedList');
   const badge = $('newsCountBadge');
-  if (!box) return;
+  const chanBox = $('newsChannelScroll');
   const items = Array.isArray(list) && list.length > 0 ? list : DEMO_NEWS;
-  if (badge) badge.textContent = `● ${items.length} новост${items.length === 1 ? 'ь' : (items.length < 5 ? 'и' : 'ей')}`;
   const isAdm = !!(playerData.is_admin || playerData.is_super_admin);
 
-  box.innerHTML = items.map(n => {
-    const dt = new Date(n.created_at || Date.now()).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-    const delBtn = (isAdm && !String(n.id).startsWith('demo_'))
-      ? `<button class="news-item-del" onclick="deleteNewsItem('${escapeHtml(String(n.id))}')">✕</button>`
-      : '';
-    return `<div class="news-item">
-      <div class="news-item-top">
-        <div class="news-item-title">${escapeHtml(n.title || 'Новость')}</div>
-        <div style="display:flex;align-items:center;"><span class="news-item-date">${dt}</span>${delBtn}</div>
-      </div>
-      <div class="news-item-text">${escapeHtml(n.text || '')}</div>
-    </div>`;
-  }).join('');
+  if (badge) {
+    badge.textContent = `● ${items.length} новост${items.length === 1 ? 'ь' : (items.length < 5 ? 'и' : 'ей')}`;
+  }
+
+  if (box) {
+    box.innerHTML = items.slice(0, 8).map(n => {
+      const dt = new Date(n.created_at || Date.now()).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+      const delBtn = (isAdm && !String(n.id).startsWith('demo_'))
+        ? `<button class="news-item-del" onclick="deleteNewsItem('${escapeHtml(String(n.id))}')">✕</button>`
+        : '';
+      return `<div class="news-item">
+        <div class="news-item-top">
+          <div class="news-item-title">${escapeHtml(n.title || 'Новость')}</div>
+          <div style="display:flex;align-items:center;"><span class="news-item-date">${dt}</span>${delBtn}</div>
+        </div>
+        <div class="news-item-text">${escapeHtml(n.text || '')}</div>
+      </div>`;
+    }).join('');
+  }
+
+  if (chanBox) {
+    chanBox.innerHTML = items.map(n => {
+      const dt = new Date(n.created_at || Date.now()).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+      const delBtn = (isAdm && !String(n.id).startsWith('demo_'))
+        ? `<button class="news-item-del" onclick="deleteNewsItem('${escapeHtml(String(n.id))}')">✕</button>`
+        : '';
+      return `<div class="news-msg-row">
+        <div class="news-msg-avatar">📣</div>
+        <div class="news-msg-body">
+          <div class="news-msg-meta">
+            <span class="news-msg-author">${escapeHtml(n.author || 'admin')}</span>
+            <div style="display:flex;align-items:center;"><span class="news-msg-time">${dt}</span>${delBtn}</div>
+          </div>
+          <div class="news-msg-bubble">
+            <div class="news-msg-title">${escapeHtml(n.title || 'Новость')}</div>
+            <div class="news-msg-text">${escapeHtml(n.text || '')}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  if ($('newsAdminPublishBar')) {
+    $('newsAdminPublishBar').style.display = isAdm ? 'block' : 'none';
+  }
+  if ($('newsPlayerReadonlyBar')) {
+    $('newsPlayerReadonlyBar').style.display = isAdm ? 'none' : 'block';
+  }
 }
 
 async function loadNewsFeed() {
@@ -1028,6 +1106,8 @@ async function enterGame() {
       Chat.isAdmin = !!(playerData.is_admin || playerData.is_super_admin);
       Chat.start();
     } else {
+      const errData = await res.json().catch(() => ({}));
+      if (res.status === 403 && errData.error) toast(errData.error, 'error');
       localStorage.removeItem('saved_user');
       localStorage.removeItem('auth_token');
       location.reload();
@@ -1060,7 +1140,7 @@ function switchTab(tabId) {
   if (target) target.classList.add('active');
   const navBtn = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
   if (navBtn) navBtn.classList.add('active');
-  if (tabId === 'games') loadNewsFeed();
+  if (tabId === 'games' || tabId === 'news') loadNewsFeed();
   if (tabId === 'admin') renderAdminUI();
   if (tabId === 'inventory') renderInventory();
   if (tabId === 'chat') { Chat.clearUnread(); Chat.load().then(() => { const b = $('chatScroll'); if (b) b.scrollTop = b.scrollHeight; }); }
@@ -1618,7 +1698,7 @@ $('btnWalletWithdraw').onclick = async () => {
   } catch (e) { toast(e.message, 'error'); }
 };
 
-/* SETTINGS & CHAT INPUTS */
+/* SETTINGS, NEWS CHANNEL & CHAT INPUTS */
 $('bgmVolumeSlider').addEventListener('input', e => {
   bgmVolume = Math.max(0, Math.min(1, Number(e.target.value) / 100));
   localStorage.setItem('tg_bgm_vol', String(bgmVolume));
@@ -1646,6 +1726,30 @@ $('toggleFireworksBtn').onclick = () => {
   syncNyButtons();
   if (fireworksEnabled) launchFireworks();
 };
+
+async function publishNewsPayload(title, text) {
+  if (!title || !text) return toast('Введите заголовок и текст новости', 'error');
+  const res = await apiPost('/api/admin/news', { title, text });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) return toast(data.error || 'Ошибка публикации', 'error');
+  toast('Новость опубликована', 'success');
+  await loadNewsFeed();
+  if ($('screen-admin').classList.contains('active')) renderAdminUI();
+}
+
+$('chanNewsSend').onclick = async () => {
+  const title = $('chanNewsTitle').value.trim();
+  const text = $('chanNewsText').value.trim();
+  await publishNewsPayload(title, text);
+  if (title && text) {
+    $('chanNewsTitle').value = '';
+    $('chanNewsText').value = '';
+  }
+};
+$('chanNewsText').addEventListener('keydown', e => {
+  if (e.key === 'Enter') $('chanNewsSend').click();
+});
+
 $('chatPageSend').onclick = () => Chat.send();
 $('chatPageInput').addEventListener('keydown', e => { if (e.key === 'Enter') Chat.send(); });
 $('chatFileBtn').onclick = () => $('chatFileInput').click();
@@ -1671,15 +1775,28 @@ async function renderAdminUI() {
       return;
     }
     const players = await res.json();
+    const isSuper = Boolean(playerData.is_super_admin);
     const optionsHtml = (Array.isArray(players) ? players : [])
-      .map(p => `<option value="${escapeHtml(p.login)}">${escapeHtml(p.login)} (${p.balance} ★)</option>`).join('');
+      .map(p => `<option value="${escapeHtml(p.login)}">${escapeHtml(p.login)} (${p.balance} ★)${p.is_banned ? ' [БАН]' : ''}</option>`).join('');
 
     box.innerHTML = `
       <div class="admin-box">
         <h3>📰 Опубликовать новость</h3>
         <input type="text" id="admNewsTitle" placeholder="Заголовок новости" maxlength="80">
-        <textarea id="admNewsText" placeholder="Текст новости..." rows="3" maxlength="400"></textarea>
+        <textarea id="admNewsText" placeholder="Текст новости..." rows="3" maxlength="500"></textarea>
         <button class="success" onclick="adminPublishNews()">Опубликовать</button>
+      </div>
+      <div class="admin-box">
+        <h3>🔨 Блокировка аккаунтов и права админа</h3>
+        <select id="admManageUser" class="admin-select">${optionsHtml}</select>
+        <div style="display:flex;gap:8px;margin-bottom:6px;">
+          <button class="danger" onclick="adminToggleBan(true)">Заблокировать</button>
+          <button class="success" onclick="adminToggleBan(false)">Разблокировать</button>
+        </div>
+        ${isSuper ? `<div style="display:flex;gap:8px;">
+          <button onclick="adminSetRole(true)">Выдать админку</button>
+          <button class="danger" onclick="adminSetRole(false)">Снять админку</button>
+        </div>` : `<div style="font-size:11px;color:var(--dim);margin-top:4px;">Выдача/снятие прав админа доступна главному администратору.</div>`}
       </div>
       <div class="admin-box">
         <h3>⭐ Выдать / снять звёзды</h3>
@@ -1698,12 +1815,21 @@ async function renderAdminUI() {
       </div>
       <div class="admin-box">
         <h3>👥 Игроки (${players.length})</h3>
-        ${players.map(p => `<div class="admin-user-row">
-          <strong>${escapeHtml(p.login)}</strong>
-          <span>${p.balance} ★</span>
-          <span style="color:#7dd3fc;">NFT: ${p.nft_count || 0}</span>
-          ${p.is_super_admin ? '<span class="admin-user-badge super">SUPER</span>' : (p.is_admin ? '<span class="admin-user-badge admin">ADMIN</span>' : '')}
-        </div>`).join('')}
+        ${players.map(p => {
+          const isSelf = p.login === currentUser;
+          const banBtn = !isSelf ? `<button class="mini-btn ${p.is_banned ? 'success' : 'danger'}" onclick="quickBan('${escapeHtml(p.login)}', ${!p.is_banned})">${p.is_banned ? 'Разбан' : 'Бан'}</button>` : '';
+          const roleBtn = (isSuper && !isSelf) ? `<button class="mini-btn" onclick="quickSetRole('${escapeHtml(p.login)}', ${!p.is_admin})">${p.is_admin ? '−Админ' : '+Админ'}</button>` : '';
+          return `<div class="admin-user-row">
+            <div class="admin-user-info">
+              <strong>${escapeHtml(p.login)}</strong>
+              <span>${p.balance} ★</span>
+              <span style="color:#7dd3fc;">NFT: ${p.nft_count || 0}</span>
+              ${p.is_super_admin ? '<span class="admin-user-badge super">SUPER</span>' : (p.is_admin ? '<span class="admin-user-badge admin">ADMIN</span>' : '')}
+              ${p.is_banned ? '<span class="admin-user-badge banned">БАН</span>' : ''}
+            </div>
+            <div class="admin-user-actions">${banBtn}${roleBtn}</div>
+          </div>`;
+        }).join('')}
       </div>
     `;
   } catch (e) {
@@ -1713,14 +1839,33 @@ async function renderAdminUI() {
 async function adminPublishNews() {
   const title = $('admNewsTitle').value.trim();
   const text = $('admNewsText').value.trim();
-  if (!title || !text) return toast('Введите заголовок и текст', 'error');
-  const res = await apiPost('/api/admin/news', { title, text });
+  await publishNewsPayload(title, text);
+  if (title && text) {
+    $('admNewsTitle').value = '';
+    $('admNewsText').value = '';
+  }
+}
+async function adminToggleBan(banned) {
+  const targetLogin = $('admManageUser').value;
+  await quickBan(targetLogin, banned);
+}
+async function quickBan(targetLogin, banned) {
+  const res = await apiPost('/api/admin/ban', { targetLogin, banned });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) return toast(data.error || 'Ошибка', 'error');
-  $('admNewsTitle').value = '';
-  $('admNewsText').value = '';
-  toast('Новость опубликована', 'success');
-  loadNewsFeed();
+  toast(banned ? `Аккаунт ${targetLogin} заблокирован` : `Аккаунт ${targetLogin} разблокирован`, 'success');
+  renderAdminUI();
+}
+async function adminSetRole(isAdminRole) {
+  const targetLogin = $('admManageUser').value;
+  await quickSetRole(targetLogin, isAdminRole);
+}
+async function quickSetRole(targetLogin, isAdminRole) {
+  const res = await apiPost('/api/admin/set-role', { targetLogin, is_admin: isAdminRole });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) return toast(data.error || 'Ошибка', 'error');
+  toast(isAdminRole ? `Права админа выданы: ${targetLogin}` : `Права админа сняты: ${targetLogin}`, 'success');
+  renderAdminUI();
 }
 async function adminStarsAction(mode) {
   const targetLogin = $('admTargetUser').value;
